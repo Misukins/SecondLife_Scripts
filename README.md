@@ -1,0 +1,2 @@
+# SecondLife_Scripts
+ allMySLScripts
