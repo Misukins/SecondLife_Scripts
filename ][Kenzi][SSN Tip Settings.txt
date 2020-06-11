@@ -1,0 +1,77 @@
+#CLUBOWNER #1 UUID(if no managers keep / add NULL_KEY) JUST FOR PERSONAL USE
+92d7a0cf-dbd1-44d1-b4ba-cc495767187a
+
+#MANAGER #1 UUID(if no managers keep / add NULL_KEY)
+92d7a0cf-dbd1-44d1-b4ba-cc495767187a
+
+#MANAGER #2 UUID (if no managers keep / add NULL_KEY)
+33bc8e04-00ff-4279-9873-928fbe945028
+
+#MANAGER #3 UUID (if no managers keep / add NULL_KEY)
+e8d67050-5b01-4ce6-898a-4d6997cca0e9
+
+#MANAGER #4 UUID (if no managers keep / add NULL_KEY)
+9b6a3800-ccd2-4092-bb93-e3e4e2571306
+
+#MANAGER #5 UUID (if no managers keep / add NULL_KEY)
+1ffac40f-b1ea-41f9-b576-1993b96e36b2
+
+#MANAGER #6 UUID (if no managers keep / add NULL_KEY)
+acba22c8-59e4-48fc-80cd-39c6a6373876
+
+#BLANK TEXTURE (when not in use Logo UUID)
+ce7cceaf-0fcd-db22-bfd9-ee090ede33f7
+
+#Split (0.2 = user will get 20%....0.6 = user will get 60%....1.0 = user will get 100%... ) owner gets what is left after split. ((Default: ClubOwner get's 20%) DO NOT USE 0.0 or 1.0)
+0.8
+
+#this will show when logged in before users name (Dancer, Host, Dj. anything you want)
+ღ Sexy Spade Nation ღ
+
+#title when not in use
+! Not in Use !
+
+#Tip button #1 (this is the same as minimum tip)
+20
+
+#Tip button #2
+50
+
+#Tip button #3
+100
+
+#Tip button #4
+200
+
+#TextColor =)
+<0.65, 1.0, 0.65>
+
+#Welcome Message (Welcome <USER (realname)>) is hard coded,
+you are now signed in to receive tips. Please remember to sign out before leaving. (Right click this board and (Touch))
+
+#Logout message (<USER (realname)>) is hard coded
+you are now signed out. Have a nice day.
+
+#KickMessage (Hey <USER (realname)>) is hard coded
+You just got kicked out of the podium. !RESPECT THE RULES!
+
+#DisplayLink-Num: (means the link number where users profile picture should be)
+2
+
+#Particle TEXTURE (UUID)
+e26260df-9989-0fa0-a9ee-d90da7c6f60b
+
+#particle_texture2 (UUID)
+e79f4f50-ff03-5b67-dfd6-bf22fab120ae
+
+#particleTarget (1 = TRUE / 0 = FALSE)
+0
+
+#ParticleOn (1 = TRUE / 0 = FALSE)
+1
+
+#AutoRespondOn (1 = TRUE / 0 = FALSE)
+1
+
+#SoundsOn (1 = TRUE / 0 = FALSE)
+0

@@ -1,0 +1,14 @@
+#Locations ["", <0.0,0.0,.0.0>,] | location_list
+"Home",<17.25929, 229.63203, 3604.48389>,
+"SSN Club",<99.98943, 215.52785, 2250.86157>,
+"Beach",<68.72098, 224.32222, 34.71979>,
+"Kristel/Chu",<103.96355, 192.07005, 3997.63696>
+
+#Hover Text | text
+Touch To Teleport
+
+#Hover Text Color | text_color
+<1.0,1.0,1.0>
+
+#Menu Message | menu_message
+Select location:

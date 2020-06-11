@@ -1,0 +1,20 @@
+#User 1 UUID#
+92d7a0cf-dbd1-44d1-b4ba-cc495767187a
+
+#User 2 UUID#
+076144a2-875c-4448-b0e2-ae7e4fa328d4
+
+#User 3 UUID#
+c59fc9b2-d7fc-49ee-a6eb-eae45f3f5761
+
+#IM Channel for User 1#
+40
+
+#IM Channel for User 2#
+41
+
+#IM Channel for User 3#
+42
+
+#Blank Texture#
+f5514051-f0a4-df60-a73c-0a91f5492b1f
