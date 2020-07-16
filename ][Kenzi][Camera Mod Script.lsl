@@ -14,6 +14,20 @@ integer childcamOn          = FALSE;
 integer petitecamOn         = FALSE;
 integer cinematiccamOn      = FALSE;
 integer sitcamOn            = FALSE;
+//integer sitOverride         = FALSE;
+
+integer DEBUG               = TRUE;
+
+debug(string message)
+{
+    if(DEBUG == TRUE)
+        llOwnerSay("[DEBUG] " + message);
+}
+
+info(string message)
+{
+    llOwnerSay("[INFO] " + message);
+}
 
 menu(key id)
 {
@@ -71,7 +85,7 @@ off_cam(key agent)
 {
     llSetLinkColor(LINK_THIS, _redState, ALL_SIDES);
     llPlaySound(_sound_off, 0.4);
-    llOwnerSay("Camera Mod Disabled.");
+    info("Camera Mod Disabled.");
     llSetCameraParams([CAMERA_ACTIVE, 0]);
     llReleaseCamera(agent);
     cameraOn = FALSE;
@@ -82,7 +96,7 @@ cinematic_cam()
     vector camPos = llGetPos();
     vector camFocus = llGetPos();
     llSetLinkColor(LINK_THIS, _greenState, ALL_SIDES);
-    llOwnerSay("Cinematic Camera Enabled.");
+    info("Cinematic Camera Enabled.");
     default_cam();
     llSetCameraParams([
         CAMERA_ACTIVE, 1,
@@ -103,7 +117,7 @@ cinematic_cam()
 adult_cam()
 {
     llSetLinkColor(LINK_THIS, _greenState, ALL_SIDES);
-    llOwnerSay("Adult Camera Enabled.");
+    info("Adult Camera Enabled.");
     default_cam();
     llSetCameraParams([
         CAMERA_ACTIVE, 1,
@@ -131,7 +145,7 @@ adult_cam()
 teen_cam()
 {
     llSetLinkColor(LINK_THIS, _greenState, ALL_SIDES);
-    llOwnerSay("Teen Camera Enabled.");
+    info("Teen Camera Enabled.");
     default_cam();
     llSetCameraParams([
         CAMERA_ACTIVE, 1,
@@ -159,7 +173,7 @@ teen_cam()
 child_cam()
 {
     llSetLinkColor(LINK_THIS, _greenState, ALL_SIDES);
-    llOwnerSay("Child Camera Enabled.");
+    info("Child Camera Enabled.");
     default_cam();
     llSetCameraParams([
         CAMERA_ACTIVE, 1,
@@ -187,7 +201,7 @@ child_cam()
 petite_cam()
 {
     llSetLinkColor(LINK_THIS, _greenState, ALL_SIDES);
-    llOwnerSay("Petite Camera Enabled.");
+    info("Petite Camera Enabled.");
     default_cam();
     llSetCameraParams([
         CAMERA_ACTIVE, 1,
@@ -212,10 +226,19 @@ petite_cam()
     cinematiccamOn  = FALSE;
 }
 
+sitting()
+{
+    string curAnimState = llGetAnimation(llGetOwner());
+    if (curAnimState == "Sitting"){
+        debug("Sitting");
+        sit_cam();
+    }
+}
+
 sit_cam()
 {
     llSetLinkColor(LINK_THIS, _redState, ALL_SIDES);
-    llOwnerSay("Sitting Camera Enabled.");
+    info("Sitting Camera Enabled.");
     default_cam();
     llSetCameraParams([
         CAMERA_ACTIVE, 1,
@@ -242,7 +265,7 @@ sit_cam()
 
 reset_cam()
 {
-    llOwnerSay("Camera Reset.");
+    info("Camera Reset.");
     llResetScript();
 }
 
@@ -250,6 +273,7 @@ default
 {
     state_entry()
     {
+
         llSetLinkColor(LINK_THIS, _redState, ALL_SIDES);
         llSitTarget(<0.0, 0.0, 0.1>, ZERO_ROTATION);
         llPreloadSound(_sound_on);
@@ -367,4 +391,19 @@ default
                 off_cam(agent);
         }
     }
+
+    /*
+    timer()
+    {
+        string curAnimState = llGetAnimation(llGetOwner());
+        if (curAnimState == "Sitting") {
+            sitOverride = TRUE;
+            if (sitOverride) {
+                sitting();
+            }
+        }
+        else
+            sitOverride = FALSE;
+    }
+    */
 }
