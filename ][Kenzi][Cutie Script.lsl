@@ -13,7 +13,7 @@ integer gMenuPosition;
 list avatarList     = [];
 list avatarUUIDs    = [];
 
-list main_menu      = [ "Poke", "Boobs", "Smack", "Options", "Exit" ];
+list main_menu      = [ "Poke", "Boobs", "Smack", "Smite", "Options", "Exit" ];
 list options_menu   = [ "Reset", "Back", "Exit" ];
 
 integer DEBUG           = FALSE;
@@ -256,6 +256,23 @@ state Send
                 ownerKey = llGetOwnerKey(llGetKey());
                 llSetObjectName("");
                 llInstantMessage(targetKey, llGetDisplayName(llGetOwner()) + " is trying to reach at you and your butt.\nWell hello there " + llGetDisplayName(targetKey) + "!\n I " + llGetDisplayName(llGetOwner()) + " just wanted to say, that your rear looks firm <3!\nSay hi to them @ secondlife:///app/agent/" + (string)ownerKey + "/im");
+                llOwnerSay("InstantMessage was sent to secondlife:///app/agent/" + (string)targetKey + "/about.");
+                llSetObjectName(origName);
+                llSleep(.5);
+                state default;
+                return;
+            }
+            else if (message == "Smite"){
+                list owner_name = llParseString2List(llGetDisplayName(llGetOwnerKey(llGetKey())), [""], []);
+                string origName = llGetObjectName();
+                list targetName = [];
+                key ownerKey;
+                targetName += [message];
+                string targetID = (key)llList2String(targetName,0);
+                targetKey = llName2Key(targetID);
+                ownerKey = llGetOwnerKey(llGetKey());
+                llSetObjectName("");
+                llInstantMessage(targetKey, llGetDisplayName(llGetOwner()) + " just smited you!\n Oh wait i meant to say I LIKE YOU " + llGetDisplayName(targetKey) + "!\n I " + llGetDisplayName(llGetOwner()) + " just wanted to say, well hello there cutie!\nSay hi to them @ secondlife:///app/agent/" + (string)ownerKey + "/im");
                 llOwnerSay("InstantMessage was sent to secondlife:///app/agent/" + (string)targetKey + "/about.");
                 llSetObjectName(origName);
                 llSleep(.5);
