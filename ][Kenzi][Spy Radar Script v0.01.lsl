@@ -87,7 +87,7 @@ default
     {
         key id = llDetectedKey(0);
         if (id == llGetOwner())
-            state Spying;
+            menu(id);
     }
 }
 

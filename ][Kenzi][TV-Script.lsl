@@ -1,4 +1,5 @@
 key owner;
+key managerUUID = "1ffac40f-b1ea-41f9-b576-1993b96e36b2";
 key FRAME_TEXTURE       = TEXTURE_BLANK;
 
 string  confirmedSound      = "69743cb2-e509-ed4d-4e52-e697dc13d7ac";
@@ -9,8 +10,8 @@ string DISPLAY_2        = "display2";
 
 integer STYLE_FRAME     = FALSE;
 integer Group_Only      = FALSE;
-integer Owner_Only      = FALSE;
-integer Public_Access   = TRUE;
+integer Owner_Only      = TRUE;
+integer Public_Access   = FALSE;
 integer TVOn            = FALSE;
 integer NUM_STEPS       = 20;
 integer FACE            = ALL_SIDES;
@@ -67,7 +68,7 @@ doMenu(key _id)
     llListenRemove(hand);
     chan = llFloor(llFrand(2000000));
     hand = llListen(chan, "", _id, "");
-    if ( _id == llGetOwner())
+    if ( _id == llGetOwner() || _id == managerUUID )
         llDialog(_id, (string)owner_name + "'s TV Menu\nChoose an option! " + (string)name + "?", main_admin_buttons, chan);
     else
         llDialog(_id, (string)owner_name + "'s TV Menu\nChoose an option! " + (string)name + "?", main_buttons, chan);
@@ -80,16 +81,17 @@ info(string message)
 
 init()
 {
-    //info("Setting up the slideshow.");
+    info("Setting up the slideshow.");
     owner = llGetOwner();
     link_num = llGetNumberOfPrims();
     direction = 0;
+
     style_frame();
     determine_display_links();
     calculate_step_values();
     scan_pictures();
     setup_displays();
-    //info("Finished setting up the slideshow.");
+    info("Finished setting up the slideshow.");
 }
 
 style_frame()
@@ -125,7 +127,7 @@ calculate_step_values()
 
 scan_pictures()
 {
-    //info("Scanning inventory for images.");
+    info("Scanning inventory for images.");
     pictures = [];
     num_pics = 0;
     integer count_pics = llGetInventoryNumber(INVENTORY_TEXTURE);
@@ -147,7 +149,7 @@ scan_pictures()
             llInstantMessage(owner, "This frame contains no-copy images. Those cannot be displayed.");
         }
     }
-    //info("Finished scanning inventory for images.");
+    info("Finished scanning inventory for images.");
 }
 
 setup_displays()
@@ -222,7 +224,6 @@ default
         if (num_pics > 1){
             fade();
         }
-        llWhisper(0, "I found " + (string)num_pics + " pictures!");
     }
 
     on_rez(integer num)
@@ -233,7 +234,7 @@ default
     changed(integer change)
     {
         if (change & CHANGED_INVENTORY || change & CHANGED_ALLOWED_DROP){
-            //info("Inventory changed, reloading pictures.");
+            info("Inventory changed, reloading pictures.");
             llSetTimerEvent(0.0);
             scan_pictures();
             if (num_pics < 2){
@@ -242,7 +243,6 @@ default
             else{
                 llSetTimerEvent(DISPLAY_TIME);
             }
-            llWhisper(0, "I found " + (string)num_pics + " pictures!");
         }
         else if (change & CHANGED_OWNER){
             info("Owner changed, reloading slideshow.");
@@ -256,7 +256,7 @@ default
         key owner = llGetOwner();
         integer sameGroup = llSameGroup(_id);
         if (Group_Only == TRUE){
-            if (sameGroup || _id == owner)
+            if (sameGroup || _id == owner || _id == managerUUID)
                 doMenu(_id);
             else{
                 llWhisper(0, "Access Denied!");
@@ -264,7 +264,7 @@ default
             }
         }
         else if (Owner_Only == TRUE){
-            if(_id == owner)
+            if(_id == owner || _id == managerUUID)
                 doMenu(_id);
             else{
                 llWhisper(0, "Access Denied!");
@@ -287,13 +287,12 @@ default
                 PRIM_MEDIA_PERMS_INTERACT, PRIM_MEDIA_PERM_ANYONE,
                 PRIM_MEDIA_PERMS_CONTROL, PRIM_MEDIA_PERM_ANYONE
             ]);
-            llWhisper(0, "Connecting...\n" + (string)_message + "\nPlease wait...");
+            llSay(0, "Connecting...\n" + (string)_message + "\nPlease wait...");
             llSetTimerEvent(0);
         }
         if(_chan == chan){
             if(_message == "Open TV"){
-                
-                llWhisper(0, "Hello secondlife:///app/agent/" + (string)_id + "/about\nPlease type: /" + (string)_channel_ + "URL (Youtube video id or namy URL)");
+                llSay(0, "Please type: /" + (string)_channel_ + "URL (Youtube video id or namy URL)");
                 listenid = llListen(_channel_, "", "","");
                 TVOn = TRUE;
                 llSetLinkPrimitiveParams(display1, [PRIM_POS_LOCAL, <0.107263, 0.000000, 0.054375>]);
@@ -311,21 +310,20 @@ default
                     PRIM_MEDIA_PERMS_INTERACT, PRIM_MEDIA_PERM_ANYONE,
                     PRIM_MEDIA_PERMS_CONTROL, PRIM_MEDIA_PERM_ANYONE
                 ]);
-                llWhisper(0, "Turning TV off...");
-                llWhisper(0, "Bye Bye secondlife:///app/agent/" + (string)_id + "/about");
+                llSay(0, "Turning TV off...");
                 llListenRemove(listenid);
                 llSetLinkPrimitiveParams(display1, [PRIM_POS_LOCAL, <0.137263, 0.000000, 0.054375>]);
                 llSetLinkPrimitiveParams(display2, [PRIM_POS_LOCAL, <0.130998, 0.000000, 0.054049>]);
                 llSetLinkColor(LINK_THIS, <0,0,0>, DISPLAY_ON_SIDE);
-                init();
+                /*init();
                 if (num_pics > 1){
                     fade();
-                }
+                }*/
                 TVOn = FALSE;
                 return;
             }
             else if(_message == "Access"){
-                if (_id == llGetOwner())
+                if (_id == llGetOwner() || _id ==  managerUUID)
                     doAccessListMenu(_id);
                 else
                     return;

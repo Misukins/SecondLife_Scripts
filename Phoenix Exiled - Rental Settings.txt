@@ -1,0 +1,61 @@
+#Spot Name
+! ;:Phoenix Exiled:; Rental Box !
+
+#Rental Cost (a week)
+#The weekly rate to rent this space (eg 1000)
+10
+
+#Rental Cost (two weeks)
+#The weekly rate to rent this space (eg 2000)
+20
+
+#Rental Cost (three weeks)
+#The weekly rate to rent this space (eg 3000)
+30
+
+#Rental Cost (a month)
+#The weekly rate to rent this space (eg 4000)
+40
+
+#Prim Count
+#The number of prims allowed by the renter in this space
+400
+
+#Split 1.0 = Please keep this or it will give you an error (only if split = 0.0) 0.1+ is fine
+1.0
+
+#Info Notecard Name
+#The name of the notecard to give to someone
+#who clicks the cube. Note: case-sensitive
+Phoenix Exiled - Rental Info
+
+#Landmark
+#Note: case-sensitive
+Phoenix Exiled - Main Office
+
+#Partner
+#Partner UUID (who gets the rent money (if slitted!!))
+#eaff95a0-42aa-48ad-b083-cc4d6527188e
+92d7a0cf-dbd1-44d1-b4ba-cc495767187a
+
+
+#Manager #1 UUID 
+#92d7a0cf-dbd1-44d1-b4ba-cc495767187a
+NULL_KEY
+
+#Manager #2 UUID
+#076144a2-875c-4448-b0e2-ae7e4fa328d4
+NULL_KEY
+
+#Manager #3 UUID
+#eaff95a0-42aa-48ad-b083-cc4d6527188e
+NULL_KEY
+
+#Manager #4 UUID
+NULL_KEY
+
+#Manager #5 UUID
+NULL_KEY
+
+#Manager #6 UUID
+NULL_KEY

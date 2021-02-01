@@ -3,63 +3,65 @@ key _sound_off = "de58f2a6-ba96-d252-7351-ca839d847196";
 
 float _volume = 0.1;
 
-integer ScannerOnline = FALSE;
-integer globalListenHandle  = -0;
-
-ScannerOn()
-{
-    llOwnerSay( "is now Online!" );
-    llTriggerSound(_sound_on, _volume);
-    integer i = 1;
-    for ( ; i <= 65; ++i )
-        globalListenHandle = llListen(i, "", "", "");
-}
-
-ScannerOff()
-{
-    llOwnerSay( "is now Offline!" );
-    llTriggerSound(_sound_off, _volume);
-    llListenRemove(globalListenHandle);
-}
-
-// ► ◄ ▲ ▼ \\
 default
 {
     state_entry()
     {
         llPreloadSound(_sound_on);
         llPreloadSound(_sound_off);
-        if (ScannerOnline)
-            llOwnerSay( "is now Online!" );
-        else
-            llOwnerSay( "is now Offline!" );
+        llPlaySound(_sound_off, _volume);
+        llOwnerSay( "is now Offline!" );
+        llSetText("", <0,0,0> ,1);
     }
 
-    attach(key agent)
+    state_exit()
     {
-        if (agent){
-            if (ScannerOnline)
-                llOwnerSay( "is now Online!" );
-            else
-                llOwnerSay( "is now Offline!" );
-        }
+        llPlaySound(_sound_on, _volume);
+        llOwnerSay( "is now Online!" );
     }
 
     touch_start(integer total_number)
     {
-        if (ScannerOnline){
-            ScannerOff();
-        }
-        else{
-            ScannerOn();
-        }
-        ScannerOnline = !ScannerOnline;
+        state Sniffing;
+    }
+}
+
+state Sniffing
+{
+    state_entry()
+    {
+        integer i = 1;
+        for ( ; i <= 65; ++i )
+            llListen( i, "", "", "" );
+        llSetTimerEvent(1);
+    }
+
+    touch_start( integer _n )
+    {
+        state default;
     }
 
     listen( integer _chan, string _name, key _id, string _message )
     {
-        //list real_name = llParseString2List(llGetDisplayName(_name), [""], []);
-        //llOwnerSay( "[" + (string) _chan + "]-[" + real_name + "(" + _name + ")]" + " " + _message );
-        llOwnerSay("[" + (string) _chan + "]-[secondlife:///app/agent/" + (string)_id + "/about.] " + _message);
+        string object_name = llGetOwnerKey(_id);
+        list owner_name = llParseString2List(llGetDisplayName(object_name), [""], []);
+        llOwnerSay( "[" + (string) _chan + "]-(" + (string)owner_name + ")[secondlife:///app/agent/" + object_name + "/about (" + _name + ")]" + " " + _message );
+    }
+
+    timer()
+    {
+        vector color;
+        float time=llList2Float(llGetObjectDetails(llGetOwner(),[OBJECT_SCRIPT_TIME]),0)*1000; //*1000 for milliseconds
+        integer count=llList2Integer(llGetObjectDetails(llGetOwner(),[OBJECT_RUNNING_SCRIPT_COUNT]),0);
+        if (time<=.4) color=<0,1,0>;
+        else if (time>.4 && time <=.9) color=<1,1,0>;
+        else if (time>.9 && time <= 1.5) color = <1,0,0>;
+        else color =<0.514, 0.000, 0.514>;
+        llSetText("Scripts:"+(string)count+"\n"+"Script Time:"+((string)time),color,1);
+    }
+
+    state_exit()
+    {
+        llSetTimerEvent(0);
     }
 }
