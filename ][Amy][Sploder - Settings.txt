@@ -17,3 +17,4 @@ SPLODER'S COUNTDOWN BEGINS!
 more participants needed to begin countdown!
 
 TODO Admins with they'r "special access" :P
+[admins] //NOTE - List UUID, UUID, ETC

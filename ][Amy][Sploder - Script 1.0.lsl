@@ -1,31 +1,35 @@
-list entrantsKey = [];
-integer pot = 0;
 float ownersCut = 10;
-integer amountLimit = 5;
 float TimeLimit = 300;
+
+integer pot = 0;
+integer amountLimit = 5;
 integer entrantsCount = 0;
 integer flag = 0;
 integer i;
 integer result = 0;
-string Text = "";
-key chave;
 integer amount;
 integer min_pay = 0; //F minimum amount to pay ppl. Exemple, if you change this value to 2, everyone will receive at least 2 L$
+integer gLine = 0; 
 
+list entrantsKey = [];
+list Admins = [];
+
+key chave;
+key gQueryID;
+
+string Text = "";
 string gName = "][Amy][Sploder - Settings";
-integer gLine = 0;        // current line number
-key gQueryID; // id used to identify dataserver queries
 string teste = "";
 
-integer RandInt(integer lower, integer higher) {
+integer RandInt(integer lower, integer higher){
     integer Range = higher - lower;
     integer Result = llFloor(llFrand(Range + 1)) + lower;
     return Result;
 }
 
-MakeParticles()//This is the function that actually starts the particle system.
+MakeParticles()
 {     
-    llParticleSystem([                                                         //KPSv1.0  
+    llParticleSystem([
         PSYS_PART_FLAGS , 0 //Comment out any of the following masks to deactivate them
         | PSYS_PART_INTERP_COLOR_MASK       //Colors fade from start to end
         | PSYS_PART_INTERP_SCALE_MASK       //Scale fades from beginning to end
@@ -45,7 +49,7 @@ MakeParticles()//This is the function that actually starts the particle system.
         ,PSYS_PART_START_SCALE,      <.35,.35,.35>      //Starting particle size
         ,PSYS_PART_END_SCALE,        <0.35,0.35,0.35>      //Ending particle size, if INTERP_SCALE_MASK is on
         ,PSYS_SRC_OMEGA,             <1.0,0.0,0.0>       //Rotation of ANGLE patterns, similar to llTargetOmega()
-            ]);
+    ]);
 }
 
 start()
@@ -80,33 +84,41 @@ default
         if (query_id == gQueryID){
             if (data != EOF){
                 if (teste == "ownercut")
-                ownersCut = (integer)data;
+                    ownersCut = (integer)data;
                 if (teste == "minimumpay")
-                amountLimit = (integer)data;
+                    amountLimit = (integer)data;
                 if (teste == "timelimit")
-                TimeLimit = (float)data;
+                    TimeLimit = (float)data;
+                if (teste == "admins")
+                    Admins = (list)data;
                 if (llToLower(data) == "[ownercut]"){
                     ++gLine;
-                    gQueryID = llGetNotecardLine(gName, gLine);    // request next line
-                    teste = "ownercut";   
+                    gQueryID = llGetNotecardLine(gName, gLine);
+                    teste = "ownercut";
                 }
                 else if (llToLower(data)== "[minimumpay]"){
                     ++gLine;
-                    gQueryID = llGetNotecardLine(gName, gLine);    // request next line 
-                    teste = "minimumpay";   
-                } 
+                    gQueryID = llGetNotecardLine(gName, gLine); 
+                    teste = "minimumpay";
+                }
                 else if (llToLower(data) == "[timelimit]"){
                     ++gLine;
-                    gQueryID = llGetNotecardLine(gName, gLine);    // request next line 
-                    teste = "timelimit";   
-                }                              
+                    gQueryID = llGetNotecardLine(gName, gLine); 
+                    teste = "timelimit";
+                }
+                else if (llToLower(data) == "[admins]"){
+                    ++gLine;
+                    gQueryID = llGetNotecardLine(gName, gLine); 
+                    teste = "admins";
+                }
                 else{
-                    ++gLine;                // increase line count
-                    gQueryID = llGetNotecardLine(gName, gLine);    // request next line
+                    ++gLine;
+                    gQueryID = llGetNotecardLine(gName, gLine);
                     teste = "";
                 }
             }
-            else start();
+            else
+                start();
         }
     }  
     
@@ -134,9 +146,9 @@ default
                     
             }
             else{
-            string message = ((string)(5 - entrantsCount)) +" more participants needed to begin countdown!"; 
-            llSay(0, message);
-            llSetText(Text + "\n" + message, <0, 1.0, 0>,  1);
+                string message = ((string)(5 - entrantsCount)) +" more participants needed to begin countdown!"; 
+                llSay(0, message);
+                llSetText(Text + "\n" + message, <0, 1.0, 0>,  1);
             }
         }        
     }
@@ -194,14 +206,16 @@ default
     
     listen(integer channel, string name, key id, string message)
     {
-        if (channel == 7){
-            if (llToLower(message) == "reset"){
-                llResetScript();
-                /*NOTE
-                //gQueryID = llGetNotecardLine(gName, gLine);
-                //start();  
-                NOTE */                  
-            }    
-        }    
-    }    
+        if(id == Admins){
+            if (channel == 7){
+                if (llToLower(message) == "reset"){
+                    llResetScript();
+                    /*NOTE
+                    //gQueryID = llGetNotecardLine(gName, gLine);
+                    //start();
+                    NOTE */
+                }
+            }
+        }
+    }
 }
