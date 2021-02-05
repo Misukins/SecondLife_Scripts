@@ -1,19 +1,29 @@
-integer access_mode = 1;
+key gQueryID;
+key manager1;
+key manager2;
+key manager3;
+key manager4;
+key manager5;
+key manager6;
 
-string text = "Touch To Teleport";
-string menu_message = "Select location:";
+integer listen_num = -1;
+integer selected = FALSE;
+integer gLine = 0;
 
 list location_list = [
-"Home",<17.25929, 229.63203, 3604.48389>,
-"SSN Club",<99.98943, 215.52785, 2250.86157>,
-"Beach",<68.72098, 224.32222, 34.71979>,
-"Kristel/Chu",<103.96355, 192.07005, 3997.63696>
-];
+"Amy Home", <58.00000, 62.00000, 3711.36719>
+]; //-NOTE MORETO COME...
 
-vector text_color = <1.0,1.0,1.0>;
+string Text = "";
+string gName = "][Kenzi][Teleporter Config";
+string teste = "";
+string teletext = "Touch To Teleport";
+string menumessage = "Select location: ";
 
+vector telecolor = <1.0,1.0,1.0>;
 vector sit_pos = <0.0, 1.1, -0.1>;
 vector sit_rot = <-90, 0, 0>;
+vector destination = ZERO_VECTOR;
 
 posJump( vector target_position )
 {
@@ -39,8 +49,7 @@ warpPos( vector destpos )
             rules = (rules=[]) + rules + rules;
         llSetPrimitiveParams( rules + llList2List( rules, (count - jumps) << 1, count) );            
     }
-    else
-    {
+    else{
         while (!arrived){
             current_pos = llGetPos();
             checking_pos = destpos;
@@ -73,39 +82,122 @@ warpPos( vector destpos )
     }
 }
 
-integer listen_num = -1;
-vector destination = ZERO_VECTOR;
-integer selected = FALSE;
-
 default
 {
+    on_rez(integer num)
+    {
+        llResetScript();
+    }
+
     state_entry()
     {
+        gQueryID = llGetNotecardLine(gName, gLine);
         llSitTarget(sit_pos, llEuler2Rot(sit_rot*DEG_TO_RAD));
-        llSetText(text,text_color,1.0);
+        llSetText(teletext,telecolor,1.0);
         llSetSitText("Teleport");
     }
+
+    dataserver(key query_id, string data)
+    {      
+        if (query_id == gQueryID){
+            if (data != EOF){
+                if (teste == "manager1")
+                    manager1 = (key)data;
+                if (teste == "manager2")
+                    manager2 = (key)data;
+                if (teste == "manager3")
+                    manager3 = (key)data;
+                if (teste == "manager4")
+                    manager4 = (key)data;
+                if (teste == "manager5")
+                    manager5 = (key)data;
+                if (teste == "manager6")
+                    manager6 = (key)data;
+                if (teste == "teletext")
+                    teletext = (string)data;
+                if (teste == "telecolor")
+                    telecolor = (vector)data;
+                if (teste == "menumessage")
+                    menumessage = (string)data;
+                if (teste == "sit_pos")
+                    sit_pos = (vector)data;
+                if (teste == "sit_rot")
+                    sit_rot = (vector)data;
+                if (llToLower(data) == "[manager1]"){
+                    ++gLine;
+                    gQueryID = llGetNotecardLine(gName, gLine);
+                    teste = "manager1";
+                }
+                else if (llToLower(data) == "[manager2]"){
+                    ++gLine;
+                    gQueryID = llGetNotecardLine(gName, gLine);
+                    teste = "manager2";
+                }
+                else if (llToLower(data) == "[manager3]"){
+                    ++gLine;
+                    gQueryID = llGetNotecardLine(gName, gLine);
+                    teste = "manager3";
+                }
+                else if (llToLower(data) == "[manager4]"){
+                    ++gLine;
+                    gQueryID = llGetNotecardLine(gName, gLine);
+                    teste = "manager4";
+                }
+                else if (llToLower(data) == "[manager5]"){
+                    ++gLine;
+                    gQueryID = llGetNotecardLine(gName, gLine);
+                    teste = "manager5";
+                }
+                else if (llToLower(data) == "[manager6]"){
+                    ++gLine;
+                    gQueryID = llGetNotecardLine(gName, gLine);
+                    teste = "manager6";
+                }
+                else if (llToLower(data) == "[teletext]"){
+                    ++gLine;
+                    gQueryID = llGetNotecardLine(gName, gLine);
+                    teste = "teletext";
+                }
+                else if (llToLower(data)== "[telecolor]"){
+                    ++gLine;
+                    gQueryID = llGetNotecardLine(gName, gLine); 
+                    teste = "telecolor";
+                }
+                else if (llToLower(data) == "[menumessage]"){
+                    ++gLine;
+                    gQueryID = llGetNotecardLine(gName, gLine); 
+                    teste = "menumessage";
+                }
+                else if (llToLower(data)== "[sit_pos]"){
+                    ++gLine;
+                    gQueryID = llGetNotecardLine(gName, gLine); 
+                    teste = "sit_pos";
+                }
+                else if (llToLower(data)== "[sit_rot]"){
+                    ++gLine;
+                    gQueryID = llGetNotecardLine(gName, gLine); 
+                    teste = "sit_rot";
+                }
+                else{
+                    ++gLine;
+                    gQueryID = llGetNotecardLine(gName, gLine);
+                    teste = "";
+                }
+            }
+            //else
+                //NOTE start();
+        }
+    } 
     
     touch_start(integer int)
     {
         key user = llDetectedKey(0);
-        integer access_granted = FALSE;
-        if (access_mode == 1)
-            access_granted = TRUE;
-        else if (access_mode == 2) {
-            if (user == llGetOwner())
-                access_granted = TRUE;
-            else
-                llSay(0,"  sorry, owner access only.");
-        }
-        else if (access_mode == 3) {
-            if (llSameGroup(user))
-                access_granted = TRUE;
-            else
-                llSay(0,"  sorry, group memeber access only.");
-        }
-
-        if (access_granted){
+        if ((user == manager1) || 
+            (user == manager2) || 
+            (user == manager3) || 
+            (user == manager4) || 
+            (user == manager5) || 
+            (user == manager6)){
             list button_list = [];
             integer i = 0;
             for (i = 0; i <= llGetListLength(location_list) - 1; i++){
@@ -115,9 +207,11 @@ default
             }
             integer menu_chan = 0 - (integer)llFrand(2147483647);
             listen_num  = llListen(menu_chan,"", user,"");
-            llDialog(user, menu_message, button_list, menu_chan);
+            llDialog(user, menumessage, button_list, menu_chan);
             llSetTimerEvent(60.0);
         }
+        else
+            return;
     }
     
     timer()
@@ -134,54 +228,33 @@ default
         if (choice_index != -1){
             destination = llList2Vector(location_list,choice_index + 1);
             selected = TRUE;
-            llWhisper(0,"  location [ "+message+" ] @ "+(string)((integer)destination.x)+", "+(string)((integer)destination.y)+", "+(string)((integer)destination.z)+" selected, right click > Teleport.");
+            llWhisper(0," location [ "+message+" ] @ "+(string)((integer)destination.x)+", "+(string)((integer)destination.y)+", "+(string)((integer)destination.z)+" selected, right click > Teleport.");
             llSetClickAction(CLICK_ACTION_SIT);
         }
     }
     
     changed(integer change)
     {
+        if (change & CHANGED_INVENTORY)
+            llResetScript();
+        if (change & CHANGED_OWNER)
+            llResetScript();
         if (change & CHANGED_LINK){
             key user = llAvatarOnSitTarget();
-            if ( (!selected) && (user != NULL_KEY) ){
-                llUnSit(user);                        
-                llWhisper(0,"  sorry, please touch and select location before teleport.");
-            }
-            else{
-                if (llGetAgentSize(user) != ZERO_VECTOR){
-                    vector init_pos = llGetPos();                
-                    warpPos(destination);
-                    llUnSit(user);
-                    llSleep(0.2);
-                    warpPos(init_pos);             
-                    selected = FALSE;
-                    llSetClickAction(CLICK_ACTION_TOUCH);
-                }
+            if ((selected) && 
+                (user == manager1) || 
+                (user == manager2) || 
+                (user == manager3) || 
+                (user == manager4) || 
+                (user == manager5) || 
+                (user == manager6)){
+                vector init_pos = llGetPos();                
+                warpPos(destination);
+                llUnSit(user);
+                llSleep(0.2);
+                warpPos(init_pos);             
+                selected = FALSE;
             }
         }
     }    
 }
-
-/*
-float color = 0.0;
-integer FACE1 = 1;
-
-default
-{
-    
-    state_entry()
-    {
-        llSetTimerEvent(2.0);
-        llSetLinkPrimitiveParams(LINK_THIS, [PRIM_FULLBRIGHT, FACE1, TRUE ]);
-    }
-    
-    timer()
-    {
-        if (color == 0.0)
-            color = 1.0;
-        else if (color == 1.0)
-            color = 0.0;
-        llSetLinkPrimitiveParams(LINK_THIS, [ PRIM_COLOR, FACE1, <0, color, color>, 1.0, PRIM_POINT_LIGHT, TRUE, <0, color, color>, 1.0, 2.0, 0.75 ]);
-    }
-}
-*/

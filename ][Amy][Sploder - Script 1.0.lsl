@@ -2,8 +2,8 @@ float ownersCut = 10;
 float TimeLimit = 300;
 
 integer pot = 0;
-integer amountLimit = 5;
-integer entrantsCount = 0;
+integer amountLimit = 20;
+integer entrantsCount = 4;
 integer flag = 0;
 integer i;
 integer result = 0;
@@ -11,8 +11,14 @@ integer amount;
 integer min_pay = 0; //F minimum amount to pay ppl. Exemple, if you change this value to 2, everyone will receive at least 2 L$
 integer gLine = 0; 
 
+//SETTING!!!!!!!!
+integer lowest_Tip = 50; //CHANGE THIS FOR YOUR LIKING!!!!!!!
+integer tiptwo = 100;    //CHANGE THIS FOR YOUR LIKING!!!!!!!
+integer tipthree = 150;  //CHANGE THIS FOR YOUR LIKING!!!!!!!
+integer tipfour = 200;   //CHANGE THIS FOR YOUR LIKING!!!!!!!
+//SETTING!!!!!!!!
+
 list entrantsKey = [];
-list Admins = [];
 
 key chave;
 key gQueryID;
@@ -27,6 +33,8 @@ integer RandInt(integer lower, integer higher){
     return Result;
 }
 
+//F Club Donation Script
+
 MakeParticles()
 {     
     llParticleSystem([
@@ -37,8 +45,8 @@ MakeParticles()
         | PSYS_PART_EMISSIVE_MASK           //Particles are self-lit (glow)
         ,PSYS_SRC_PATTERN   
         ,PSYS_SRC_PATTERN_EXPLODE
-        ,PSYS_SRC_TARGET_KEY,        llGetOwner() //F
-        ,PSYS_SRC_TEXTURE,           "cifrao"     //UUID of the desired particle texture F
+        ,PSYS_SRC_TARGET_KEY,        llGetOwner()
+        ,PSYS_SRC_TEXTURE,           "df123004-3e9a-d54e-a7ff-dd9250a09b8e"     //UUID of the desired particle texture F
         ,PSYS_PART_MAX_AGE,          2.5                //Lifetime, in seconds, that a particle lasts
         ,PSYS_SRC_BURST_RATE,        .5            //How long, in seconds, between each emission
         ,PSYS_SRC_BURST_PART_COUNT,  10       //Number of particles per emission
@@ -77,6 +85,8 @@ default
         //start(); //NOTE
         llListen(7, "", llGetOwner(), "");
         llRequestPermissions(llGetOwner(),PERMISSION_DEBIT);
+        llSetClickAction(CLICK_ACTION_PAY);
+        llSetPayPrice(lowest_Tip, [lowest_Tip ,tiptwo, tipthree, tipfour]);
     }
     
     dataserver(key query_id, string data)
@@ -89,8 +99,6 @@ default
                     amountLimit = (integer)data;
                 if (teste == "timelimit")
                     TimeLimit = (float)data;
-                if (teste == "admins")
-                    Admins = (list)data;
                 if (llToLower(data) == "[ownercut]"){
                     ++gLine;
                     gQueryID = llGetNotecardLine(gName, gLine);
@@ -105,11 +113,6 @@ default
                     ++gLine;
                     gQueryID = llGetNotecardLine(gName, gLine); 
                     teste = "timelimit";
-                }
-                else if (llToLower(data) == "[admins]"){
-                    ++gLine;
-                    gQueryID = llGetNotecardLine(gName, gLine); 
-                    teste = "admins";
                 }
                 else{
                     ++gLine;
@@ -133,20 +136,20 @@ default
                 entrantsKey += giver;
             entrantsCount = llGetListLength(entrantsKey);
             pot += amount; 
-            llSay(0, llKey2Name(giver) + " adds L$" + (string)amount + " to the SPLODER. Current pot is L$"+ (string)pot +".");
-            if (entrantsCount >= 5){
-                llSetText("Ready to explode!!! Current pot is L$ "+ (string)pot, <0, 1.0, 0>,  1);
+            llSay(0, llKey2Name(giver) + " adds L$" + (string)amount + " to the GATOR SPLODER. Current pot is L$"+ (string)pot +".");
+            if (entrantsCount >= 4){
+                llSetText("Ready for gator explode!!! Current pot is L$ "+ (string)pot, <0, 1.0, 0>,  1);
                 if (flag == 0){
                     llSay(0, "SPLODER'S COUNTDOWN BEGINS!");
-                    llSay(0, (string)(llRound(TimeLimit)) + " seconds before it explodes!!!");
-                    llSetText("Ready to explode!!! Current pot is L$ "+ (string)pot, <0, 1.0, 0>,  1);
+                    llSay(0, (string)(llRound(TimeLimit)) + " seconds before gator explodes!!!");
+                    llSetText("Ready for gator explode!!! Current pot is L$ "+ (string)pot, <0, 1.0, 0>,  1);
                     llSetTimerEvent(TimeLimit);
                     flag = 1;
                 }
                     
             }
             else{
-                string message = ((string)(5 - entrantsCount)) +" more participants needed to begin countdown!"; 
+                string message = ((string)(4 - entrantsCount)) +" more participants needed to gator sploder for begin countdown!"; 
                 llSay(0, message);
                 llSetText(Text + "\n" + message, <0, 1.0, 0>,  1);
             }
@@ -174,7 +177,7 @@ default
         integer value = 0;
         
         while (cut_pot > 0){
-            j = RandInt(0, (entrantsCount - 1));
+            j = RandInt(0, (entrantsCount - 4));
             integer rand;
             rand = RandInt(1, cut_pot);
             value = ((integer)llList2String(payment, j));
@@ -206,15 +209,13 @@ default
     
     listen(integer channel, string name, key id, string message)
     {
-        if(id == Admins){
-            if (channel == 7){
-                if (llToLower(message) == "reset"){
-                    llResetScript();
+        if (channel == 7){
+            if (llToLower(message) == "reset"){
+                llResetScript();
                     /*NOTE
                     //gQueryID = llGetNotecardLine(gName, gLine);
                     //start();
                     NOTE */
-                }
             }
         }
     }

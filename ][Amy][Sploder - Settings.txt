@@ -1,20 +1,6 @@
-#TEMP //F = FIXME - aka need more info xD
 [timelimit]
 100
 [ownercut]
 10
 [minimumpay]
-2
-[MinimumpayText]
-The minimum amount is L$
-#Textchats thigns ( adds L$" + (string)amount + " to the SPLODER. Current pot is L$)
-[adds L$]
-to the SPLODER. Current pot is L$
-#SPLODER'S COUNTDOWN BEGINS!
-[begin]
-SPLODER'S COUNTDOWN BEGINS!
-[NeedMore]
-more participants needed to begin countdown!
-
-TODO Admins with they'r "special access" :P
-[admins] //NOTE - List UUID, UUID, ETC
+20
