@@ -10,19 +10,32 @@ default
         llPreloadSound(_sound_on);
         llPreloadSound(_sound_off);
         llPlaySound(_sound_off, _volume);
-        llOwnerSay( "is now Offline!" );
-        llSetText("", <0,0,0> ,1);
+        llOwnerSay("is now Offline!");
+        llSetTimerEvent(1);
+    }
+
+    touch_start(integer total_number)
+    {
+        state Sniffing;
+    }
+
+    timer()
+    {
+        vector color;
+        float time=llList2Float(llGetObjectDetails(llGetOwner(),[OBJECT_SCRIPT_TIME]),0)*1000; //*1000 for milliseconds
+        integer count=llList2Integer(llGetObjectDetails(llGetOwner(),[OBJECT_RUNNING_SCRIPT_COUNT]),0);
+        if (time<=.4) color=<0,1,0>;
+        else if (time>.4 && time <=.9) color=<1,1,0>;
+        else if (time>.9 && time <= 1.5) color = <1,0,0>;
+        else color =<0.514, 0.000, 0.514>;
+        llSetText("Scripts:"+(string)count+"\n"+"Script Time:"+((string)time),color,1);
     }
 
     state_exit()
     {
         llPlaySound(_sound_on, _volume);
         llOwnerSay( "is now Online!" );
-    }
-
-    touch_start(integer total_number)
-    {
-        state Sniffing;
+        llSetTimerEvent(0);
     }
 }
 
