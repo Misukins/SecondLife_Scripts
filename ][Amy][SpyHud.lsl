@@ -70,7 +70,7 @@ default
         if (llGetOwnerKey(id) == llGetOwner()){
             if (message == "Exit")
                 return;
-            else if ((message == "□ ScannerOn") || (message == "■ ScannerOn")){
+            else if (message == "□ ScannerOn") || (message == "■ ScannerOn"){
                 if (!ScannerOn){
                     ScannerOn = TRUE;
                     llOwnerSay("Listen Scanner is now On..");
@@ -85,9 +85,9 @@ default
                     menu(llGetOwner());
                     return;
                 }
-                //F ScannerOn = !ScannerOn;
+                ScannerOn = !ScannerOn;
             }
-            else if ((message == "□ Script") || (message == "■ Script")){
+            else if (message == "□ Script") || (message == "■ Script"){
                 if (!ScriptOn){
                     ScriptOn = TRUE;
                     llOwnerSay("Script Counter is now On..");
@@ -102,7 +102,7 @@ default
                     menu(llGetOwner());
                     return;
                 }
-                //F ScriptOn = !ScriptOn;
+                ScriptOn = !ScriptOn;
             }
             else if (message == "BothOn"){
                 state BothOnState;
@@ -140,7 +140,7 @@ state Sniffing
         if (llGetOwnerKey(id) == llGetOwner()){
             if (message == "Exit")
                 return;
-            else if ((message == "□ ScannerOn") || (message == "■ ScannerOn")){
+            else if (message == "□ ScannerOn") || (message == "■ ScannerOn"){
                 if (!ScannerOn){
                     state Sniffing;
                     llOwnerSay("Listen Scanner is now On..");
@@ -155,9 +155,9 @@ state Sniffing
                     menu(llGetOwner());
                     return;
                 }
-                //F ScannerOn = !ScannerOn;
+                ScannerOn = !ScannerOn;
             }
-            else if ((message == "□ Script") || (message == "■ Script")){
+            else if (message == "□ Script") || (message == "■ Script"){
                 if (!ScriptOn){
                     state Script;
                     ScriptOn = TRUE;
@@ -174,7 +174,7 @@ state Sniffing
                     menu(llGetOwner());
                     return;
                 }
-                //F ScriptOn = !ScriptOn;
+                ScriptOn = !ScriptOn;
             }
             else if (message == "BothOn"){
                 state BothOnState;
@@ -215,7 +215,7 @@ state Script
         if (llGetOwnerKey(id) == llGetOwner()){
             if (message == "Exit")
                 return;
-            else if ((message == "□ ScannerOn") || (message == "■ ScannerOn")){
+            else if (message == "□ ScannerOn") || (message == "■ ScannerOn"){
                 if (!ScannerOn){
                     state Sniffing;
                     llOwnerSay("Listen Scanner is now On..");
@@ -230,9 +230,9 @@ state Script
                     menu(llGetOwner());
                     return;
                 }
-                //F ScannerOn = !ScannerOn;
+                ScannerOn = !ScannerOn;
             }
-            else if ((message == "□ Script") || (message == "■ Script")){
+            else if (message == "□ Script") || (message == "■ Script"){
                 if (!ScriptOn){
                     state Script;
                     ScriptOn = TRUE;
@@ -249,7 +249,7 @@ state Script
                     menu(llGetOwner());
                     return;
                 }
-                //F ScriptOn = !ScriptOn;
+                ScriptOn = !ScriptOn;
             }
             else if (message == "BothOn"){
                 state BothOnState;
@@ -309,7 +309,7 @@ state BothOnState
         if (llGetOwnerKey(id) == llGetOwner()){
             if (message == "Exit")
                 return;
-            else if ((message == "□ ScannerOn") || (message == "■ ScannerOn")){
+            else if (message == "□ ScannerOn") || (message == "■ ScannerOn"){
                 if (!ScannerOn){
                     state Sniffing;
                     llOwnerSay("Listen Scanner is now On..");
@@ -324,9 +324,9 @@ state BothOnState
                     menu(llGetOwner());
                     return;
                 }
-                //F ScannerOn = !ScannerOn;
+                ScannerOn = !ScannerOn;
             }
-            else if ((message == "□ Script") || (message == "■ Script")){
+            else if (message == "□ Script") || (message == "■ Script"){
                 if (!ScriptOn){
                     state Script;
                     ScriptOn = TRUE;
@@ -343,7 +343,7 @@ state BothOnState
                     menu(llGetOwner());
                     return;
                 }
-                //F ScriptOn = !ScriptOn;
+                ScriptOn = !ScriptOn;
             }
             else if (message == "BothOn"){
                 state BothOnState;
