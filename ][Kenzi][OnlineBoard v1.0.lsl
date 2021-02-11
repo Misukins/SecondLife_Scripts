@@ -4,6 +4,8 @@ key blank;
 key toucher;
 key the_name_query;
 
+list main_menu = [];
+
 string url = "http://world.secondlife.com/resident/";
 string name;
 string real_name;
@@ -24,15 +26,12 @@ integer channel;
 vector online = <0.000, 0.502, 0.000>;
 vector offline = <0.502, 0.000, 0.000>;
 
-list main_menu = [];
-
-menu(key id)
-{
-    if(id == llGetOwner()){
-        main_menu = [ "† Profile †", "† Message †", "† Reset †", "† Exit †" ];
+menu(key id){
+    if(id != llGetOwner()){
+        main_menu = [ "† Profile †", "† Message †", "† Exit †" ];
     }
     else{
-        main_menu = [ "† Profile †", "† Message †", "† Exit †" ];
+        main_menu = [ "† Profile †", "† Message †", "† Reset †", "† Exit †" ];
     }
     llListenRemove(listener);
     channel = -1000000000 - (integer)(llFrand(1000000000));
@@ -152,7 +151,7 @@ state show
     timer()
     {
         llHTTPRequest( url + (string)user_key,[HTTP_METHOD,"GET"],"");
-        llRequestAgentData( user_key, DATA_ONLINE);
+        llRequestAgentData( user_key, DATA_ONLINE);   
     }
     
     on_rez(integer start_param)

@@ -12,17 +12,17 @@ integer Debug           = FALSE;
 
 key owner;
 
-list main_menu =                [ "LivingRoom", "BedRoom", "BathRoom", "Window", "Upstairs", "+-Lights-+", "Access", "Exit" ];
-list AllLights_Menu =           [ "+-On-+", "+-Off-+", "Back", "Exit" ];
-list LivingRoomOptions_Menu =   [ "Lights", "CeilingFan", "Back", "Exit" ];
-list CeilingFanLights_Menu =    [ "Low", "Medium", "High", "Off", "Back", "Exit" ];
-list CeilingFanRotation_Menu =  [ "+VerySlow+", "+Slow+", "+Medium+", "+Fast+", "+VeryFast+", "+Off+", "Back", "Exit" ];
-list BedRoomOptions_Menu =      [ ">+Lights+<", ">+CeilingFan+<", "Back", "Exit" ];
-list BedRoomLights_Menu =       [ "-Low-", "-Medium-", "-High-", "-Off-", "Back", "Exit" ];
-list BedRoomFan_Menu =          [ ">+VerySlow+<", ">+Slow+<", ">+Medium+<", ">+Fast+<", ">+VeryFast+<", ">+Off+<", "Back", "Exit" ];
-list D_W_tint_Menu =            [ "*Open*", "*Closed*", "Back", "Exit" ];
-list BathRoomLights_Menu =      [ ">Low<", ">Medium<", ">High<", ">Off<", "Back", "Exit" ];
-list AccessList_Menu =          [ "Group", "Private", "Public", "Back", "Exit" ];
+list main_menu =                    [ "LivingRoom", "BedRoom", "BathRoom", "Window", "Upstairs", "+-Lights-+", "Access", "Exit" ];
+list AllLights_Menu =               [ "+-On-+", "+-Off-+", "Back", "Exit" ];
+list LivingRoomOptions_Menu =       [ "Lights", "CeilingFan", "Back", "Exit" ];
+list CeilingFanLights_Menu =        [ "Low", "Medium", "High", "Off", "Back", "Exit" ];
+list CeilingFanRotation_Menu =      [ "+VerySlow+", "+Slow+", "+Medium+", "+Fast+", "+VeryFast+", "+Off+", "Back", "Exit" ];
+list BedRoomOptions_Menu =          [ ">+Lights+<", ">+CeilingFan+<", "Back", "Exit" ];
+list BedRoomLights_Menu =           [ "-Low-", "-Medium-", "-High-", "-Off-", "Back", "Exit" ];
+list BedRoomFan_Menu =              [ ">+VerySlow+<", ">+Slow+<", ">+Medium+<", ">+Fast+<", ">+VeryFast+<", ">+Off+<", "Back", "Exit" ];
+list D_W_tint_Menu =                [ "*Open*", "*Closed*", "Back", "Exit" ];
+list BathRoomLights_Menu =          [ ">Low<", ">Medium<", ">High<", ">Off<", "Back", "Exit" ];
+list AccessList_Menu =              [ "Group", "Private", "Public", "Back", "Exit" ];
 list Upstairs_Menu =                [ "**Room1**", "**Room2**", "Back", "Exit" ];
 list UpstairsBedRoomOptions_Menu =  [ "++Lights++", "++CeilingFan++", "Back", "Exit" ];
 list UpstairsBedRoomFan_Menu =      [ "*+VerySlow+*", "*+Slow+*", "*+Medium+*", "*+Fast+*", "*+VeryFast+*", "*+Off+*", "Back", "Exit" ];
