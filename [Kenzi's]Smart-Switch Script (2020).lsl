@@ -33,6 +33,7 @@ list UpstairsRoomLights_Menu =      [ "-+Low+-", "-+Medium+-", "-+High+-", "-+Of
 
 string  confirmedSound      = "69743cb2-e509-ed4d-4e52-e697dc13d7ac";
 string  accessDeniedSound   = "58da0f9f-42e5-8a8f-ee51-4fac6c247c98";
+string  helpNotecart        = "Amy's - SmartHome Commands";
 
 doMenu(key id){
     llListenRemove(listen_handle);
@@ -441,6 +442,10 @@ default
             else if (msg == "kidsroom ceilingfan off"){
                 llMessageLinked(LINK_SET, 0, "*+Off+*", NULL_KEY);
                 AccessSound();
+            }
+            else if (msg == "help"){
+                llInstantMessage(id, "Notecart Send...");
+                llGiveInventory(id, helpNotecart);
             }
         }
 

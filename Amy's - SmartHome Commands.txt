@@ -1,0 +1,59 @@
+lights on
+lights off
+
+fans on
+fans off
+
+blinds open
+blinds closed
+
+livingroom lights low
+livingroom lights medium
+livingroom lights high
+livingroom lights off
+livingroom ceilingfan very slow
+livingroom ceilingfan slow
+livingroom ceilingfan medium
+livingroom ceilingfan fast
+livingroom ceilingfan very fast
+livingroom ceilingfan off
+
+bedroom lights low
+bedroom lights medium
+bedroom lights high
+bedroom lights off
+bedroom ceilingfan very slow
+bedroom ceilingfan slow
+bedroom ceilingfan medium
+bedroom ceilingfan fast
+bedroom ceilingfan very fast
+bedroom ceilingfan off
+
+bathroom lights low
+bathroom lights medium
+bathroom lights high
+bathroom lights off
+
+kitchen lights low
+kitchen lights medium
+kitchen lights high
+kitchen lights off
+kitchen ceilingfan very low
+kitchen ceilingfan slow
+kitchen ceilingfan medium
+kitchen ceilingfan fast
+kitchen ceilingfan very fast
+kitchen ceilingfan off
+
+kidsroom lights low
+kidsroom lights medium
+kidsroom lights high
+kidsroom lights off
+kidsroom ceilingfan very slow 
+kidsroom ceilingfan slow
+kidsroom ceilingfan medium
+kidsroom ceilingfan fast
+kidsroom ceilingfan very fast
+kidsroom ceilingfan off
+
+help
