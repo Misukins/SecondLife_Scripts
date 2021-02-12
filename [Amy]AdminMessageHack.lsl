@@ -1,17 +1,40 @@
-//Key of the user of the Menu 
-key UserID;
+string pokeSound            = "f6d4dd62-c5ff-5007-b8f4-2603e3692b9c";
+string spankSound           = "475a3e83-6801-49c6-e7ad-d6386b2ecc29";
 
-//Channel to listen for item the avatar has put in.
-integer InputDialogChannel;
+integer dlgHandle = -1;
+integer dlgChannel;
 
-//Handle to listen for input
-integer InputListenHandle;
+integer channel;
+integer listen_handle;
+
+integer range = 4096;
+integer gMenuPosition;
 
 list avatarList     = [];
 list avatarUUIDs    = [];
 
-integer range = 4096;
-integer gMenuPosition;
+list main_menu      = [ "GOD", "Options", "Exit" ];
+list options_menu   = [ "Reset", "Back", "Exit" ];
+
+integer DEBUG           = TRUE;
+
+key targetKey;
+
+MainMenu(key detectedKey)
+{
+    list avatar_name = llParseString2List(llGetDisplayName(detectedKey), [""], []);
+    channel = llFloor(llFrand(2000000));
+    listen_handle = llListen(channel, "", detectedKey, "");
+    llDialog(detectedKey, "Hello " + (string)avatar_name + ".\nSelect a an option", main_menu, channel);
+}
+
+OptionsMenu(key detectedKey)
+{
+    list avatar_name = llParseString2List(llGetDisplayName(detectedKey), [""], []);
+    channel = llFloor(llFrand(2000000));
+    listen_handle = llListen(channel, "", detectedKey, "");
+    llDialog(detectedKey, "Hello " + (string)avatar_name + ".\nSelect a an option", options_menu, channel);
+}
 
 Menu()
 {
@@ -44,49 +67,51 @@ Menu()
     dlgHandle = llListen(dlgChannel, "", llGetOwner(), "");
     llSetTimerEvent(30.0);
     Buttons += ["▼"];
-    llDialog(llGetOwner(), "Please select an avatar you want to send an AdminMessage", Buttons, dlgChannel);
+    llDialog(llGetOwner(), "Please select an avatar you want to follow", Buttons, dlgChannel);
+}
+
+reset()
+{
+    string origName = llGetObjectName();
+    llSetTimerEvent(0.0);
+    llListenRemove(dlgHandle);
+    dlgHandle = -1;
+    llSetObjectName(origName);
 }
 
 default
 {
- 
     state_entry()
     {
-        //F
-    }
-  
-    touch_start(integer num_detected)
-    {
-        state Dial;
-
-    //Get the UUID of the user that has touched the object
-        UserID = llDetectedKey(0);
-       
-    //Assign the listen to a handle so we can kill it when the user don't respond to the text box
-        llListenRemove(InputListenHandle);
-        InputListenHandle = llListen(InputDialogChannel, "", "", "");    
-      
-        llTextBox(UserID, "Please enter...", InputDialogChannel);
-    
+        dlgChannel = -1 - (integer)("0x" + llGetSubString( (string)llGetKey(), -7, -1) );
+        if (DEBUG == TRUE)
+            llOwnerSay("DEBUG: default");
     }
 
-    listen(integer channel, string name, key id, string message)
+    on_rez(integer x)
     {
-        llListenRemove(InputListenHandle);
-        llSetTimerEvent(0);
-        llOwnerSay("You wrote: " + message);
+        llResetScript();
     }
- 
-     //Take action if the user did not respond within time    
-    timer()
-    {
-    //Stop timer and listening because the user did not responds within the time given.
-    //User could have touched the ignore button, walk or tp away or crashed
-        llSetTimerEvent(0);
-        llListenRemove(InputListenHandle);
 
-    }   
-    
+    attach(key attached)
+    {
+        if(attached != NULL_KEY)
+            llResetScript();
+    }
+
+    changed(integer change)
+    {
+        if (change & CHANGED_OWNER)
+            llResetScript();
+    }
+
+    touch_start(integer total_number)
+    {
+        key id = llDetectedKey(0);
+        if (id == llGetOwner())
+            state Dial;
+    }
+
 }
 
 state Dial
@@ -96,6 +121,8 @@ state Dial
         avatarList = [];
         avatarUUIDs = [];
         llSensor("", NULL_KEY, AGENT, range, PI);
+        if (DEBUG == TRUE)
+            llOwnerSay("DEBUG: Dial");
     }
 
     sensor(integer num_detected)
@@ -119,22 +146,27 @@ state Dialog
     {
         gMenuPosition = 0;
         Menu();
-        InputDialogChannel = -1 - (integer)("0x" + llGetSubString( (string)llGetKey(), -7, -1) );
+        if (DEBUG == TRUE)
+            llOwnerSay("DEBUG: Dialog");
     }
 
     listen(integer channel, string name, key id, string message)
     {
         if ((channel == dlgChannel) && (llListFindList(avatarList, [message]) != -1)){
-            //F state Send;
+            state Send;
         }
 
         if (~llSubStringIndex(message,"►")){
             gMenuPosition += 10;
             Menu();
+            if (DEBUG == TRUE)
+                llOwnerSay("Prev");
         }
         else if (~llSubStringIndex(message,"◄")){
             gMenuPosition -= 10;
             Menu();
+            if (DEBUG == TRUE)
+                llOwnerSay("Next");
         }
     }
 
@@ -149,18 +181,17 @@ state Send
 {
     state_entry()
     {
-        
+        key id = llGetOwner();
+        MainMenu(id);
+        if (DEBUG == TRUE)
+            llOwnerSay("DEBUG: Send");
     }
 
     listen(integer channel, string name, key id, string message)
     {
-        if (llGetOwnerKey(id) == llGetOwner()){
-            UserID = llDetectedKey(0);
-            llListenRemove(InputListenHandle);
-            InputListenHandle = llListen(InputDialogChannel, "", "", "");
-            llTextBox(UserID, "Please enter...", InputDialogChannel);
-            /*NOTE
-            if (message == "Poke"){
+        if (llGetOwnerKey(id) == llGetOwner())
+        {
+            if (message == "GOD"){
                 list owner_name = llParseString2List(llGetDisplayName(llGetOwnerKey(llGetKey())), [""], []);
                 string origName = llGetObjectName();
                 list targetName = [];
@@ -170,16 +201,22 @@ state Send
                 targetKey = llName2Key(targetID);
                 ownerKey = llGetOwnerKey(llGetKey());
                 llSetObjectName("");
-                llInstantMessage(targetKey, llGetDisplayName(llGetOwner()) + " is trying to reach at you and poke you.\nWell hello there " + llGetDisplayName(targetKey) + "!\n I " + llGetDisplayName(llGetOwner()) + " just wanted to say you look amazing <3!\nSay hi to them @ secondlife:///app/agent/" + (string)ownerKey + "/im");
-                llOwnerSay("InstantMessage was sent to secondlife:///app/agent/" + (string)targetKey + "/about.");
+                llTextBox(targetID, "This is your Princess speaking, and i'm the law here" + llGetDisplayName(targetKey) + "!", channel);
+                llOwnerSay("TextBox was sent to secondlife:///app/agent/" + (string)targetKey + "/about.");
                 llSetObjectName(origName);
                 llSleep(.5);
                 state default;
                 return;
             }
-            */
+            else if (message == "Options")
+                OptionsMenu(id);
+            else if (message == "Back")
+                MainMenu(id);
+            else if (message == "Reset")
+                llResetScript();
+            else if (message == "Exit")
+                return;
         }
 
     }
 }
-
