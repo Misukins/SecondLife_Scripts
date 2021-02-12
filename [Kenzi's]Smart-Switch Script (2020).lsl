@@ -12,17 +12,18 @@ integer Debug           = FALSE;
 
 key owner;
 
-list main_menu =                    [ "LivingRoom", "BedRoom", "BathRoom", "Window", "Upstairs", "+-Lights-+", "Access", "Exit" ];
+list main_menu =                    [ "LivingRoom", "Amys Room", "Hennas Room", "Kenzis Room", "BathRoom", "+-Lights-+", "Access", "Exit" ];
 list AllLights_Menu =               [ "+-On-+", "+-Off-+", "Back", "Exit" ];
 list LivingRoomOptions_Menu =       [ "Lights", "CeilingFan", "Back", "Exit" ];
 list CeilingFanLights_Menu =        [ "Low", "Medium", "High", "Off", "Back", "Exit" ];
 list CeilingFanRotation_Menu =      [ "+VerySlow+", "+Slow+", "+Medium+", "+Fast+", "+VeryFast+", "+Off+", "Back", "Exit" ];
-list BedRoomOptions_Menu =          [ ">+Lights+<", ">+CeilingFan+<", "Back", "Exit" ];
+list BedRoomOptions_Menu =          [ ">+Lights+<", "Back", "Exit" ];
 list BedRoomLights_Menu =           [ "-Low-", "-Medium-", "-High-", "-Off-", "Back", "Exit" ];
 list BedRoomFan_Menu =              [ ">+VerySlow+<", ">+Slow+<", ">+Medium+<", ">+Fast+<", ">+VeryFast+<", ">+Off+<", "Back", "Exit" ];
-list D_W_tint_Menu =                [ "*Open*", "*Closed*", "Back", "Exit" ];
+//list D_W_tint_Menu =                [ "*Open*", "*Closed*", "Back", "Exit" ];
 list BathRoomLights_Menu =          [ ">Low<", ">Medium<", ">High<", ">Off<", "Back", "Exit" ];
 list AccessList_Menu =              [ "Group", "Private", "Public", "Back", "Exit" ];
+/*
 list Upstairs_Menu =                [ "**Room1**", "**Room2**", "Back", "Exit" ];
 list UpstairsBedRoomOptions_Menu =  [ "++Lights++", "++CeilingFan++", "Back", "Exit" ];
 list UpstairsBedRoomFan_Menu =      [ "*+VerySlow+*", "*+Slow+*", "*+Medium+*", "*+Fast+*", "*+VeryFast+*", "*+Off+*", "Back", "Exit" ];
@@ -30,6 +31,7 @@ list UpstairsBedRoomLights_Menu =   [ "++Low++", "++Medium++", "++High++", "++Of
 list UpstairsRoomOptions_Menu =     [ "-+Lights+-", "-+CeilingFan+-", "Back", "Exit" ];
 list UpstairsRoomFan_Menu =         [ "-*VerySlow*-", "-*Slow*-", "-*Medium*-", "-*Fast*-", "-*VeryFast*-", "-*Off*-", "Back", "Exit" ];
 list UpstairsRoomLights_Menu =      [ "-+Low+-", "-+Medium+-", "-+High+-", "-+Off+-", "Back", "Exit" ];
+*/
 
 string  confirmedSound      = "69743cb2-e509-ed4d-4e52-e697dc13d7ac";
 string  accessDeniedSound   = "58da0f9f-42e5-8a8f-ee51-4fac6c247c98";
