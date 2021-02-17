@@ -101,84 +101,12 @@ doBedRoomLightsMenu(key id){
     llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", BedRoomLights_Menu, channel);
 }
 
-doBedRoomFanMenu(key id){
-    llListenRemove(listen_handle);
-    channel = llFloor(llFrand(2000000));
-    listen_handle = llListen(channel, "", id, "");
-    list name = llParseString2List(llGetDisplayName(id), [""], []);
-    llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", BedRoomFan_Menu, channel);
-}
-
-doD_W_tintMenu(key id){
-    llListenRemove(listen_handle);
-    channel = llFloor(llFrand(2000000));
-    listen_handle = llListen(channel, "", id, "");
-    list name = llParseString2List(llGetDisplayName(id), [""], []);
-    llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", D_W_tint_Menu, channel);
-}
-
 doBathRoomLightsMenu(key id){
     llListenRemove(listen_handle);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", id, "");
     list name = llParseString2List(llGetDisplayName(id), [""], []);
     llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", BathRoomLights_Menu, channel);
-}
-
-doUpstairsMenu(key id){
-    llListenRemove(listen_handle);
-    channel = llFloor(llFrand(2000000));
-    listen_handle = llListen(channel, "", id, "");
-    list name = llParseString2List(llGetDisplayName(id), [""], []);
-    llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", Upstairs_Menu, channel);
-}
-
-doUpstairsRoomOptionsMenu(key id){
-    llListenRemove(listen_handle);
-    channel = llFloor(llFrand(2000000));
-    listen_handle = llListen(channel, "", id, "");
-    list name = llParseString2List(llGetDisplayName(id), [""], []);
-    llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", UpstairsRoomOptions_Menu, channel);
-}
-
-doUpstairsRoomFanMenu(key id){
-    llListenRemove(listen_handle);
-    channel = llFloor(llFrand(2000000));
-    listen_handle = llListen(channel, "", id, "");
-    list name = llParseString2List(llGetDisplayName(id), [""], []);
-    llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", UpstairsRoomFan_Menu, channel);
-}
-
-doUpstairsRoomLightsMenu(key id){
-    llListenRemove(listen_handle);
-    channel = llFloor(llFrand(2000000));
-    listen_handle = llListen(channel, "", id, "");
-    list name = llParseString2List(llGetDisplayName(id), [""], []);
-    llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", UpstairsRoomLights_Menu, channel);
-}
-
-doUpstairsBedRoomOptionsMenu(key id){
-    llListenRemove(listen_handle);
-    channel = llFloor(llFrand(2000000));
-    listen_handle = llListen(channel, "", id, "");
-    list name = llParseString2List(llGetDisplayName(id), [""], []);
-    llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", UpstairsBedRoomOptions_Menu, channel);
-}
-
-doUpstairsBedRoomFanMenu(key id){
-    llListenRemove(listen_handle);
-    channel = llFloor(llFrand(2000000));
-    listen_handle = llListen(channel, "", id, "");
-    list name = llParseString2List(llGetDisplayName(id), [""], []);
-    llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", UpstairsBedRoomFan_Menu, channel);
-}
-
-doUpstairsBedRoomLightsMenu(key id){
-    llListenRemove(listen_handle);
-    channel = llFloor(llFrand(2000000));
-    listen_handle = llListen(channel, "", id, "");
-    list name = llParseString2List(llGetDisplayName(id), [""], []);
-    llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", UpstairsBedRoomLights_Menu, channel);
 }
 
 AccessSound(){
@@ -247,26 +175,12 @@ default
                 llMessageLinked(LINK_SET, 0, "++Off++", NULL_KEY);
                 AccessSound();
             }
-            else if (msg == "fans on"){
+            else if (msg == "fan on"){
                 llMessageLinked(LINK_SET, 0, "+Medium+", NULL_KEY);
-                llMessageLinked(LINK_SET, 0, ">+Medium+<", NULL_KEY);
-                llMessageLinked(LINK_SET, 0, "-*Medium*-", NULL_KEY);
-                llMessageLinked(LINK_SET, 0, "*+Medium+*", NULL_KEY);
                 AccessSound();     
             }
-            else if (msg == "fans off"){
+            else if (msg == "fan off"){
                 llMessageLinked(LINK_SET, 0, "+Off+", NULL_KEY);
-                llMessageLinked(LINK_SET, 0, ">+Off+<", NULL_KEY);
-                llMessageLinked(LINK_SET, 0, "-*Off*-", NULL_KEY);
-                llMessageLinked(LINK_SET, 0, "*+Off+*", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "blinds open"){
-                llMessageLinked(LINK_SET, 0, "*Open*", NULL_KEY);
-                AccessSound();     
-            }
-            else if (msg == "blinds closed"){
-                llMessageLinked(LINK_SET, 0, "*Closed*", NULL_KEY);
                 AccessSound();
             }
             else if (msg == "livingroom lights low"){
@@ -309,6 +223,7 @@ default
                 llMessageLinked(LINK_SET, 0, "+Off+", NULL_KEY);
                 AccessSound();
             }
+            //F
             else if (msg == "bedroom lights low"){
                 llMessageLinked(LINK_SET, 0, "-Low-", NULL_KEY);
                 AccessSound();
@@ -325,30 +240,7 @@ default
                 llMessageLinked(LINK_SET, 0, "-Off-", NULL_KEY);
                 AccessSound();
             }
-            else if (msg == "bedroom ceilingfan very slow"){
-                llMessageLinked(LINK_SET, 0, ">+VerySlow+<", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "bedroom ceilingfan slow"){
-                llMessageLinked(LINK_SET, 0, ">+Slow+<", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "bedroom ceilingfan medium"){
-                llMessageLinked(LINK_SET, 0, ">+Medium+<", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "bedroom ceilingfan fast"){
-                llMessageLinked(LINK_SET, 0, ">+Fast+<", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "bedroom ceilingfan very fast"){
-                llMessageLinked(LINK_SET, 0, ">+VeryFast+<", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "bedroom ceilingfan off"){
-                llMessageLinked(LINK_SET, 0, ">+Off+<", NULL_KEY);
-                AccessSound();
-            }
+            //F
             else if (msg == "bathroom lights low"){
                 llMessageLinked(LINK_SET, 0, ">Low<", NULL_KEY);
                 AccessSound();
@@ -365,6 +257,7 @@ default
                 llMessageLinked(LINK_SET, 0, ">Off<", NULL_KEY);
                 AccessSound();
             }
+            //F
             else if (msg == "kitchen lights low"){
                 llMessageLinked(LINK_SET, 0, "-+Low+-", NULL_KEY);
                 AccessSound();
@@ -381,30 +274,7 @@ default
                 llMessageLinked(LINK_SET, 0, "-+Off+-", NULL_KEY);
                 AccessSound();
             }
-            else if (msg == "kitchen ceilingfan very low"){
-                llMessageLinked(LINK_SET, 0, "-*VerySlow*-", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "kitchen ceilingfan slow"){
-                llMessageLinked(LINK_SET, 0, "-*Slow*-", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "kitchen ceilingfan medium"){
-                llMessageLinked(LINK_SET, 0, "-*Medium*-", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "kitchen ceilingfan fast"){
-                llMessageLinked(LINK_SET, 0, "-*Fast*-", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "kitchen ceilingfan very fast"){
-                llMessageLinked(LINK_SET, 0, "-*VeryFast*-", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "kitchen ceilingfan off"){
-                llMessageLinked(LINK_SET, 0, "-*Off*-", NULL_KEY);
-                AccessSound();
-            }
+            //F
             else if (msg == "kidsroom lights low"){
                 llMessageLinked(LINK_SET, 0, "++Low++", NULL_KEY);
                 AccessSound();
@@ -419,30 +289,6 @@ default
             }
             else if (msg == "kidsroom lights off"){
                 llMessageLinked(LINK_SET, 0, "++Off++", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "kidsroom ceilingfan very slow "){
-                llMessageLinked(LINK_SET, 0, "*+VerySlow+*", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "kidsroom ceilingfan slow"){
-                llMessageLinked(LINK_SET, 0, "*+Slow+*", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "kidsroom ceilingfan medium"){
-                llMessageLinked(LINK_SET, 0, "*+Medium+*", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "kidsroom ceilingfan fast"){
-                llMessageLinked(LINK_SET, 0, "*+Fast+*", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "kidsroom ceilingfan very fast"){
-                llMessageLinked(LINK_SET, 0, "*+VeryFast+*", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "kidsroom ceilingfan off"){
-                llMessageLinked(LINK_SET, 0, "*+Off+*", NULL_KEY);
                 AccessSound();
             }
             else if (msg == "help"){
@@ -463,8 +309,10 @@ default
         else if (msg == "Access"){
             if (id == llGetOwner())
                 doAccessListMenu(id);
-            else
+            else{
+                DeniedSound();
                 return;
+            }
         }
         else if (msg == "LivingRoom")
             doLivingRoomOptionsMenu(id);
