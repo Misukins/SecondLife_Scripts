@@ -217,6 +217,61 @@ soundsOFF()
     llSetTimerEvent(seconds_to_check_when_avatar_walks);
 }
 
+stopFollowing()
+{
+  string origName = llGetObjectName();
+  llTargetRemove(tid);
+  llStopMoveToTarget();
+  llSetTimerEvent(0.0);
+  llSetObjectName(objectName);
+  llOwnerSay("No longer following.");
+  llSetObjectName(origName);
+}
+
+startFollowingName(string name)
+{
+  targetName = name;
+  llSensor(targetName,NULL_KEY,AGENT,96.0,PI);
+}
+
+startFollowingKey(key id)
+{
+  string origName = llGetObjectName();
+  targetKey = id;
+  llSetObjectName(objectName);
+  llOwnerSay("Now following "+targetName+" type /" + (string)CHANNEL + "stop to stop following");
+  llSetObjectName(origName);
+  keepFollowing();
+  llSetTimerEvent(DELAY);
+}
+
+keepFollowing()
+{
+  llTargetRemove(tid);  
+  llStopMoveToTarget();
+  list answer = llGetObjectDetails(targetKey,[OBJECT_POS]);
+  string origName = llGetObjectName();
+  if (llGetListLength(answer)==0) {
+    if (!announced){
+      llSetObjectName(objectName);
+      llOwnerSay(targetName+" seems to be out of range.  Waiting for return...");
+      llSetObjectName(origName);
+    }
+    announced = TRUE;
+  }
+  else {
+    announced = FALSE;
+    vector targetPos = llList2Vector(answer,0);
+    float dist = llVecDist(targetPos,llGetPos());
+    if (dist>RANGE) {
+      tid = llTarget(targetPos,RANGE);
+      if (dist>LIMIT)
+        targetPos = llGetPos() + LIMIT * llVecNorm( targetPos - llGetPos() );
+      llMoveToTarget(targetPos,TAU);
+    }
+  }
+}
+
 default
 {
     on_rez(integer s) 
@@ -273,6 +328,10 @@ default
         else if ((message == "Leash") || (message == "Unleash")){
             if(leshedON){
                 //NOTE
+                stopFollowing();    
+            }
+            else{
+                startFollowingKey(llDetectedKey(0));
             }
             leshedON = !leshedON;
             //F leshedON = TRUE;
@@ -453,5 +512,6 @@ default
             else
                 soundsOFF();
         }
+        keepFollowing();
     }
 }

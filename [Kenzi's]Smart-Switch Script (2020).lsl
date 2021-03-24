@@ -6,7 +6,7 @@ integer soundVolume     = 1.0;
 
 integer Group_Only      = FALSE;
 integer Owner_Only      = FALSE;
-integer Public_Access   = TRUE;
+integer Public_Access   = FALSE;
 
 integer Debug           = FALSE;
 
@@ -15,23 +15,12 @@ key owner;
 list main_menu =                    [ "LivingRoom", "Amys Room", "Hennas Room", "Kenzis Room", "BathRoom", "+-Lights-+", "Access", "Exit" ];
 list AllLights_Menu =               [ "+-On-+", "+-Off-+", "Back", "Exit" ];
 list LivingRoomOptions_Menu =       [ "Lights", "CeilingFan", "Back", "Exit" ];
-list CeilingFanLights_Menu =        [ "Low", "Medium", "High", "Off", "Back", "Exit" ];
 list CeilingFanRotation_Menu =      [ "+VerySlow+", "+Slow+", "+Medium+", "+Fast+", "+VeryFast+", "+Off+", "Back", "Exit" ];
 list BedRoomOptions_Menu =          [ ">+Lights+<", "Back", "Exit" ];
 list BedRoomLights_Menu =           [ "-Low-", "-Medium-", "-High-", "-Off-", "Back", "Exit" ];
 list BedRoomFan_Menu =              [ ">+VerySlow+<", ">+Slow+<", ">+Medium+<", ">+Fast+<", ">+VeryFast+<", ">+Off+<", "Back", "Exit" ];
-//list D_W_tint_Menu =                [ "*Open*", "*Closed*", "Back", "Exit" ];
 list BathRoomLights_Menu =          [ ">Low<", ">Medium<", ">High<", ">Off<", "Back", "Exit" ];
 list AccessList_Menu =              [ "Group", "Private", "Public", "Back", "Exit" ];
-/*
-list Upstairs_Menu =                [ "**Room1**", "**Room2**", "Back", "Exit" ];
-list UpstairsBedRoomOptions_Menu =  [ "++Lights++", "++CeilingFan++", "Back", "Exit" ];
-list UpstairsBedRoomFan_Menu =      [ "*+VerySlow+*", "*+Slow+*", "*+Medium+*", "*+Fast+*", "*+VeryFast+*", "*+Off+*", "Back", "Exit" ];
-list UpstairsBedRoomLights_Menu =   [ "++Low++", "++Medium++", "++High++", "++Off++", "Back", "Exit" ];
-list UpstairsRoomOptions_Menu =     [ "-+Lights+-", "-+CeilingFan+-", "Back", "Exit" ];
-list UpstairsRoomFan_Menu =         [ "-*VerySlow*-", "-*Slow*-", "-*Medium*-", "-*Fast*-", "-*VeryFast*-", "-*Off*-", "Back", "Exit" ];
-list UpstairsRoomLights_Menu =      [ "-+Low+-", "-+Medium+-", "-+High+-", "-+Off+-", "Back", "Exit" ];
-*/
 
 string  confirmedSound      = "69743cb2-e509-ed4d-4e52-e697dc13d7ac";
 string  accessDeniedSound   = "58da0f9f-42e5-8a8f-ee51-4fac6c247c98";
@@ -67,14 +56,6 @@ doLivingRoomOptionsMenu(key id){
     listen_handle = llListen(channel, "", id, "");
     list name = llParseString2List(llGetDisplayName(id), [""], []);
     llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", LivingRoomOptions_Menu, channel);
-}
-
-doCeilingFanLightsMenu(key id){
-    llListenRemove(listen_handle);
-    channel = llFloor(llFrand(2000000));
-    listen_handle = llListen(channel, "", id, "");
-    list name = llParseString2List(llGetDisplayName(id), [""], []);
-    llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", CeilingFanLights_Menu, channel);
 }
 
 doCeilingFanRotationMenu(key id){
@@ -324,28 +305,14 @@ default
             doBedRoomOptionsMenu(id);
         else if (msg == "BathRoom")
             doBathRoomLightsMenu(id);
-        else if (msg == "Window")
-            doD_W_tintMenu(id);
         else if (msg == "+-Lights-+")
             doAllLightsMenu(id);
         else if (msg == ">+Lights+<")
             doBedRoomLightsMenu(id);
-        else if (msg == ">+CeilingFan+<")
-            doBedRoomFanMenu(id);
-        else if (msg == "Upstairs")
-            doUpstairsMenu(id);
         else if (msg == "**Room1**")
             doUpstairsRoomOptionsMenu(id);
-        else if (msg == "**Room2**")
-            doUpstairsBedRoomOptionsMenu(id);
         else if (msg == "-+Lights+-")
             doUpstairsRoomLightsMenu(id);
-        else if (msg == "-+CeilingFan+-")
-            doUpstairsRoomFanMenu(id);
-        else if (msg == "++Lights++")
-            doUpstairsBedRoomLightsMenu(id);
-        else if (msg == "++CeilingFan++")
-            doUpstairsBedRoomFanMenu(id);
         
         else if (msg == "Group"){
             Group_Only      = TRUE;
