@@ -11,6 +11,12 @@ integer BothOn    = FALSE;
 
 float _volume = 0.3;
 
+init(){
+    llListenRemove(listener);
+    llPreloadSound(_sound_on);
+    llPreloadSound(_sound_off);
+}
+
 menu(key id)
 {
     if ((ScannerOn == FALSE) && (ScriptOn == FALSE)){
@@ -52,25 +58,24 @@ StartSniffing()
 
 StartScriptSniffing()
 {
-    //F
+    //NOTE NO NEED.. THIS IS RDY TO YOU!
 }
 
 default
 {
     state_entry()
     {
-        llPreloadSound(_sound_on);
-        llPreloadSound(_sound_off);
+        init();
         llSetText("",<1,1,1>,1);
         ScannerOn = FALSE;
         ScriptOn  = FALSE;
         BothOn    = FALSE;
+        menu(llGetOwner());
     }
 
     touch_start(integer total_number)
     {
-        if(llDetectedKey(0) == llGetOwner())
-            menu(llGetOwner());
+        state default;
     }
 
     listen(integer channel, string name, key id, string message)
@@ -133,13 +138,11 @@ state Sniffing
 
     touch_start(integer _n)
     {
-        if(llDetectedKey(0) == llGetOwner())
-            menu(llGetOwner());
+        state default;
     }
 
     listen(integer channel, string name, key id, string message)
     {
-        //F ~
         if(channel != menuchannel){
             string object_name = llGetOwnerKey(id);
             list owner_name = llParseString2List(llGetDisplayName(object_name), [""], []);
@@ -212,8 +215,7 @@ state Script
 
     touch_start( integer _n )
     {
-        if(llDetectedKey(0) == llGetOwner())
-            menu(llGetOwner());
+        state default;
     }
 
     listen(integer channel, string name, key id, string message)
@@ -265,10 +267,14 @@ state Script
         vector color;
         float time=llList2Float(llGetObjectDetails(llGetOwner(),[OBJECT_SCRIPT_TIME]),0)*1000;
         integer count=llList2Integer(llGetObjectDetails(llGetOwner(),[OBJECT_RUNNING_SCRIPT_COUNT]),0);
-        if (time<=.4) color=<0,1,0>;
-        else if (time>.4 && time <=.9) color=<1,1,0>;
-        else if (time>.9 && time <= 1.5) color = <1,0,0>;
-        else color =<0.514, 0.000, 0.514>;
+        if(time<=.4)
+            color=<0,1,0>;
+        else if (time>.4 && time <=.9)
+            color=<1,1,0>;
+        else if (time>.9 && time <= 1.5)
+                color = <1,0,0>;
+        else
+            color =<0.514, 0.000, 0.514>;
         llSetText("Scripts:"+(string)count+"\n"+"Scripts Time:"+((string)time),color,1);
     }
 
@@ -296,8 +302,7 @@ state BothOnState
 
     touch_start( integer _n )
     {
-        if(llDetectedKey(0) == llGetOwner())
-            menu(llGetOwner());
+        state default;
     }
 
     listen(integer channel, string name, key id, string message)
@@ -355,10 +360,14 @@ state BothOnState
         vector color;
         float time=llList2Float(llGetObjectDetails(llGetOwner(),[OBJECT_SCRIPT_TIME]),0)*1000;
         integer count=llList2Integer(llGetObjectDetails(llGetOwner(),[OBJECT_RUNNING_SCRIPT_COUNT]),0);
-        if (time<=.4) color=<0,1,0>;
-        else if (time>.4 && time <=.9) color=<1,1,0>;
-        else if (time>.9 && time <= 1.5) color = <1,0,0>;
-        else color =<0.514, 0.000, 0.514>;
+        if(time<=.4)
+            color=<0,1,0>;
+        else if (time>.4 && time <=.9)
+            color=<1,1,0>;
+        else if (time>.9 && time <= 1.5)
+                color = <1,0,0>;
+        else
+            color =<0.514, 0.000, 0.514>;
         llSetText("Scripts:"+(string)count+"\n"+"Scripts Time:"+((string)time),color,1);
     }
 
@@ -370,5 +379,7 @@ state BothOnState
         BothOn      = FALSE;
         llOwnerSay("Scripts Counter and Channel Sniffer are now Offline..");
         llPlaySound(_sound_off, _volume);
+        state default;
+        return;
     }
 }

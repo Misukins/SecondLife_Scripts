@@ -16,10 +16,19 @@ list main_menu =                    [ "LivingRoom", "Amys Room", "Hennas Room", 
 list AllLights_Menu =               [ "+-On-+", "+-Off-+", "Back", "Exit" ];
 list LivingRoomOptions_Menu =       [ "Lights", "CeilingFan", "Back", "Exit" ];
 list CeilingFanRotation_Menu =      [ "+VerySlow+", "+Slow+", "+Medium+", "+Fast+", "+VeryFast+", "+Off+", "Back", "Exit" ];
-list BedRoomOptions_Menu =          [ ">+Lights+<", "Back", "Exit" ];
+
+list BedRoomOptions_Menu =          [ ">+Lights+<", "Back", "Exit" ]; //Amy's Room
 list BedRoomLights_Menu =           [ "-Low-", "-Medium-", "-High-", "-Off-", "Back", "Exit" ];
-list BedRoomFan_Menu =              [ ">+VerySlow+<", ">+Slow+<", ">+Medium+<", ">+Fast+<", ">+VeryFast+<", ">+Off+<", "Back", "Exit" ];
+
+list BedRoom1Options_Menu =          [ ">+Lights+<", "Back", "Exit" ]; //Henna's Room
+list BedRoom1Lights_Menu =           [ "-Low-", "-Medium-", "-High-", "-Off-", "Back", "Exit" ];
+
+list BedRoom2Options_Menu =          [ ">+Lights+<", "Back", "Exit" ]; //"Kenzis room"
+list BedRoom2Lights_Menu =           [ "-Low-", "-Medium-", "-High-", "-Off-", "Back", "Exit" ];
+
 list BathRoomLights_Menu =          [ ">Low<", ">Medium<", ">High<", ">Off<", "Back", "Exit" ];
+
+list KitchenLights_Menu =          [ ">Low<", ">Medium<", ">High<", ">Off<", "Back", "Exit" ];
 list AccessList_Menu =              [ "Group", "Private", "Public", "Back", "Exit" ];
 
 string  confirmedSound      = "69743cb2-e509-ed4d-4e52-e697dc13d7ac";
