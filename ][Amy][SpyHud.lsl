@@ -11,12 +11,6 @@ integer BothOn    = FALSE;
 
 float _volume = 0.3;
 
-init(){
-    llListenRemove(listener);
-    llPreloadSound(_sound_on);
-    llPreloadSound(_sound_off);
-}
-
 menu(key id)
 {
     if ((ScannerOn == FALSE) && (ScriptOn == FALSE)){
@@ -56,16 +50,13 @@ StartSniffing()
         llListen(i, "", "", "");
 }
 
-StartScriptSniffing()
-{
-    //NOTE NO NEED.. THIS IS RDY TO YOU!
-}
-
 default
 {
     state_entry()
     {
-        init();
+        llPreloadSound(_sound_on);
+        llPreloadSound(_sound_off);
+        llSetTimerEvent(0);
         llSetText("",<1,1,1>,1);
         ScannerOn = FALSE;
         ScriptOn  = FALSE;
@@ -148,49 +139,6 @@ state Sniffing
             list owner_name = llParseString2List(llGetDisplayName(object_name), [""], []);
             llOwnerSay( "[" + (string) channel + "]-(" + (string)owner_name + ")[secondlife:///app/agent/" + object_name + "/about (" + name + ")]" + " " + message );
         }
-
-        if (message == "Exit")
-            return;
-        else if ((message == "□ Scanner") || (message == "■ Scanner")){
-            if (!ScannerOn){
-                state Sniffing;
-                llOwnerSay("Listen Scanner is now On..");
-                llPlaySound(_sound_on, _volume);
-                menu(llGetOwner());
-                return;
-            }
-            else{
-                state default;
-                llOwnerSay("Listen Scanner is now Off..");
-                llPlaySound(_sound_off, _volume);
-                menu(llGetOwner());
-                return;
-            }
-            ScannerOn = !ScannerOn;
-        }
-        else if ((message == "□ Scripts") || (message == "■ Scripts")){
-            if (!ScriptOn){
-                state Script;
-                ScriptOn = TRUE;
-                llOwnerSay("Scripts Counter is now On..");
-                llPlaySound(_sound_on, _volume);
-                menu(llGetOwner());
-                return;
-            }
-            else{
-                state default;
-                ScriptOn = FALSE;
-                llOwnerSay("Scripts Counter is now Off..");
-                llPlaySound(_sound_off, _volume);
-                menu(llGetOwner());
-                return;
-            }
-            ScriptOn = !ScriptOn;
-        }
-        else if (message == "BothOn"){
-            state BothOnState;
-            return;
-        }
     }
 
     state_exit()
@@ -216,50 +164,6 @@ state Script
     touch_start( integer _n )
     {
         state default;
-    }
-
-    listen(integer channel, string name, key id, string message)
-    {
-        if (message == "Exit")
-            return;
-        else if ((message == "□ Scanner") || (message == "■ Scanner")){
-            if (!ScannerOn){
-                state Sniffing;
-                llOwnerSay("Listen Scanner is now On..");
-                llPlaySound(_sound_on, _volume);
-                menu(llGetOwner());
-                return;
-            }
-            else{
-                state default;
-                llOwnerSay("Listen Scanner is now Off..");
-                llPlaySound(_sound_off, _volume);
-                menu(llGetOwner());
-                return;
-            }
-            ScannerOn = !ScannerOn;
-        }
-        else if ((message == "□ Scripts") || (message == "■ Scripts")){
-            if (!ScriptOn){
-                state Script;
-                llOwnerSay("Scripts Counter is now On..");
-                llPlaySound(_sound_on, _volume);
-                menu(llGetOwner());
-                return;
-            }
-            else{
-                state default;
-                llOwnerSay("Scripts Counter is now Off..");
-                llPlaySound(_sound_off, _volume);
-                menu(llGetOwner());
-                return;
-            }
-            ScriptOn = !ScriptOn;
-        }
-        else if (message == "BothOn"){
-            state BothOnState;
-            return;
-        }
     }
 
     timer()
@@ -302,6 +206,12 @@ state BothOnState
 
     touch_start( integer _n )
     {
+        llSetTimerEvent(0);
+        ScannerOn   = FALSE;
+        ScriptOn    = FALSE;
+        BothOn      = FALSE;
+        llOwnerSay("Scripts Counter and Channel Sniffer are now Offline..");
+        llPlaySound(_sound_off, _volume);
         state default;
     }
 
@@ -311,47 +221,6 @@ state BothOnState
             string object_name = llGetOwnerKey(id);
             list owner_name = llParseString2List(llGetDisplayName(object_name), [""], []);
             llOwnerSay( "[" + (string) channel + "]-(" + (string)owner_name + ")[secondlife:///app/agent/" + object_name + "/about (" + name + ")]" + " " + message );
-        }
-
-        if (message == "Exit")
-            return;
-        else if ((message == "□ Scanner") || (message == "■ Scanner")){
-            if (!ScannerOn){
-                state Sniffing;
-                llOwnerSay("Listen Scanner is now On..");
-                llPlaySound(_sound_on, _volume);
-                menu(llGetOwner());
-                return;
-            }
-            else{
-                state default;
-                llOwnerSay("Listen Scanner is now Off..");
-                llPlaySound(_sound_off, _volume);
-                menu(llGetOwner());
-                return;
-            }
-            ScannerOn = !ScannerOn;
-        }
-        else if ((message == "□ Scripts") || (message == "■ Scripts")){
-            if (!ScriptOn){
-                state Script;
-                llOwnerSay("Scripts Counter is now On..");
-                llPlaySound(_sound_on, _volume);
-                menu(llGetOwner());
-                return;
-            }
-            else{
-                state default;
-                llOwnerSay("Scripts Counter is now Off..");
-                llPlaySound(_sound_off, _volume);
-                menu(llGetOwner());
-                return;
-            }
-            ScriptOn = !ScriptOn;
-        }
-        else if (message == "BothOn"){
-            state BothOnState;
-            return;
         }
     }
 
@@ -373,13 +242,6 @@ state BothOnState
 
     state_exit()
     {
-        llSetTimerEvent(0);
-        ScannerOn   = FALSE;
-        ScriptOn    = FALSE;
-        BothOn      = FALSE;
-        llOwnerSay("Scripts Counter and Channel Sniffer are now Offline..");
-        llPlaySound(_sound_off, _volume);
-        state default;
-        return;
+        //!
     }
 }
