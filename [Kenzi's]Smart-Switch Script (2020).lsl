@@ -18,15 +18,15 @@ list LivingRoomOptions_Menu =       [ "Lights", "CeilingFan", "Back", "Exit" ];
 list CeilingFanRotation_Menu =      [ "+VerySlow+", "+Slow+", "+Medium+", "+Fast+", "+VeryFast+", "+Off+", "Back", "Exit" ];
 
 list BedRoomOptions_Menu =          [ ">+Lights+<", "Back", "Exit" ]; //Amy's Room
-list BedRoomLights_Menu =           [ "-Low-", "-Medium-", "-High-", "-Off-", "Back", "Exit" ];
+list BedRoomLights_Menu =           [ ">+Low+<", ">+Medium+<", ">+High+<", ">+Off+<", "Back", "Exit" ];
 
-list BedRoom1Options_Menu =          [ ">+Lights+<", "Back", "Exit" ]; //Henna's Room
+list BedRoom1Options_Menu =          [ "-+Lights+-", "Back", "Exit" ]; //Henna's Room
 list BedRoom1Lights_Menu =           [ "-Low-", "-Medium-", "-High-", "-Off-", "Back", "Exit" ];
 
-list BedRoom2Options_Menu =          [ ">+Lights+<", "Back", "Exit" ]; //"Kenzis room"
-list BedRoom2Lights_Menu =           [ "-Low-", "-Medium-", "-High-", "-Off-", "Back", "Exit" ];
+list BedRoom2Options_Menu =          [ "++Lights++", "Back", "Exit" ]; //"Kenzis room"
+list BedRoom2Lights_Menu =           [ "++Low++", "++Medium++", "++High++", "++Off++", "Back", "Exit" ];
 
-list BathRoomLights_Menu =          [ ">Low<", ">Medium<", ">High<", ">Off<", "Back", "Exit" ];
+list BathRoomLights_Menu =          [ "->Low<-", "->Medium<-", "->High<-", "->Off<-", "Back", "Exit" ];
 
 list KitchenLights_Menu =          [ ">Low<", ">Medium<", ">High<", ">Off<", "Back", "Exit" ];
 list AccessList_Menu =              [ "Group", "Private", "Public", "Back", "Exit" ];
@@ -213,72 +213,89 @@ default
                 llMessageLinked(LINK_SET, 0, "+Off+", NULL_KEY);
                 AccessSound();
             }
-            //F
-            else if (msg == "bedroom lights low"){
-                llMessageLinked(LINK_SET, 0, "-Low-", NULL_KEY);
+            //NOTE Amy
+            else if (msg == "amy room lights low"){
+                llMessageLinked(LINK_SET, 0, ">+Low+<", NULL_KEY);
                 AccessSound();
             }
-            else if (msg == "bedroom lights medium"){
-                llMessageLinked(LINK_SET, 0, "-Medium-", NULL_KEY);
+            else if (msg == "amy room lights medium"){
+                llMessageLinked(LINK_SET, 0, ">+Medium+<", NULL_KEY);
                 AccessSound();
             }
-            else if (msg == "bedroom lights high"){
-                llMessageLinked(LINK_SET, 0, "-High-", NULL_KEY);
+            else if (msg == "amy room lights high"){
+                llMessageLinked(LINK_SET, 0, ">+High+<", NULL_KEY);
                 AccessSound();
             }
-            else if (msg == "bedroom lights off"){
-                llMessageLinked(LINK_SET, 0, "-Off-", NULL_KEY);
+            else if (msg == "amy room lights off"){
+                llMessageLinked(LINK_SET, 0, ">+Off+<", NULL_KEY);
                 AccessSound();
             }
-            //F
-            else if (msg == "bathroom lights low"){
-                llMessageLinked(LINK_SET, 0, ">Low<", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "bathroom lights medium"){
-                llMessageLinked(LINK_SET, 0, ">Medium<", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "bathroom lights high"){
-                llMessageLinked(LINK_SET, 0, ">High<", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "bathroom lights off"){
-                llMessageLinked(LINK_SET, 0, ">Off<", NULL_KEY);
-                AccessSound();
-            }
-            //F
-            else if (msg == "kitchen lights low"){
+            //NOTE Henna
+            else if (msg == "henna room lights low"){
                 llMessageLinked(LINK_SET, 0, "-+Low+-", NULL_KEY);
                 AccessSound();
             }
-            else if (msg == "kitchen lights medium"){
+            else if (msg == "henna room lights medium"){
                 llMessageLinked(LINK_SET, 0, "-+Medium+-", NULL_KEY);
                 AccessSound();
             }
-            else if (msg == "kitchen lights high"){
+            else if (msg == "henna room lights high"){
                 llMessageLinked(LINK_SET, 0, "-+High+-", NULL_KEY);
                 AccessSound();
             }
-            else if (msg == "kitchen lights off"){
+            else if (msg == "henna room lights off"){
                 llMessageLinked(LINK_SET, 0, "-+Off+-", NULL_KEY);
                 AccessSound();
             }
-            //F
-            else if (msg == "kidsroom lights low"){
+            //NOTE Kenzi
+            else if (msg == "kenzi room lights low"){
                 llMessageLinked(LINK_SET, 0, "++Low++", NULL_KEY);
                 AccessSound();
             }
-            else if (msg == "kidsroom lights medium"){
+            else if (msg == "kenzi room lights medium"){
                 llMessageLinked(LINK_SET, 0, "++Medium++", NULL_KEY);
                 AccessSound();
             }
-            else if (msg == "kidsroom lights high"){
+            else if (msg == "kenzi room lights high"){
                 llMessageLinked(LINK_SET, 0, "++High++", NULL_KEY);
                 AccessSound();
             }
-            else if (msg == "kidsroom lights off"){
+            else if (msg == "kenzi room lights off"){
                 llMessageLinked(LINK_SET, 0, "++Off++", NULL_KEY);
+                AccessSound();
+            }
+            //NOTE Kitchen
+            else if (msg == "kitchen lights low"){
+                llMessageLinked(LINK_SET, 0, ">Low<", NULL_KEY);
+                AccessSound();
+            }
+            else if (msg == "kitchen lights medium"){
+                llMessageLinked(LINK_SET, 0, ">Medium<", NULL_KEY);
+                AccessSound();
+            }
+            else if (msg == "kitchen lights high"){
+                llMessageLinked(LINK_SET, 0, ">High<", NULL_KEY);
+                AccessSound();
+            }
+            else if (msg == "kitchen lights off"){
+                llMessageLinked(LINK_SET, 0, ">Off<", NULL_KEY);
+                AccessSound();
+            }
+            //NOTE Bathroom
+            else if (msg == "bathroom lights low"){
+                llMessageLinked(LINK_SET, 0, "->Low<-", NULL_KEY);
+                AccessSound();
+            }
+            else if (msg == "bathroom lights medium"){
+                llMessageLinked(LINK_SET, 0, "->Medium<-", NULL_KEY);
+                AccessSound();
+            }
+            else if (msg == "bathroom lights high"){
+                llMessageLinked(LINK_SET, 0, "->High<-", NULL_KEY);
+                AccessSound();
+            }
+            else if (msg == "bathroom lights off"){
+                llMessageLinked(LINK_SET, 0, "->Off<-", NULL_KEY);
                 AccessSound();
             }
             else if (msg == "help"){
