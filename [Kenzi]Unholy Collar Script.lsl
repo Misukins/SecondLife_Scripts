@@ -1,4 +1,8 @@
 key owner;
+key g_kLeashedTo;
+key g_kLeashToPoint;
+key g_kParticleTarget;
+key targetKey = NULL_KEY;
 
 string Default_Start_Walking_Sound = "";
 string Default_Walking_Sound = "";
@@ -19,6 +23,13 @@ string whiteTexture = "9c6e07c4-52cb-be8f-9ba3-ccfef92ebe7f";
 
 string API_Start_Sound;
 string API_Stop_Sound;
+string targetName = "";
+string objectName = "Collar - Leash";
+
+float DELAY = 0.5;
+float RANGE = 3.0;
+float TAU = 1.0;
+float LIMIT = 60.0;
 
 integer On              = TRUE;
 integer sound1          = TRUE;
@@ -31,25 +42,38 @@ integer sound7          = FALSE;
 integer sound8          = FALSE;
 integer walking         = FALSE;
 integer leshedON        = FALSE;
+integer announced       = FALSE;
 
 integer globalListenHandle  = -0;
 integer channel;
 integer listen_handle;
+integer g_iLoop;
+list g_lLeashPrims;
+integer g_bLeashActive = FALSE;
+integer tid = 0;
 
 float Walking_Sound_Speed = 1.0;
 float Volume_For_Sounds = 0.05;
 float Volume_For_Bell = 0.2;
 float seconds_to_check_when_avatar_walks = 0.01;
 
+list main_menu;
 list sounds_menu = [ "Bell 1", "Bell 2", "Bell 3", "Bell 4", "Bell 5", "Bell 6", "Bell 7", "Bell 8", "Back" ];
 list textures_menu = ["Black", "White"];
 
+key manager1UUID = "92d7a0cf-dbd1-44d1-b4ba-cc495767187a";
+key manager2UUID = "1ffac40f-b1ea-41f9-b576-1993b96e36b2";
+key manager3UUID = "076144a2-875c-4448-b0e2-ae7e4fa328d4";
+
+
 menu(key _id)
 {
-    if (!leshedON)
-        list main_menu = [ "Leash", "Sounds", "On/Off", "Textures", "Exit" ];
-    else
-        list main_menu = [ "Unleash", "Sounds", "On/Off", "Textures", "Exit" ];
+    if (!leshedON){
+        main_menu = ["Leash", "Sounds", "On/Off", "Textures", "Exit"];
+    }
+    else{
+        main_menu = ["Unleash", "Sounds", "On/Off", "Textures", "Exit"];
+    }
     list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", _id, "");
@@ -84,7 +108,6 @@ FindLinkedPrims()
         integer iLoop;
         for (iLoop = 0; iLoop < llGetListLength(lTemp); iLoop++){
             string sTest = llList2String(lTemp, iLoop);
-            debug(sTest);
             if (llGetSubString(sTest, 0, 9) == "leashpoint"){
                 if (llGetSubString(sTest, 11, -1) == ""){
                     g_lLeashPrims += [sTest, (string)g_iLoop, "1"];
@@ -113,7 +136,7 @@ integer g_iParticleCount = 1;
 float g_fBurstRate = 0.04;
 Particles(integer iLink, key kParticleTarget)
 {
-    if (kParticleTarget == NULLKEY){
+    if (kParticleTarget == NULL_KEY){
         return;
     }
     integer iFlags = PSYS_PART_FOLLOW_VELOCITY_MASK | PSYS_PART_TARGET_POS_MASK|PSYS_PART_FOLLOW_SRC_MASK;
@@ -136,7 +159,6 @@ Particles(integer iLink, key kParticleTarget)
 
 StartParticles(key kParticleTarget)
 {
-    debug(llList2CSV(g_lLeashPrims));
     for (g_iLoop = 0; g_iLoop < llGetListLength(g_lLeashPrims); g_iLoop = g_iLoop + 3){
         if ((integer)llList2String(g_lLeashPrims, g_iLoop + 2)){
             Particles((integer)llList2String(g_lLeashPrims, g_iLoop + 1), kParticleTarget);
@@ -152,9 +174,9 @@ StopParticles(integer iEnd)
     }
     if (iEnd){
         g_bLeashActive = FALSE;
-        g_kLeashedTo = NULLKEY;
-        g_kLeashToPoint = NULLKEY;
-        g_kParticleTarget = NULLKEY;
+        g_kLeashedTo = NULL_KEY;
+        g_kLeashToPoint = NULL_KEY;
+        g_kParticleTarget = NULL_KEY;
         llSensorRemove();
     }
 }
@@ -190,14 +212,6 @@ asLoadSounds()
         }
     }
     while(i++<a);
-}
-
-integer CheckMono()
-{
-    if(llGetFreeMemory() > 40000)
-        return TRUE;
-    else
-        return FALSE;
 }
 
 key llGetObjectOwner()
@@ -239,7 +253,6 @@ startFollowingKey(key id)
   string origName = llGetObjectName();
   targetKey = id;
   llSetObjectName(objectName);
-  llOwnerSay("Now following "+targetName+" type /" + (string)CHANNEL + "stop to stop following");
   llSetObjectName(origName);
   keepFollowing();
   llSetTimerEvent(DELAY);
@@ -282,9 +295,6 @@ default
     state_entry()
     {
         llSetObjectName(llKey2Name(llGetOwner())+ "'s Collar");
-        if(CheckMono() == FALSE)
-            llInstantMessage(llGetObjectOwner(), "This script will run better in Mono");
-        
         if(llGetAttached() != 0){
             llSetTimerEvent(seconds_to_check_when_avatar_walks);
             asLoadSounds();
@@ -315,6 +325,12 @@ default
             llWhisper(0, (string)username + " plays with the trinket on " + (string)owner +"'s collar.");
             if(toucher_key == llGetOwner())
                 menu(toucher_key);
+            else if(toucher_key == manager1UUID)
+                menu(toucher_key);
+            else if(toucher_key == manager2UUID)
+                menu(toucher_key);
+            else if(toucher_key == manager3UUID)
+                menu(toucher_key);
             else
                 return;
         }
@@ -326,15 +342,29 @@ default
         if (message == "Exit")
             return;
         else if ((message == "Leash") || (message == "Unleash")){
-            if(leshedON){
-                //NOTE
-                stopFollowing();    
+            if(id == manager1UUID){
+                if(leshedON)
+                    stopFollowing();
+                else
+                    startFollowingKey(id);
+                leshedON = !leshedON; //NOTE TRUE or FALSE ALREADY
             }
-            else{
-                startFollowingKey(llDetectedKey(0));
+            else if(id == manager2UUID){
+                if(leshedON)
+                    stopFollowing();
+                else
+                    startFollowingKey(id);
+                leshedON = !leshedON; //NOTE TRUE or FALSE ALREADY
             }
-            leshedON = !leshedON;
-            //F leshedON = TRUE;
+            else if(id == manager3UUID){
+                if(leshedON)
+                    stopFollowing();
+                else
+                    startFollowingKey(id);
+                leshedON = !leshedON; //NOTE TRUE or FALSE ALREADY
+            }
+            else
+                llWhisper(0, "no access!! (temp)");
         }
         else if (message == "On/Off")
         {
