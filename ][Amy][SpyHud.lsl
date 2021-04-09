@@ -66,7 +66,7 @@ default
 
     touch_start(integer total_number)
     {
-        state default;
+        llResetScript();
     }
 
     listen(integer channel, string name, key id, string message)
