@@ -61,9 +61,9 @@ list main_menu;
 list sounds_menu = [ "Bell 1", "Bell 2", "Bell 3", "Bell 4", "Bell 5", "Bell 6", "Bell 7", "Bell 8", "Back" ];
 list textures_menu = ["Black", "White"];
 
-key manager1UUID = "92d7a0cf-dbd1-44d1-b4ba-cc495767187a";
-key manager2UUID = "1ffac40f-b1ea-41f9-b576-1993b96e36b2";
-key manager3UUID = "076144a2-875c-4448-b0e2-ae7e4fa328d4";
+key manager1UUID = "92d7a0cf-dbd1-44d1-b4ba-cc495767187a"; //NOTE Kenzi -
+key manager2UUID = "1ffac40f-b1ea-41f9-b576-1993b96e36b2"; //NOTE Amy -
+key manager3UUID = "076144a2-875c-4448-b0e2-ae7e4fa328d4"; //NOTE Henna -
 
 
 menu(key _id)
@@ -347,21 +347,21 @@ default
                     stopFollowing();
                 else
                     startFollowingKey(id);
-                leshedON = !leshedON; //NOTE TRUE or FALSE ALREADY
+                leshedON = !leshedON;
             }
             else if(id == manager2UUID){
                 if(leshedON)
                     stopFollowing();
                 else
                     startFollowingKey(id);
-                leshedON = !leshedON; //NOTE TRUE or FALSE ALREADY
+                leshedON = !leshedON;
             }
             else if(id == manager3UUID){
                 if(leshedON)
                     stopFollowing();
                 else
                     startFollowingKey(id);
-                leshedON = !leshedON; //NOTE TRUE or FALSE ALREADY
+                leshedON = !leshedON;
             }
             else
                 llWhisper(0, "no access!! (temp)");
