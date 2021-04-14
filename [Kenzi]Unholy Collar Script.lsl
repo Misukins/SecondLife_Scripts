@@ -1,10 +1,4 @@
-//key owner;
-key g_kLeashedTo;
-key g_kLeashToPoint;
-key g_kParticleTarget;
 key targetKey = NULL_KEY;
-
-key ropetextureDIFF = "f8cfcfee-8ce8-b73a-37e1-95af0220ecb0";
 
 float DELAY = 0.5;
 float RANGE = 3.0;
@@ -17,15 +11,6 @@ float seconds_to_check_when_avatar_walks = 0.01;
 
 integer On              = TRUE;
 integer sound1          = TRUE;
-/*
-integer sound2          = FALSE;
-integer sound3          = FALSE;
-integer sound4          = FALSE;
-integer sound5          = FALSE;
-integer sound6          = FALSE;
-integer sound7          = FALSE;
-integer sound8          = FALSE;
-*/
 integer walking         = FALSE;
 integer leshedON        = FALSE;
 integer announced       = FALSE;
@@ -33,18 +18,15 @@ integer announced       = FALSE;
 integer globalListenHandle  = -0;
 integer channel;
 integer listen_handle;
-integer g_iLoop;
-integer g_bLeashActive = FALSE;
 integer tid = 0;
 
 list accessList = [];
-list g_lLeashPrims;
 list main_menu;
-list sounds_menu = [ "Bell 1", "Back", "Exit"]; //, "Bell 2", "Bell 3", "Bell 4", "Bell 5", "Bell 6", "Bell 7", "Bell 8", "Back" ];
+list sounds_menu = [ "Bell 1", "Back", "Exit"];
 list textures_menu = ["Black", "White", "Back", "Exit"];
 list users_menu = ["Add", "Remove", "List", "Clear", "Back", "Exit"];
 
-/* //NOTE Coming soon.. (walk sounds)
+/* //NOTE Coming soon.. (walk sounds) with on/off option
 string Default_Start_Walking_Sound = "";
 string Default_Walking_Sound = "";
 string Default_Stop_Walking_Sound = "";
@@ -128,93 +110,9 @@ usersmenu(key _id)
     llDialog(_id, "Hello " + (string)avatar_name + " Select a an option", textures_menu, channel);
 }
 
-FindLinkedPrims()
-{
-    integer linkcount = llGetNumberOfPrims();
-    for (g_iLoop = 2; g_iLoop <= linkcount; g_iLoop++){
-        string sPrimDesc = (string)llGetObjectDetails(llGetLinkKey(g_iLoop), [OBJECT_DESC]);
-        list lTemp = llParseString2List(sPrimDesc, ["~"], []);
-        integer iLoop;
-        for (iLoop = 0; iLoop < llGetListLength(lTemp); iLoop++){
-            string sTest = llList2String(lTemp, iLoop);
-            if (llGetSubString(sTest, 0, 9) == "leashpoint"){
-                if (llGetSubString(sTest, 11, -1) == ""){
-                    g_lLeashPrims += [sTest, (string)g_iLoop, "1"];
-                }
-                else{
-                    g_lLeashPrims += [llGetSubString(sTest, 11, -1), (string)g_iLoop, "1"];
-                }
-            }
-        }
-    }
-    /*
-    if (!llGetListLength(g_lLeashPrims)){
-        g_lLeashPrims = ["collar", LINK_THIS, "1"]; //TODO
-    }
-    */
-}
-
 dumpAccessList()
 {
     llOwnerSay("current access list: " + llDumpList2String(accessList, ", "));
-}
-
-//string g_sParticleTexture = "chain";
-string g_sParticleTextureID = ropetextureDIFF;
-float g_fLeashLength;
-vector g_vLeashColor = <1,1,1>;
-vector g_vLeashSize = <0.07, 0.07, 1.0>;
-integer g_bParticleGlow = TRUE;
-float g_fParticleAge = 1.0;
-float g_fParticleAlpha = 1.0;
-vector g_vLeashGravity = <0.0,0.0,-1.0>;
-integer g_iParticleCount = 1;
-float g_fBurstRate = 0.04;
-Particles(integer iLink, key kParticleTarget)
-{
-    if (kParticleTarget == NULL_KEY){
-        return;
-    }
-    integer iFlags = PSYS_PART_FOLLOW_VELOCITY_MASK | PSYS_PART_TARGET_POS_MASK|PSYS_PART_FOLLOW_SRC_MASK;
-    if (g_bParticleGlow) iFlags = iFlags | PSYS_PART_EMISSIVE_MASK;
-    list lTemp = [
-        PSYS_PART_MAX_AGE,g_fParticleAge,
-        PSYS_PART_FLAGS,iFlags,
-        PSYS_PART_START_COLOR, g_vLeashColor,
-        PSYS_PART_START_SCALE,g_vLeashSize,
-        PSYS_SRC_PATTERN, PSYS_SRC_PATTERN_DROP,
-        PSYS_SRC_BURST_RATE,g_fBurstRate,
-        PSYS_SRC_ACCEL, g_vLeashGravity,
-        PSYS_SRC_BURST_PART_COUNT,g_iParticleCount,
-        PSYS_SRC_TARGET_KEY,kParticleTarget,
-        PSYS_SRC_MAX_AGE, 0,
-        PSYS_SRC_TEXTURE, g_sParticleTextureID
-    ];
-    llLinkParticleSystem(iLink, lTemp);
-}
-
-StartParticles(key kParticleTarget)
-{
-    for (g_iLoop = 0; g_iLoop < llGetListLength(g_lLeashPrims); g_iLoop = g_iLoop + 3){
-        if ((integer)llList2String(g_lLeashPrims, g_iLoop + 2)){
-            Particles((integer)llList2String(g_lLeashPrims, g_iLoop + 1), kParticleTarget);
-        }
-    }
-    g_bLeashActive = TRUE;
-}
-
-StopParticles(integer iEnd)
-{
-    for (g_iLoop = 0; g_iLoop < llGetListLength(g_lLeashPrims); g_iLoop++){
-        llLinkParticleSystem((integer)llList2String(g_lLeashPrims, g_iLoop + 1), []);
-    }
-    if (iEnd){
-        g_bLeashActive = FALSE;
-        g_kLeashedTo = NULL_KEY;
-        g_kLeashToPoint = NULL_KEY;
-        g_kParticleTarget = NULL_KEY;
-        llSensorRemove();
-    }
 }
 
 asLoadSounds()
@@ -231,22 +129,6 @@ asLoadSounds()
                 API_Start_Sound = name;
             else if(llSubStringIndex(name, sound_9) != -1)
                 API_Start_Sound = name;
-            /*
-            else if(llSubStringIndex(name, sound_2) != -1)
-                API_Start_Sound = name;
-            else if(llSubStringIndex(name, sound_3) != -1)
-                API_Start_Sound = name;
-            else if(llSubStringIndex(name, sound_4) != -1)
-                API_Start_Sound = name;
-            else if(llSubStringIndex(name, sound_5) != -1)
-                API_Start_Sound = name;
-            else if(llSubStringIndex(name, sound_6) != -1)
-                API_Start_Sound = name;
-            else if(llSubStringIndex(name, sound_7) != -1)
-                API_Start_Sound = name;
-            else if(llSubStringIndex(name, sound_8) != -1)
-                API_Start_Sound = name;
-            */
         }
     }
     while(i++<a);
@@ -275,13 +157,10 @@ stopFollowing()
   string origName = llGetObjectName();
   llTargetRemove(tid);
   llStopMoveToTarget();
-  llSetTimerEvent(0.0);
-  llSetObjectName(objectName);
+  //llSetTimerEvent(0.0);
+  llSetObjectName(llKey2Name(llGetOwner())+ "'s Collar");
   llOwnerSay("No longer following.");
   llSetObjectName(origName);
-  if(g_bLeashActive == TRUE){
-    StopParticles(TRUE);
-  }
 }
 
 startFollowingName(string name)
@@ -293,8 +172,11 @@ startFollowingName(string name)
 startFollowingKey(key id)
 {
   string origName = llGetObjectName();
+  list username = llParseString2List(llGetDisplayName(id), [""], []);
+  list owner = llParseString2List(llGetDisplayName(llGetOwner()), [""], []);
   targetKey = id;
-  llSetObjectName(objectName);
+  llSetObjectName(llKey2Name(llGetOwner())+ "'s Collar");
+  llOwnerSay("You are now following " + (string)username + ".");
   llSetObjectName(origName);
   keepFollowing();
   llSetTimerEvent(DELAY);
@@ -306,14 +188,8 @@ keepFollowing()
   llStopMoveToTarget();
   list answer = llGetObjectDetails(targetKey,[OBJECT_POS]);
   string origName = llGetObjectName();
-  if (llGetListLength(answer)==0){
-    /*if (!announced){
-      llSetObjectName(objectName);
-      llOwnerSay(targetName+" seems to be out of range.  Waiting for return...");
-      llSetObjectName(origName);
-    }*/
+  if (llGetListLength(answer)==0)
     announced = TRUE;
-  }
   else{
     announced = FALSE;
     vector targetPos = llList2Vector(answer,0);
@@ -324,7 +200,6 @@ keepFollowing()
         targetPos = llGetPos() + LIMIT * llVecNorm( targetPos - llGetPos() );
       llMoveToTarget(targetPos,TAU);
     }
-    StartParticles(targetKey);
   }
 }
 
@@ -368,15 +243,21 @@ default
                 ownermenu(toucher_key);
             else{
                 key ownerKey = llGetOwner();
-                string owner = llKey2Name(ownerKey);
+                string owneruser = llKey2Name(ownerKey);
                 string avatar = llKey2Name(toucher_key);
+                string origName = llGetObjectName();
                 if (llListFindList(accessList, [avatar]) < 0 && toucher_key != ownerKey){
-                    llInstantMessage(toucher_key, "you are not on the access list, ask " + owner + " if you would like to get access :P");
+                    llSetObjectName("");
+                    llOwnerSay((string)username + " touched your collar. (secondlife:///app/agent/" + (string)toucher_key + "/about)" );
+                    llSetObjectName(origName);
+                    llInstantMessage(toucher_key, "Hello " + (string)username + ", you are not on the access list, ask " + (string)owner + " (" + owneruser + ") if you would like to get access :P");
                     return;
                 }
                 else{
-                    llPlaySound(sound_9 , Volume_For_Bell);
-                    llWhisper(0, (string)username + " plays with the trinket on " + (string)owner +"'s collar.");
+                    llPlaySound(sound_9, Volume_For_Bell);
+                    llSetObjectName("");
+                    llWhisper(0, (string)username + " plays with the trinket on " + (string)owner + "'s collar.");
+                    llSetObjectName(origName);
                     menu(toucher_key);
                 }
             }
@@ -385,14 +266,19 @@ default
 
     listen(integer channel, string name, key id, string message) 
     {
+        list owner = llParseString2List(llGetDisplayName(llGetOwner()), [""], []);
         llListenRemove(listen_handle);
         if (message == "Exit")
             return;
         else if ((message == "Leash") || (message == "Unleash")){
-            if(leshedON)
+            if(leshedON){
+                llInstantMessage(id, (string)owner + " is no longer following you.");
                 stopFollowing();
-            else
+            }
+            else{
+                llInstantMessage(id, (string)owner + " is now following you.");
                 startFollowingKey(id);
+            }
             leshedON = !leshedON;
         }
         else if (message == "On/Off")
@@ -401,26 +287,12 @@ default
                 llOwnerSay("Bell is now Off..");
                 On = FALSE;
                 sound1 = FALSE;
-                //sound2 = FALSE;
-                //sound3 = FALSE;
-                //sound4 = FALSE;
-                //sound5 = FALSE;
-                //sound6 = FALSE;
-                //sound7 = FALSE;
-                //sound8 = FALSE;
             }
             else{
                 llOwnerSay("Bell is now On..");
                 On = TRUE;
                 sound1 = TRUE;
-                //sound2 = FALSE;
-                //sound3 = FALSE;
-                //sound4 = FALSE;
-                //sound5 = FALSE;
-                //sound6 = FALSE;
-                //sound7 = FALSE;
-                //sound8 = FALSE;
-                menu(id);
+                ownermenu(id);
             }
         }
         else if (message == "Sounds")
@@ -428,107 +300,12 @@ default
         else if (message == "Textures")
             texturesmenu(id);
         else if (message == "Back")
-            menu(id);
+            ownermenu(id);
         else if (message == "Bell 1"){
             llOwnerSay("Bell 1 sound enabled..");
             sound1 = TRUE;
-            /*
-            sound2 = FALSE;
-            sound3 = FALSE;
-            sound4 = FALSE;
-            sound5 = FALSE;
-            sound6 = FALSE;
-            sound7 = FALSE;
-            sound8 = FALSE;
-            */
             soundsmenu(id);
         }
-        /*
-        else if (message == "Bell 2"){
-            llOwnerSay("Bell 2 sound enabled..");
-            sound1 = FALSE;
-            sound2 = TRUE;
-            sound3 = FALSE;
-            sound4 = FALSE;
-            sound5 = FALSE;
-            sound6 = FALSE;
-            sound7 = FALSE;
-            sound8 = FALSE;
-            soundsmenu(id);
-        }
-        else if (message == "Bell 3"){
-            llOwnerSay("Bell 3 sound enabled..");
-            sound1 = FALSE;
-            sound2 = FALSE;
-            sound3 = TRUE;
-            sound4 = FALSE;
-            sound5 = FALSE;
-            sound6 = FALSE;
-            sound7 = FALSE;
-            sound8 = FALSE;
-            soundsmenu(id);
-        }
-        else if (message == "Bell 4"){
-            llOwnerSay("Bell 4 sound enabled..");
-            sound1 = FALSE;
-            sound2 = FALSE;
-            sound3 = FALSE;
-            sound4 = TRUE;
-            sound5 = FALSE;
-            sound6 = FALSE;
-            sound7 = FALSE;
-            sound8 = FALSE;
-            soundsmenu(id);
-        }
-        else if (message == "Bell 5"){
-            llOwnerSay("Bell 5 sound enabled..");
-            sound1 = FALSE;
-            sound2 = FALSE;
-            sound3 = FALSE;
-            sound4 = FALSE;
-            sound5 = TRUE;
-            sound6 = FALSE;
-            sound7 = FALSE;
-            sound8 = FALSE;
-            soundsmenu(id);
-        }
-        else if (message == "Bell 6"){
-            llOwnerSay("Bell 6 sound enabled..");
-            sound1 = FALSE;
-            sound2 = FALSE;
-            sound3 = FALSE;
-            sound4 = FALSE;
-            sound5 = FALSE;
-            sound6 = TRUE;
-            sound7 = FALSE;
-            sound8 = FALSE;
-            soundsmenu(id);
-        }
-        else if (message == "Bell 7"){
-            llOwnerSay("Bell 7 sound enabled..");
-            sound1 = FALSE;
-            sound2 = FALSE;
-            sound3 = FALSE;
-            sound4 = FALSE;
-            sound5 = FALSE;
-            sound6 = FALSE;
-            sound7 = TRUE;
-            sound8 = FALSE;
-            soundsmenu(id);
-        }
-        else if (message == "Bell 8"){
-            llOwnerSay("Bell 8 sound enabled..");
-            sound1 = FALSE;
-            sound2 = FALSE;
-            sound3 = FALSE;
-            sound4 = FALSE;
-            sound5 = FALSE;
-            sound6 = FALSE;
-            sound7 = FALSE;
-            sound8 = TRUE;
-            soundsmenu(id);
-        }
-        */
         else if (message == "Black"){
             llSetLinkTexture(LINK_THIS, blackTexture, ALL_SIDES);
             texturesmenu(id);
@@ -539,47 +316,11 @@ default
         }
         else if (message == "Users")
         {
-            if(id == llGetOwner()){
-                //usersmenu(id);
+            if(id == llGetOwner())
                 state Owner;
-            }
             else
                 return;
         }
-        /*
-        else if (message == "Add")
-        {
-            if(id == llGetOwner()){
-                useeersmenu(id);
-            }
-            else
-                return;
-        }
-        else if (message == "Remove")
-        {
-            if(id == llGetOwner()){
-                useeersmenu(id);
-            }
-            else
-                return;
-        }
-        else if (message == "List")
-        {
-            if(id == llGetOwner()){
-                useeersmenu(id);
-            }
-            else
-                return;
-        }
-        else if (message == "Clear")
-        {
-            if(id == llGetOwner()){
-                useeersmenu(id);
-            }
-            else
-                return;
-        }
-        */
     }
 
     sensor(integer n)
@@ -595,22 +336,6 @@ default
                 if(On == TRUE){
                     if (sound1 == TRUE)
                         llPlaySound(sound_1, Volume_For_Sounds);
-                    /*
-                    else if (sound2 == TRUE)
-                        llPlaySound(sound_2, Volume_For_Sounds);
-                    else if (sound3 == TRUE)
-                        llPlaySound(sound_3, Volume_For_Sounds);
-                    else if (sound4 == TRUE)
-                        llPlaySound(sound_4, Volume_For_Sounds);
-                    else if (sound5 == TRUE)
-                        llPlaySound(sound_5, Volume_For_Sounds);
-                    else if (sound6 == TRUE)
-                        llPlaySound(sound_6, Volume_For_Sounds);
-                    else if (sound7 == TRUE)
-                        llPlaySound(sound_7, Volume_For_Sounds);
-                    else if (sound8 == TRUE)
-                        llPlaySound(sound_8, Volume_For_Sounds);
-                    */
                 }
                 else
                     soundsOFF();
@@ -620,7 +345,8 @@ default
             else
                 soundsOFF();
         }
-        keepFollowing();
+        if(leshedON)
+            keepFollowing();
     }
 }
 
@@ -628,7 +354,7 @@ state Owner
 {
     state_entry()
     {
-        llListen(1, "", NULL_KEY, "");
+        llListen(1, "", llGetOwner(), "");
         llOwnerSay("type /1add (username) or if you wihs to remove users then type /1del (username)");
         dumpAccessList();
     }
