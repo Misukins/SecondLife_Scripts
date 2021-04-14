@@ -3,8 +3,7 @@ integer ll_channel = 489;
 integer channel;
 integer listen_handle;
 
-integer ParticleOn      = TRUE;
-
+integer ParticleOn = TRUE;
 string texturer = "419c3949-3f56-6115-5f1c-1f3aa85a4606";
 integer effectFlags=0;
 integer running=TRUE;
