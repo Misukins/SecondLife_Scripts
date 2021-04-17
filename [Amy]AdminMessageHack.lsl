@@ -1,15 +1,17 @@
 integer dlgHandle = -1;
 integer dlgChannel;
+integer DEBUG = FALSE;
 
 list avatarList = [];
 list avatarUUIDs = [];
 
-reset(){
-    string origName = llGetObjectName();
+reset()
+{
     llSetTimerEvent(0.0);
     llListenRemove(dlgHandle);
     dlgHandle = -1;
-    llSetObjectName(origName);
+    if (DEBUG)
+        llOwnerSay("DEBUG: RESET");
 }
 
 default
@@ -39,7 +41,7 @@ state Scan
     {
         avatarList = [];
         avatarUUIDs = [];
-        llSensor("", NULL_KEY, AGENT, 20.0, PI);
+        llSensor("", NULL_KEY, AGENT, 4096.0, PI);
     }
     
     sensor(integer num_detected)
@@ -78,8 +80,10 @@ state Dialog
                 targetName += [message];
                 string targetID = (key)llList2String(targetName,0);
                 targetKey = llName2Key(targetID);
-                llSetObjectName("");
-                llTextBox(targetID, "This is your Princess speaking, and i'm the law here" + llGetDisplayName(targetKey) + "!", channel);
+                llSetObjectName(" - !Shouter!");
+                llDialog(targetKey, "\nHey,\nThis is your Princess " + (string)owner_name + " speaking!\nI'm the law in here " + llGetDisplayName(targetKey) + "!\n", ["YES!", "NO!"], -99);
+                llOwnerSay("Dialog was sent to secondlife:///app/agent/" + (string)targetKey + "/about.");
+                llSetObjectName(origName);
             }
             reset();
             state default;
