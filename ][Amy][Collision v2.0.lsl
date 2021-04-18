@@ -1,3 +1,49 @@
+key owner;
+key Target_Key;
+
+integer globalListenHandle  = -0;
+integer ll_channel = 666;
+integer channel;
+integer listen_handle;
+integer wait_till_next = 5;
+integer running;
+integer Target;
+integer On;
+integer ParticleOn;
+integer sound1;
+integer sound2;
+integer sound3;
+integer sound4;
+integer sound5;
+integer sound6;
+integer sound7;
+integer Follow_Source;
+integer Follow_Velocity;
+integer Wind;
+integer Bounce;
+integer Pattern;
+integer Count;
+integer Emissive;
+integer Interpolate_Colour;
+integer Interpolate_Scale;
+
+float soundvolume = 0.6;
+float uwusoundvolume = 3.0;
+float sleepDelay = 5.0;
+float Start_Alpha;
+float End_Alpha;
+float Age;
+float Rate;
+float Life;
+float Radius;
+float Begin_Angle;
+float End_Angle;
+float Minimum_Speed;
+float Maximum_Speed;
+
+list main_menu = [ "Sounds", "On/Off", "Particles", "Exit" ];
+list sounds_menu =[ "Moan", "I'm Hit", "Squeek", "Bleeding", "Growl", "uWu", "Nyaa", "Back" ];
+
 string sound_1 = "219c5d93-6c09-31c5-fb3f-c5fe7495c115"; //Muijan Ähkäsy
 string sound_2 = "5d0432d8-58c2-764e-5080-a96594257db1"; //UT I'm Hit
 string sound_3 = "f6d4dd62-c5ff-5007-b8f4-2603e3692b9c"; //Squeek
@@ -5,66 +51,25 @@ string sound_4 = "b8dcf632-ace2-1598-9cec-688a9e2403bb"; //Bleeding
 string sound_5 = "ad44d652-7f13-f538-7759-c248143c2877"; //Growl
 string sound_6 = "8013e8ea-8978-7b21-52b7-3826c0adb0b8"; //uWu
 string sound_7 = "03f9c086-cf50-0f4c-a4d5-7c32284b85ae"; //Nuaaah
-
-integer globalListenHandle  = -0;
-integer ll_channel = 666;
-integer channel;
-integer listen_handle;
-
-integer On              = TRUE;
-integer ParticleOn      = TRUE;
-
-integer sound1          = FALSE;
-integer sound2          = FALSE;
-integer sound3          = FALSE;
-integer sound4          = FALSE;
-integer sound5          = FALSE;
-integer sound6          = FALSE;
-integer sound7          = TRUE;
-
-float soundvolume = 0.6;
-float uwusoundvolume = 3.0;
-integer wait_till_next = 5;
-float sleepDelay = 5.0;
-
-integer running=TRUE;
-key owner;
+string Texture;
 
 vector textColor;
-string Texture;
-integer Interpolate_Scale;
+vector Acceleration;
 vector Start_Scale;
 vector End_Scale;
-integer Interpolate_Colour;
 vector Start_Colour;
 vector End_Colour;
-float Start_Alpha;
-float End_Alpha;
-integer Emissive;
-float Age;
-float Rate;
-integer Count;
-float Life;
-integer Pattern;
-float Radius;
-float Begin_Angle;
-float End_Angle;
 vector Omega;
-integer Follow_Source;
-integer Follow_Velocity;
-integer Wind;
-integer Bounce;
-float Minimum_Speed;
-float Maximum_Speed;
-vector Acceleration;
-integer Target;
-key Target_Key;
-
-list main_menu = [ "Sounds", "On/Off", "Particles", "Exit" ];
-list sounds_menu =[ "Moan", "I'm Hit", "Squeek", "Bleeding", "Growl", "uWu", "Nyaa", "Back" ];
 
 init()
 {
+    llPreloadSound(sound_1);
+    llPreloadSound(sound_2);
+    llPreloadSound(sound_3);
+    llPreloadSound(sound_4);
+    llPreloadSound(sound_5);
+    llPreloadSound(sound_6);
+    llPreloadSound(sound_7);
     llListenRemove(listen_handle);
     owner = llGetOwner();
     channel = llFloor(llFrand(2000000));
@@ -73,14 +78,14 @@ init()
 
 soundsOFF()
 {
-    running=FALSE;
+    running = FALSE;
     llParticleSystem([]);
     llSetStatus(STATUS_PHANTOM, TRUE);
     llDie();
     llSetTimerEvent(0);
 }
 
-Particle_System ()
+Particle_System()
 {
     list Parameters =
     [
@@ -149,7 +154,14 @@ MyParticle (key myTarget)
     Acceleration = < 0, 0, 0 >;
     Target = TRUE;
     Target_Key = myTarget;
-    Particle_System ();
+    Particle_System();
+}
+
+integer random_chance()
+{
+    if (llFrand(1.0) < 0.5)
+        return TRUE;
+    return FALSE;
 }
 
 default
@@ -190,7 +202,7 @@ default
             if (message == "Exit")
                 return;
             else if (message == "On/Off"){
-                    if (On){
+                if (On == TRUE){
                     llOwnerSay("Collision is now Off..");
                     On = FALSE;
                     ParticleOn = FALSE;
@@ -205,25 +217,27 @@ default
                 else{
                     llOwnerSay("Collision is now On..");
                     On = TRUE;
-                    ParticleOn = FALSE;
+                    ParticleOn = TRUE;
                     sound1 = FALSE;
                     sound2 = FALSE;
                     sound3 = FALSE;
                     sound4 = FALSE;
                     sound5 = FALSE;
                     sound6 = FALSE;
-                    sound7 = FALSE;
+                    sound7 = TRUE;
                     llDialog(owner, "\n\nSelect a an option", main_menu, channel);
                 }
             }
             else if (message == "Particles"){
-                if (ParticleOn){
+                if (ParticleOn == TRUE){
                     llOwnerSay("Particles is now Off..");
                     ParticleOn = FALSE;
+                    llDialog(owner, "\n\nSelect a an option", main_menu, channel);
                 }
                 else{
                     llOwnerSay("Particles is now On..");
                     ParticleOn = TRUE;
+                    llDialog(owner, "\n\nSelect a an option", main_menu, channel);
                 }
             }
             else if (message == "Sounds")
@@ -342,17 +356,24 @@ default
                 soundsOFF();
             }
             else if (sound7 == TRUE){
-                llPlaySound(sound_7, soundvolume);
-                llSetTimerEvent(wait_till_next);
-                soundsOFF();
+                if (random_chance()){
+                    llPlaySound(sound_3, soundvolume);
+                    llSetTimerEvent(wait_till_next);
+                    soundsOFF();
+                }
+                else{
+                    llPlaySound(sound_7, soundvolume);
+                    llSetTimerEvent(wait_till_next);
+                    soundsOFF();
+                }
             }
 
             if(person != owner){
                 if (ParticleOn == TRUE){
-                    running=TRUE;
+                    running = TRUE;
                     MyParticle(person);
                     llSleep(1.0);
-                    running=FALSE;
+                    running = FALSE;
                     llParticleSystem([]);
                     llSetStatus(STATUS_PHANTOM, TRUE);
                     llDie();
