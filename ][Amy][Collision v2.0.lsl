@@ -177,6 +177,13 @@ default
             llResetScript();
     }
 
+    attach(key kAttached)
+    {
+        if (!kAttached == NULL_KEY){
+            //TODO ---
+        }
+    }
+
     state_entry()
     {
         globalListenHandle = llListen(ll_channel, "", llGetOwner(), "");
@@ -227,6 +234,7 @@ default
                     sound7 = TRUE;
                     llDialog(owner, "\n\nSelect a an option", main_menu, channel);
                 }
+                On = !On;
             }
             else if (message == "Particles"){
                 if (ParticleOn == TRUE){
@@ -239,6 +247,7 @@ default
                     ParticleOn = TRUE;
                     llDialog(owner, "\n\nSelect a an option", main_menu, channel);
                 }
+                ParticleOn = !ParticleOn;
             }
             else if (message == "Sounds")
                 llDialog(owner, "\n\nSelect a an option", sounds_menu, channel);
