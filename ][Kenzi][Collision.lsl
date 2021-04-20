@@ -8,7 +8,7 @@ string sound_7 = "03f9c086-cf50-0f4c-a4d5-7c32284b85ae"; //Nuaaah
 
 integer globalListenHandle  = -0;
 integer ll_channel      = 666;
-//integer listen_handle;
+integer listen_handle;
 
 integer listener;
 integer channel;
@@ -209,6 +209,13 @@ MyParticle (key myTarget)
     Particle_System ();
 }
 
+integer random_chance()
+{
+    if (llFrand(1.0) < 0.5)
+        return TRUE;
+    return FALSE;
+}
+
 default
 {
     on_rez(integer start_param)
@@ -320,18 +327,26 @@ default
 
     state_entry()
     {
-        globalListenHandle = llListen(ll_channel, "", llGetOwner(), "");
-        //init();
+        owner = llGetOwner();
+        channel = llFloor(llFrand(2000000));
+        listen_handle = llListen(channel, "", owner, "");
+        globalListenHandle = llListen(ll_channel, "", owner, "");
         llOwnerSay("Type /" +  (string)ll_channel + "menu for Menu");
+        llPreloadSound(sound_1);
+        llPreloadSound(sound_2);
+        llPreloadSound(sound_3);
+        llPreloadSound(sound_4);
+        llPreloadSound(sound_5);
+        llPreloadSound(sound_6);
+        llPreloadSound(sound_7);
     }
 
     listen(integer channel, string name, key id, string message) 
     {
-        llListenRemove(listen_handle);
         if (id == owner){
             if (message == "Exit")
                 return;
-            else if (message == "□ On" ) || (message = "■ On"){
+            else if (message == "□ On"){
                 if (!On){
                     CollisionOn();
                     menu(id);
@@ -344,7 +359,7 @@ default
                 }
                 On = !On;
             }
-            else if (message == "□ Particle") || (message = "■ Particle"){
+            else if (message == "□ Particle"){
                 if (!ParticleOn){
                     llOwnerSay("Particles is now Off..");
                     return;
@@ -478,9 +493,16 @@ default
                 soundsOFF();
             }
             else if (sound7 == TRUE){
-                llPlaySound(sound_7, soundvolume);
-                llSetTimerEvent(wait_till_next);
-                soundsOFF();
+                if (random_chance()){
+                    llPlaySound(sound_3, soundvolume);
+                    llSetTimerEvent(wait_till_next);
+                    soundsOFF();
+                }
+                else{
+                    llPlaySound(sound_7, soundvolume);
+                    llSetTimerEvent(wait_till_next);
+                    soundsOFF();
+                }
             }
             
             if(person != owner){
