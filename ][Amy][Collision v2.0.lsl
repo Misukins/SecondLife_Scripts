@@ -63,48 +63,11 @@ vector Start_Colour;
 vector End_Colour;
 vector Omega;
 
-/*
-TODO
-FIX REWRITE WHOLE SCRIPT
-
-
-*/
-
-init()
-{
-    llPreloadSound(sound_1);
-    llPreloadSound(sound_2);
-    llPreloadSound(sound_3);
-    llPreloadSound(sound_4);
-    llPreloadSound(sound_5);
-    llPreloadSound(sound_6);
-    llPreloadSound(sound_7);
-    llListenRemove(listen_handle);
-    owner = llGetOwner();
-    channel = llFloor(llFrand(2000000));
-    listen_handle = llListen(channel, "", owner, "");
-    globalListenHandle = llListen(ll_channel, "", owner, "");
-    llOwnerSay("Type /" +  (string)ll_channel + "menu for Menu");
-    if (On)
-        llOwnerSay("Collision is now On..");
-    else{
-        llOwnerSay("Collision is now Off..");
-        llParticleSystem([]);
-        llSetStatus(STATUS_PHANTOM, TRUE);
-        //llDie();
-    }
-    if (ParticleOn)
-        llOwnerSay("Particles are On..");
-    else
-        llOwnerSay("Particles are Off..");
-}
-
 soundsOFF()
 {
     running = FALSE;
     llParticleSystem([]);
     llSetStatus(STATUS_PHANTOM, TRUE);
-    //llDie();
     llSetTimerEvent(0);
 }
 
@@ -187,6 +150,44 @@ integer random_chance()
     return FALSE;
 }
 
+Collision_ON()
+{
+    llOwnerSay("Collision is now On..");
+    On = TRUE;
+    sound1 = FALSE;
+    sound2 = FALSE;
+    sound3 = FALSE;
+    sound4 = FALSE;
+    sound5 = FALSE;
+    sound6 = FALSE;
+    sound7 = TRUE;
+}
+
+Collision_OFF()
+{
+    llOwnerSay("Collision is now Off..");
+    On = FALSE;
+    sound1 = FALSE;
+    sound2 = FALSE;
+    sound3 = FALSE;
+    sound4 = FALSE;
+    sound5 = FALSE;
+    sound6 = FALSE;
+    sound7 = FALSE;
+}
+
+Particles_ON()
+{
+    llOwnerSay("Particles is now On..");
+    ParticleOn = TRUE;
+}
+
+Particles_OFF()
+{
+    llOwnerSay("Particles is now Off..");
+    ParticleOn = FALSE;
+}
+
 default
 {
     on_rez(integer start_param)
@@ -194,22 +195,50 @@ default
         llResetScript();
     }
 
-    /* changed(integer change) //FIX
+    /* changed(integer change)
     {
         if (change & CHANGED_OWNER)
             llResetScript();
     } */
 
-    /* attach(key kAttached) //FIX
+    attach(key agent)
     {
-        if (!kAttached == NULL_KEY){
-            //TODO ---
+        if (agent){
+            if(On == TRUE)
+                Collision_ON();
+            else
+                Collision_OFF();
+            if (ParticleOn == TRUE)
+                Particles_ON();
+            else
+                Particles_OFF();
         }
-    } */
+    }
 
     state_entry()
     {
-        init();
+        llPreloadSound(sound_1);
+        llPreloadSound(sound_2);
+        llPreloadSound(sound_3);
+        llPreloadSound(sound_4);
+        llPreloadSound(sound_5);
+        llPreloadSound(sound_6);
+        llPreloadSound(sound_7);
+        llListenRemove(listen_handle);
+        owner = llGetOwner();
+        channel = llFloor(llFrand(2000000));
+        listen_handle = llListen(channel, "", owner, "");
+        globalListenHandle = llListen(ll_channel, "", owner, "");
+        llOwnerSay("Type /" +  (string)ll_channel + "menu for Menu");
+        if (On == TRUE)
+            llOwnerSay("Collision is now On..");
+        else
+            llOwnerSay("Collision is now Off..");
+
+        if (ParticleOn == TRUE)
+            llOwnerSay("Particles are On..");
+        else
+            llOwnerSay("Particles are Off..");
     }
 
     listen(integer channel, string name, key id, string message)
@@ -218,45 +247,18 @@ default
             if (message == "Exit")
                 return;
             else if (message == "On/Off"){
-                if (On){
-                    llOwnerSay("Collision is now Off..");
-                    On = FALSE;
-                    ParticleOn = FALSE;
-                    sound1 = FALSE;
-                    sound2 = FALSE;
-                    sound3 = FALSE;
-                    sound4 = FALSE;
-                    sound5 = FALSE;
-                    sound6 = FALSE;
-                    sound7 = FALSE;
-                }
-                else{
-                    llOwnerSay("Collision is now On..");
-                    On = TRUE;
-                    ParticleOn = TRUE;
-                    sound1 = FALSE;
-                    sound2 = FALSE;
-                    sound3 = FALSE;
-                    sound4 = FALSE;
-                    sound5 = FALSE;
-                    sound6 = FALSE;
-                    sound7 = TRUE;
-                    llDialog(owner, "\n\nSelect a an option", main_menu, channel);
-                }
-                On = !On;
+                if(On == TRUE)
+                    Collision_ON();
+                else
+                    Collision_OFF();
+                //On = !On;
             }
             else if (message == "Particles"){
-                if (ParticleOn){
-                    llOwnerSay("Particles is now Off..");
-                    ParticleOn = FALSE;
-                    llDialog(owner, "\n\nSelect a an option", main_menu, channel);
-                }
-                else{
-                    llOwnerSay("Particles is now On..");
-                    ParticleOn = TRUE;
-                    llDialog(owner, "\n\nSelect a an option", main_menu, channel);
-                }
-                ParticleOn = !ParticleOn;
+                if (ParticleOn == TRUE)
+                    Particles_ON();
+                else
+                    Particles_OFF();
+                //ParticleOn = !ParticleOn;
             }
             else if (message == "Sounds")
                 llDialog(owner, "\n\nSelect a an option", sounds_menu, channel);
@@ -273,6 +275,7 @@ default
                 sound5 = FALSE;
                 sound6 = FALSE;
                 sound7 = FALSE;
+                llDialog(owner, "\n\nSelect a an option", main_menu, channel);
             }
             else if (message == "I'm Hit"){
                 llOwnerSay("I'm Hit sound enabled..");
@@ -283,6 +286,7 @@ default
                 sound5 = FALSE;
                 sound6 = FALSE;
                 sound7 = FALSE;
+                llDialog(owner, "\n\nSelect a an option", main_menu, channel);
             }
             else if (message == "Squeek"){
                 llOwnerSay("Squeek sound enabled..");
@@ -293,6 +297,7 @@ default
                 sound5 = FALSE;
                 sound6 = FALSE;
                 sound7 = FALSE;
+                llDialog(owner, "\n\nSelect a an option", main_menu, channel);
             }
             else if (message == "Bleeding"){
                 llOwnerSay("Bleeding sound enabled..");
@@ -303,6 +308,7 @@ default
                 sound5 = FALSE;
                 sound6 = FALSE;
                 sound7 = FALSE;
+                llDialog(owner, "\n\nSelect a an option", main_menu, channel);
             }
             else if (message == "Growl"){
                 llOwnerSay("Growl sound enabled..");
@@ -313,6 +319,7 @@ default
                 sound5 = TRUE;
                 sound6 = FALSE;
                 sound7 = FALSE;
+                llDialog(owner, "\n\nSelect a an option", main_menu, channel);
             }
             else if (message == "uWu"){
                 llOwnerSay("uWu sound enabled..");
@@ -323,6 +330,7 @@ default
                 sound5 = FALSE;
                 sound6 = TRUE;
                 sound7 = FALSE;
+                llDialog(owner, "\n\nSelect a an option", main_menu, channel);
             }
             else if (message == "Nyaa"){
                 llOwnerSay("Nuah sound enabled..");
@@ -333,6 +341,7 @@ default
                 sound5 = FALSE;
                 sound6 = FALSE;
                 sound7 = TRUE;
+                llDialog(owner, "\n\nSelect a an option", main_menu, channel);
             }
         }
     }
@@ -343,37 +352,37 @@ default
         key person = llDetectedKey(0);
         string origName = llGetObjectName();
         if (type & AGENT){
-            if (sound1){
+            if (sound1 == TRUE){
                 llPlaySound(sound_1, soundvolume);
                 llSetTimerEvent(wait_till_next);
                 soundsOFF();
             }
-            else if (sound2){
+            else if (sound2 == TRUE){
                 llPlaySound(sound_2, soundvolume);
                 llSetTimerEvent(wait_till_next);
                 soundsOFF();
             }
-            else if (sound3){
+            else if (sound3 == TRUE){
                 llPlaySound(sound_3, soundvolume);
                 llSetTimerEvent(wait_till_next);
                 soundsOFF();
             }
-            else if (sound4){
+            else if (sound4 == TRUE){
                 llPlaySound(sound_4, soundvolume);
                 llSetTimerEvent(wait_till_next);
                 soundsOFF();
             }
-            else if (sound5){
+            else if (sound5 == TRUE){
                 llPlaySound(sound_5, soundvolume);
                 llSetTimerEvent(wait_till_next);
                 soundsOFF();
             }
-            else if (sound6){
+            else if (sound6 == TRUE){
                 llPlaySound(sound_6, uwusoundvolume);
                 llSetTimerEvent(wait_till_next);
                 soundsOFF();
             }
-            else if (sound7){
+            else if (sound7 == TRUE){
                 if (random_chance()){
                     llPlaySound(sound_3, soundvolume);
                     llSetTimerEvent(wait_till_next);
@@ -387,28 +396,23 @@ default
             }
 
             if(person != owner){
-                if (ParticleOn){
+                if (ParticleOn == TRUE){
                     running = TRUE;
                     MyParticle(person);
                     llSleep(3.0);
                     running = FALSE;
                     llParticleSystem([]);
                     llSetStatus(STATUS_PHANTOM, TRUE);
-                    //llDie();
                 }
                 else{
                     llParticleSystem([]);
                     llSetStatus(STATUS_PHANTOM, TRUE);
-                    //llDie();
                 }
             }
             llSetObjectName("");
             llOwnerSay("secondlife:///app/agent/" + (string)llDetectedKey(0) + "/about) Touched you!");
             llSetObjectName(origName);
         }
-        /* else{
-            llDie();
-        } */
     }
 
     timer()
