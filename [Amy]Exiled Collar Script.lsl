@@ -74,7 +74,7 @@ string objectName = "(TEMP): Collar - Leash";
 
 //TODO -START
 string g_sParticleTexture;
-string g_sParticleTextureID = "9a342cda-d62a-ae1f-fc32-a77a24a85d73"; 
+string g_sParticleTextureID = "9a342cda-d62a-ae1f-fc32-a77a24a85d73";
 /*
 9a342cda-d62a-ae1f-fc32-a77a24a85d73 //Rope UUID
 4cde01ac-4279-2742-71e1-47ff81cc3529 //Chain UUID
@@ -195,7 +195,7 @@ LMSay()
     llShout(LOCKMEISTER, (string)llGetOwnerKey(g_kLeashedTo) +  "handle");
 }
 
-init() 
+init()
 {
     FindLinkedPrims();
     StopParticles(TRUE);
@@ -242,7 +242,7 @@ startFollowingKey(key id)
 
 keepFollowing()
 {
-  llTargetRemove(tid);  
+  llTargetRemove(tid);
   llStopMoveToTarget();
   list answer = llGetObjectDetails(targetKey,[OBJECT_POS]);
   string origName = llGetObjectName();
@@ -345,15 +345,14 @@ StopParticles(integer iEnd)
 
 default
 {
-    on_rez(integer s) 
+    on_rez(integer s)
     {
         init();
     }
-    
+
     state_entry()
     {
         init();
-        //llSetTimerEvent(2.0); //F -- will fuck up follow
         llSetObjectName(llKey2Name(llGetOwner())+ "'s Collar");
         if(llGetAttached() != 0){
             llSetTimerEvent(seconds_to_check_when_avatar_walks);
@@ -366,7 +365,7 @@ default
         else
             llOwnerSay("Bell is now Off..");
     }
-    
+
     touch_start(integer total_number)
     {
         integer i;
@@ -385,7 +384,7 @@ default
                     llSetObjectName("");
                     llOwnerSay((string)username + " touched your collar. (secondlife:///app/agent/" + (string)toucher_key + "/about)" );
                     llSetObjectName(origName);
-                    llInstantMessage(toucher_key, "Hello " + (string)username + ", you are not on the access list, ask " + (string)owner + " (" + owneruser + ") if you would like to get access :P");
+                    llInstantMessage(toucher_key, "Hello " + (string)username + ", you are not on the access list, ask secondlife:///app/agent/" + (string)ownerKey + "/about");
                     return;
                 }
                 else{
@@ -399,7 +398,7 @@ default
         }
     }
 
-    listen(integer channel, string name, key id, string message) 
+    listen(integer channel, string name, key id, string message)
     {
         g_kParticleTarget = id;
         list owner = llParseString2List(llGetDisplayName(llGetOwner()), [""], []);
@@ -517,7 +516,7 @@ default
     {
         startFollowingKey(llDetectedKey(0));
     }
-    
+
     timer()
     {
         if(llGetAgentInfo(llGetObjectOwner()) & AGENT_WALKING){
@@ -551,15 +550,18 @@ state Owner
 
     listen(integer channel, string name, key id, string message)
     {
+        key targetKey;
         if (id == llGetOwner()){
             integer space = llSubStringIndex(message, " ");
             if (space > 0) {
                 string command = llGetSubString(message, 0, space - 1);
                 string avatar = llGetSubString(message, space + 1, -1);
+                targetKey = llName2Key(avatar);
                 if (command == "add"){
                     if (llListFindList(accessList, [avatar]) == -1) {
                         accessList = llListInsertList(accessList, [avatar], 0);
                         llOwnerSay("Added: " + avatar + " to access list");
+                        llInstantMessage(targetKey, " secondlife:///app/agent/" + (string)id + "/about added you to her Collar");
                         state default;
                     }
                 }
@@ -568,11 +570,11 @@ state Owner
                     if (pos >= 0) {
                         accessList = llDeleteSubList(accessList, pos, pos);
                         llOwnerSay("Added: " + avatar + " to access list");
+                        llInstantMessage(targetKey, " secondlife:///app/agent/" + (string)id + "/about removed you from her Collar");
                         dumpAccessList();
                         state default;
                     }
                 }
-                dumpAccessList();
             }
         }
     }
