@@ -15,7 +15,7 @@ integer dlgChannel;
 integer gMenuPosition;
 
 string targetName = "";
-string objectName = "][Kenzi][Camera Mod - Follower";
+string objectName = "][Amy][Camera Mod - Follower";
 
 list avatarList = [];
 list avatarUUIDs = [];
@@ -25,7 +25,7 @@ vector _whiteState = <1.000, 1.000, 1.000>;
 
 integer DEBUG = TRUE;
 
-// ► ◄ ▲ ▼ \\  
+// ► ◄ ▲ ▼ \\
 Menu()
 {
     integer Last;
@@ -37,8 +37,8 @@ Menu()
       if((All - gMenuPosition) > 10)
         Buttons += "►";
       else
-        Last = TRUE;          
-    }    
+        Last = TRUE;
+    }
     else if (All > gMenuPosition+9){
       if((All - gMenuPosition) > 10)
         Buttons += "►";
@@ -49,7 +49,7 @@ Menu()
       Last = TRUE;
     if (All > 0){
       integer b;
-      integer len = llGetListLength(Buttons);     
+      integer len = llGetListLength(Buttons);
       for(b = gMenuPosition + len + Last - 1 ; (len < 11)&&(b < All); ++b){
           Buttons = Buttons + [llList2String(avatarList,b)];
           len = llGetListLength(Buttons);
@@ -102,7 +102,7 @@ startFollowingKey(key id)
   string origName = llGetObjectName();
   targetKey = id;
   llSetObjectName(objectName);
-  llOwnerSay("Now following "+targetName+" type /" + (string)CHANNEL + "stop to stop following");
+  llOwnerSay("Now following "+ targetName +" type /" + (string)CHANNEL + "stop to stop following");
   llSetObjectName(origName);
   keepFollowing();
   llSetTimerEvent(DELAY);
@@ -110,14 +110,14 @@ startFollowingKey(key id)
 
 keepFollowing()
 {
-  llTargetRemove(tid);  
+  llTargetRemove(tid);
   llStopMoveToTarget();
   list answer = llGetObjectDetails(targetKey,[OBJECT_POS]);
   string origName = llGetObjectName();
   if (llGetListLength(answer)==0) {
     if (!announced){
       llSetObjectName(objectName);
-      llOwnerSay(targetName+" seems to be out of range.  Waiting for return...");
+      llOwnerSay(targetName + " seems to be out of range.  Waiting for return...");
       llSetObjectName(origName);
     }
     announced = TRUE;
@@ -168,7 +168,7 @@ default
         state Scan;
     }
   }
-    
+
   listen(integer c,string n,key id,string msg)
   {
     if (msg == "off")
@@ -202,7 +202,7 @@ default
   at_target(integer tnum,vector tpos,vector ourpos)
   {
     llTargetRemove(tnum);
-    llStopMoveToTarget();  
+    llStopMoveToTarget();
   }
 }
 
@@ -214,7 +214,7 @@ state Scan
     avatarUUIDs = [];
     llSensor("", NULL_KEY, AGENT, 96.0, PI);
   }
-  
+
   sensor(integer num_detected)
   {
     integer i;
@@ -249,7 +249,7 @@ state Dialog
         state default;
     }
   }
-  
+
   listen(integer channel, string name, key id, string message)
   {
     if ((channel == dlgChannel) && (llListFindList(avatarList, [message]) != -1)){
@@ -262,14 +262,17 @@ state Dialog
         startFollowingName(message);
         followOn = TRUE;
         llSetLinkColor(LINK_THIS, _greenState, ALL_SIDES);
-        llInstantMessage(targetKey, " secondlife:///app/agent/" + (string)id + "/about is now following you");
+        if(followOn)
+          llInstantMessage(targetKey, "secondlife:///app/agent/" + (string)id + "/about is now following you.");
+        else
+          llInstantMessage(targetKey, "secondlife:///app/agent/" + (string)id + "/about is no longer following you.");
       }
       else if(message == "▼"){
         reset();
-        state default;  
+        state default;
       }
     }
-    
+
     if (message == "off"){
       stopFollowing();
       reset();
@@ -297,7 +300,7 @@ state Dialog
   {
     startFollowingKey(llDetectedKey(0));
   }
-  
+
   timer()
   {
     keepFollowing();
