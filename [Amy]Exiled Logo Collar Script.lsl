@@ -1,27 +1,42 @@
-integer g_iMychannel = -8888;
+//UNUSED
+
+/* integer g_iMychannel = -8888;
+integer DEBUG = TRUE;
+
 string g_sListenfor;
 string g_sResponse;
 
 AnnounceLeashHolder()
 {
     llSay(g_iMychannel, g_sResponse);
+    if(DEBUG)
+        llOwnerSay("DEBUG: AnnounceLeashHolder() - heard (-8888, " + g_iMychannel + ", " + g_sResponse + ")");
 }
 
 default
 {
+    on_rez(integer param)
+    {
+        llResetScript();
+    }
+
     state_entry()
     {
         g_sListenfor = (string)llGetOwner() + "handle";
         g_sResponse = (string)llGetOwner() + "handle ok";
         llListen(g_iMychannel, "", NULL_KEY, g_sListenfor);
         AnnounceLeashHolder();
-        llSetTimerEvent(2.0);              
+        llSetTimerEvent(2.0);
+        if(DEBUG)
+            llOwnerSay("DEBUG: state_entry() - heard");
     }
     
     listen(integer channel, string name, key id, string message)
     {
         AnnounceLeashHolder();
         llSetTimerEvent(2.0);
+        if(DEBUG)
+            llOwnerSay("DEBUG: listen() - heard");
     }
 
     attach(key kAttached)
@@ -29,6 +44,8 @@ default
         if (kAttached == NULL_KEY){
             llSay(g_iMychannel, (string)llGetOwner() + "handle detached");
         }
+        if(DEBUG)
+            llOwnerSay("DEBUG: attach() - heard");
     }
 
     changed(integer change)
@@ -37,6 +54,8 @@ default
             AnnounceLeashHolder();
             llSetTimerEvent(2.0);
         }
+        if(DEBUG)
+            llOwnerSay("DEBUG: changed() - heard");
     }
 
     timer()
@@ -44,9 +63,5 @@ default
         llSetTimerEvent(0.0);
         AnnounceLeashHolder();
     }
-    
-    on_rez(integer param)
-    {
-        llResetScript();
-    }
 }
+ */
