@@ -10,10 +10,10 @@ key owner;
 key Target_Key;
 
 // DEFAULT ON you may edit
-integer CollisionOn     = TRUE;
-integer ParticleOn      = TRUE;
-integer SoundsOn        = TRUE;
-integer Running         = TRUE;
+integer CollisionOn;
+integer ParticleOn;
+integer SoundsOn;
+integer Running;
 
 //Listen Channel
 integer ll_channel      = 666;
@@ -66,7 +66,7 @@ integer random_chance(){
     return FALSE;
 }
 
-init() 
+init()
 {
     llListenRemove(listen_handle);
     owner = llGetOwner();
@@ -74,6 +74,8 @@ init()
     listen_handle = llListen(channel, "", owner, "");
     llPreloadSound(sound_6);
     llPreloadSound(sound_7);
+    llParticleSystem([]);
+    llSetStatus(STATUS_PHANTOM, TRUE);
 }
 
 soundsOFF()
@@ -86,7 +88,7 @@ soundsOFF()
 
 Particle_System ()
 {
-    list Parameters = 
+    list Parameters =
     [
         PSYS_PART_FLAGS,
         (
@@ -128,12 +130,12 @@ MyParticle (key myTarget)
     Texture = "53e5859e-f122-87dc-a31a-21270e53d37a";
     Interpolate_Scale = TRUE;
     Start_Scale = <0.04,0.04, 0>;
-    End_Scale = <0.5,0.5, 0>;
+    End_Scale = <0.05,0.05, 0>;
     Interpolate_Colour = TRUE;
-    Start_Colour = < 1, 1, 1 >;
-    End_Colour = < 1, 0, 0 >;
+    Start_Colour = <llFrand(1.0),llFrand(1.0),llFrand(1.0)>;
+    End_Colour = <llFrand(1.0),llFrand(1.0),llFrand(1.0)>;
     Start_Alpha = 1;
-    End_Alpha =0.1;
+    End_Alpha = 0.1;
     Emissive = TRUE;
     Age = 4;
     Rate = 3;
@@ -202,18 +204,15 @@ default
         llOwnerSay("Type /" +  (string)ll_channel + "menu for Menu");
         if (CollisionOn)
             llOwnerSay("Collision is now On..");
-        else{
+        else
             llOwnerSay("Collision is now Off..");
-            llParticleSystem([]);
-            llSetStatus(STATUS_PHANTOM, TRUE);
-        }
         if (ParticleOn)
             llOwnerSay("Particles are On..");
         else
             llOwnerSay("Particles are Off..");
     }
-    
-    listen(integer channel, string name, key id, string message) 
+
+    listen(integer channel, string name, key id, string message)
     {
         if (id == owner){
             if (message == "▼")
@@ -255,7 +254,7 @@ default
                 llResetScript();
         }
     }
-    
+
     collision_start(integer detected)
     {
         integer type = llDetectedType(0);
@@ -274,7 +273,7 @@ default
                     soundsOFF();
                 }
             }
-            
+
             if(person != owner){
                 if (ParticleOn == TRUE){
                     Running = TRUE;
@@ -297,7 +296,7 @@ default
             }
         }
     }
-    
+
     timer()
     {
         soundsOFF();
