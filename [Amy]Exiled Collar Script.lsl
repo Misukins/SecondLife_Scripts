@@ -1,21 +1,21 @@
 key targetKey           = NULL_KEY;
-key NULLKEY             = "";
+/* key NULLKEY             = "";
 key g_kLeashedTo        = ""; //NULLKEY;
 key g_kLeashToPoint     = ""; //NULLKEY;
-key g_kParticleTarget   = ""; //NULLKEY;
+key g_kParticleTarget   = ""; //NULLKEY; */
 
 float DELAY = 0.5;
-float RANGE = 3.0;
+float RANGE = 2.0;
 float TAU = 1.0;
 float LIMIT = 60.0;
 float Walking_Sound_Speed = 1.0;
 float Volume_For_Sounds = 0.05;
 float Volume_For_Bell = 0.2;
 float seconds_to_check_when_avatar_walks = 0.01;
-float g_fLeashLength;
+/* float g_fLeashLength;
 float g_fParticleAge = 1.0;
 float g_fParticleAlpha = 1.0;
-float g_fBurstRate = 0.04;
+float g_fBurstRate = 0.04; */
 
 integer DEBUG           = TRUE;
 integer On              = TRUE;
@@ -23,15 +23,15 @@ integer sound1          = TRUE;
 integer walking         = FALSE;
 integer leshedON        = FALSE;
 integer announced       = FALSE;
+/* integer g_bLeashedToAvi; */
 
-integer globalListenHandle  = -0;
 integer channel;
 integer listen_handle;
-integer g_iLMListener;
-integer g_iLMListernerDetach;
+/* integer g_iLMListener;
+integer g_iLMListernerDetach; */
 integer tid = 0;
 
-integer g_iParticleCount = 1;
+/* integer g_iParticleCount = 1;
 integer g_bLeashActive;
 integer g_iLoop;
 integer g_bParticleGlow = TRUE;
@@ -39,7 +39,7 @@ integer g_bInvisibleLeash = FALSE;
 integer COMMAND_PARTICLE = 20000;
 integer LOCKMEISTER = -8888;
 
-list g_lLeashPrims;
+list g_lLeashPrims; */
 list main_menu;
 list sounds_menu    = [ "Bell 1", "Back", "Exit"];
 list textures_menu  = ["Black", "White", "Back", "Exit"];
@@ -71,10 +71,13 @@ string API_Start_Sound;
 string API_Stop_Sound;
 string targetName = "";
 string objectName = "(TEMP): Collar - Leash";
+/* string CTYPE = "collar";
+string g_sCheck; */
 
 //TODO -START
-string g_sParticleTexture;
-string g_sParticleTextureID = "9a342cda-d62a-ae1f-fc32-a77a24a85d73";
+/* string g_sParticleTexture;
+string g_sParticleTextureID = "9a342cda-d62a-ae1f-fc32-a77a24a85d73"; */
+
 /*
 9a342cda-d62a-ae1f-fc32-a77a24a85d73 //Rope UUID
 4cde01ac-4279-2742-71e1-47ff81cc3529 //Chain UUID
@@ -82,13 +85,9 @@ bd7d7770-39c2-d4c8-e371-0342ecf20921 //Transparent UUID
 */
 //TODO -END
 
-vector g_vLeashColor    = <1,1,1>;
+/* vector g_vLeashColor    = <1,1,1>;
 vector g_vLeashSize     = <0.07, 0.07, 1.0>;
-vector g_vLeashGravity  = <0.0,0.0,-1.0>;
-
-
-
-
+vector g_vLeashGravity  = <0.0,0.0,-1.0>; */
 
 // TODO list START
 /* //NOTE so far this works 100% but leash goesto Avi Center looks stupid!!
@@ -104,16 +103,12 @@ what else? oh
 //F CLEAN UP!!!
 */ //TODO list END
 
-
-
-CheckMemory()
-{
+CheckMemory(){
     integer free_memory = llGetFreeMemory();
     llOwnerSay((string)free_memory + " bytes of free memory available for allocation.");
 }
 
-menu(key _id)
-{
+menu(key _id){
     if (!leshedON){
         main_menu = ["Leash", "Exit"];
     }
@@ -126,8 +121,7 @@ menu(key _id)
     llDialog(_id, "Hello " + (string)avatar_name + " Select a an option", main_menu, channel);
 }
 
-ownermenu(key _id)
-{
+ownermenu(key _id){
     main_menu = ["Sounds", "On/Off", "Textures", "Users", "Reset", "Exit"];
     list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
     channel = llFloor(llFrand(2000000));
@@ -135,37 +129,32 @@ ownermenu(key _id)
     llDialog(_id, "Hello " + (string)avatar_name + " Select a an option", main_menu, channel);
 }
 
-soundsmenu(key _id)
-{
+soundsmenu(key _id){
     list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", _id, "");
     llDialog(_id, "Hello " + (string)avatar_name + " Select a an option", sounds_menu, channel);
 }
 
-texturesmenu(key _id)
-{
+texturesmenu(key _id){
     list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", _id, "");
     llDialog(_id, "Hello " + (string)avatar_name + " Select a an option", textures_menu, channel);
 }
 
-usersmenu(key _id)
-{
+usersmenu(key _id){
     list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", _id, "");
     llDialog(_id, "Hello " + (string)avatar_name + " Select a an option", textures_menu, channel);
 }
 
-dumpAccessList()
-{
+dumpAccessList(){
     llOwnerSay("current access list: " + llDumpList2String(accessList, ", "));
 }
 
-asLoadSounds()
-{
+asLoadSounds(){
     API_Start_Sound = "";
     API_Stop_Sound = "";
     integer i = 0;
@@ -183,36 +172,32 @@ asLoadSounds()
     while(i++<a);
 }
 
-key llGetObjectOwner()
-{
+key llGetObjectOwner(){
     list details = llGetObjectDetails(llGetKey(), [OBJECT_OWNER]);
     return (key)llList2CSV(details);
 }
 
-LMSay()
+/* LMSay()
 {
     llShout(LOCKMEISTER, (string)llGetOwnerKey(g_kLeashedTo) + "collar");
-    llShout(LOCKMEISTER, (string)llGetOwnerKey(g_kLeashedTo) +  "handle");
-}
+    llShout(LOCKMEISTER, (string)llGetOwnerKey(g_kLeashedTo) + "handle");
+} */
 
-init()
-{
-    FindLinkedPrims();
-    StopParticles(TRUE);
+init(){
+    //FindLinkedPrims();
+    //StopParticles(TRUE);
     llListenRemove(listen_handle);
-    llListen(COMMAND_PARTICLE,"","","");
+    //llListen(COMMAND_PARTICLE,"","","");
     CheckMemory();
-    llParticleSystem([]);
+    //llParticleSystem([]);
 }
 
-soundsOFF()
-{
+soundsOFF(){
     walking = FALSE;
     llSetTimerEvent(seconds_to_check_when_avatar_walks);
 }
 
-stopFollowing()
-{
+stopFollowing(){
   string origName = llGetObjectName();
   llTargetRemove(tid);
   llStopMoveToTarget();
@@ -221,14 +206,12 @@ stopFollowing()
   llSetObjectName(origName);
 }
 
-startFollowingName(string name)
-{
+startFollowingName(string name){
   targetName = name;
   llSensor(targetName,NULL_KEY,AGENT,96.0,PI);
 }
 
-startFollowingKey(key id)
-{
+startFollowingKey(key id){
   string origName = llGetObjectName();
   list username = llParseString2List(llGetDisplayName(id), [""], []);
   list owner = llParseString2List(llGetDisplayName(llGetOwner()), [""], []);
@@ -240,8 +223,7 @@ startFollowingKey(key id)
   llSetTimerEvent(DELAY);
 }
 
-keepFollowing()
-{
+keepFollowing(){
   llTargetRemove(tid);
   llStopMoveToTarget();
   list answer = llGetObjectDetails(targetKey,[OBJECT_POS]);
@@ -261,12 +243,11 @@ keepFollowing()
   }
 }
 
-debug(string sText)
-{
+debug(string sText){
     llOwnerSay(llGetScriptName() + " DEBUG: " + sText);
 }
 
-FindLinkedPrims()
+/* FindLinkedPrims()
 {
     integer linkcount = llGetNumberOfPrims();
     for (g_iLoop = 2; g_iLoop <= linkcount; g_iLoop++)
@@ -341,13 +322,13 @@ StopParticles(integer iEnd)
         g_kParticleTarget = NULLKEY;
         llSensorRemove();
     }
-}
+} */
 
 default
 {
     on_rez(integer s)
     {
-        init();
+        llResetScript();
     }
 
     state_entry()
@@ -381,17 +362,21 @@ default
                 string avatar = llKey2Name(toucher_key);
                 string origName = llGetObjectName();
                 if (llListFindList(accessList, [avatar]) < 0 && toucher_key != ownerKey){
-                    llSetObjectName("");
-                    llOwnerSay((string)username + " touched your collar. (secondlife:///app/agent/" + (string)toucher_key + "/about)" );
-                    llSetObjectName(origName);
-                    llInstantMessage(toucher_key, "Hello " + (string)username + ", you are not on the access list, ask secondlife:///app/agent/" + (string)ownerKey + "/about");
+                    if(!DEBUG){
+                        llSetObjectName("");
+                        llOwnerSay((string)username + " touched your collar. (secondlife:///app/agent/" + (string)toucher_key + "/about)" );
+                        llSetObjectName(origName);
+                        llInstantMessage(toucher_key, "Hello " + (string)username + ", you are not on the access list, ask secondlife:///app/agent/" + (string)ownerKey + "/about");
+                    }
                     return;
                 }
                 else{
-                    llPlaySound(sound_9, Volume_For_Bell);
-                    llSetObjectName("");
-                    llWhisper(0, (string)username + " plays with the trinket on " + (string)owner + "'s collar.");
-                    llSetObjectName(origName);
+                    if(!DEBUG){
+                        llPlaySound(sound_9, Volume_For_Bell);
+                        llSetObjectName("");
+                        llWhisper(0, (string)username + " plays with the trinket on " + (string)owner + "'s collar.");
+                        llSetObjectName(origName);
+                    }
                     menu(toucher_key);
                 }
             }
@@ -400,7 +385,7 @@ default
 
     listen(integer channel, string name, key id, string message)
     {
-        g_kParticleTarget = id;
+        //g_kParticleTarget = id;
         list owner = llParseString2List(llGetDisplayName(llGetOwner()), [""], []);
         llListenRemove(listen_handle);
         if (message == "Exit")
@@ -408,13 +393,15 @@ default
         else if ((message == "Leash") || (message == "Unleash")){
             if(leshedON){
                 llInstantMessage(id, (string)owner + " is no longer following you.");
+                //llMessageLinked(LINK_ALL_OTHERS, COMMAND_PARTICLE, "leash|" + (string)g_kParticleTarget, g_kLeashedTo);
                 stopFollowing();
-                StopParticles(TRUE);
+                //StopParticles(TRUE);
             }
             else{
                 llInstantMessage(id, (string)owner + " is now following you.");
+                //llMessageLinked(LINK_ALL_OTHERS, COMMAND_PARTICLE, "unleash", g_kLeashedTo);
                 startFollowingKey(id);
-                StartParticles(g_kParticleTarget);
+                //StartParticles(g_kParticleTarget);
             }
             leshedON = !leshedON;
         }
@@ -462,7 +449,7 @@ default
             llResetScript();
     }
 
-    link_message(integer iSenderPrim, integer iNum, string sMessage, key kMessageID)
+    /* link_message(integer iSenderPrim, integer iNum, string sMessage, key kMessageID)
     {
         if (iNum == COMMAND_PARTICLE)
         {
@@ -494,7 +481,7 @@ default
                 }
             }
         }
-    }
+    } */
 
     attach(key kAttached)
     {
