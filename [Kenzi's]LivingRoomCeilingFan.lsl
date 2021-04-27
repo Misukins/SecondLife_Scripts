@@ -4,7 +4,7 @@ default
     {
         llResetScript();
     }
-    
+
     state_entry()
     {
         //
