@@ -29,7 +29,7 @@ default
         else if (msg == "High")
         {
             llSetLinkPrimitiveParamsFast(LINK_THIS, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
-            llSetLinkPrimitiveParamsFast(LINK_THIS, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 1.000, 4.0, 0.0 ]);
+            llSetLinkPrimitiveParamsFast(LINK_THIS, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 1.000, 10.0, 2.0 ]);
             llSetLinkPrimitiveParamsFast(LINK_THIS, [PRIM_GLOW,LIGHT_SIDE,0.55]);
         }
         else if (msg == "Off")
