@@ -24,7 +24,9 @@ integer walking         = FALSE;
 integer leshedON        = FALSE;
 integer announced       = FALSE;
 /* integer g_bLeashedToAvi; */
+integer ll_channel      = 665;
 
+integer globalListenHandle  = -0;
 integer channel;
 integer listen_handle;
 /* integer g_iLMListener;
@@ -334,7 +336,9 @@ default
     state_entry()
     {
         init();
+        globalListenHandle = llListen(ll_channel, "", llGetOwner(), "");
         llSetObjectName(llKey2Name(llGetOwner())+ "'s Collar");
+        llOwnerSay("Type /" +  (string)ll_channel + "menu for Menu");
         if(llGetAttached() != 0){
             llSetTimerEvent(seconds_to_check_when_avatar_walks);
             asLoadSounds();
@@ -444,6 +448,9 @@ default
                 state Owner;
             else
                 return;
+        }
+        else if (message == "menu"){
+            ownermenu(id);
         }
         else if (message == "Reset")
             llResetScript();
