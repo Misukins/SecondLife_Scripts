@@ -17,9 +17,8 @@ float g_fParticleAge = 1.0;
 float g_fParticleAlpha = 1.0;
 float g_fBurstRate = 0.04; */
 
-integer DEBUG           = TRUE;
-integer On              = TRUE;
-integer sound1          = TRUE;
+integer DEBUG           = FALSE;
+integer WalkingSound;
 integer walking         = FALSE;
 integer leshedON        = FALSE;
 integer announced       = FALSE;
@@ -43,7 +42,7 @@ integer LOCKMEISTER = -8888;
 
 list g_lLeashPrims; */
 list main_menu;
-list sounds_menu    = [ "Bell 1", "Back", "Exit"];
+//list sounds_menu    = [ "Bell 1", "Back", "Exit"];
 list textures_menu  = ["Black", "White", "Back", "Exit"];
 list users_menu     = ["Add", "Remove", "List", "Clear", "Back", "Exit"];
 list accessList     = [];
@@ -111,12 +110,10 @@ CheckMemory(){
 }
 
 menu(key _id){
-    if (!leshedON){
+    if (!leshedON)
         main_menu = ["Leash", "Exit"];
-    }
-    else{
+    else
         main_menu = ["Unleash", "Exit"];
-    }
     list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", _id, "");
@@ -124,18 +121,14 @@ menu(key _id){
 }
 
 ownermenu(key _id){
-    main_menu = ["Sounds", "On/Off", "Textures", "Users", "Reset", "Exit"];
+    if(!WalkingSound)
+        main_menu = ["On", "Textures", "Users", "Reset", "Exit"];
+    else
+        main_menu = ["Off", "Textures", "Users", "Reset", "Exit"];
     list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", _id, "");
     llDialog(_id, "Hello " + (string)avatar_name + " Select a an option", main_menu, channel);
-}
-
-soundsmenu(key _id){
-    list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
-    channel = llFloor(llFrand(2000000));
-    listen_handle = llListen(channel, "", _id, "");
-    llDialog(_id, "Hello " + (string)avatar_name + " Select a an option", sounds_menu, channel);
 }
 
 texturesmenu(key _id){
@@ -185,14 +178,14 @@ key llGetObjectOwner(){
     llShout(LOCKMEISTER, (string)llGetOwnerKey(g_kLeashedTo) + "handle");
 } */
 
+/*
 init(){
     //FindLinkedPrims();
     //StopParticles(TRUE);
-    llListenRemove(listen_handle);
     //llListen(COMMAND_PARTICLE,"","","");
-    CheckMemory();
     //llParticleSystem([]);
 }
+*/
 
 soundsOFF(){
     walking = FALSE;
@@ -335,7 +328,8 @@ default
 
     state_entry()
     {
-        init();
+        //init();
+        CheckMemory();
         globalListenHandle = llListen(ll_channel, "", llGetOwner(), "");
         llSetObjectName(llKey2Name(llGetOwner())+ "'s Collar");
         llOwnerSay("Type /" +  (string)ll_channel + "menu for Menu");
@@ -345,7 +339,8 @@ default
         }
         else
             llSetTimerEvent(0);
-        if (On)
+        
+        if (WalkingSound)
             llOwnerSay("Bell is now On..");
         else
             llOwnerSay("Bell is now Off..");
@@ -409,31 +404,23 @@ default
             }
             leshedON = !leshedON;
         }
-        else if (message == "On/Off")
-        {
-            if (On){
-                llOwnerSay("Bell is now Off..");
-                On = FALSE;
-                sound1 = FALSE;
-            }
-            else{
+        else if((message == "On") || (message == "Off")){
+            if(!WalkingSound){
                 llOwnerSay("Bell is now On..");
-                On = TRUE;
-                sound1 = TRUE;
+                WalkingSound = TRUE;
                 ownermenu(id);
             }
+            else{
+                llOwnerSay("Bell is now Off..");
+                WalkingSound = FALSE;
+                ownermenu(id);
+            }
+            !WalkingSound = WalkingSound;
         }
-        else if (message == "Sounds")
-            soundsmenu(id);
         else if (message == "Textures")
             texturesmenu(id);
         else if (message == "Back")
             ownermenu(id);
-        else if (message == "Bell 1"){
-            llOwnerSay("Bell 1 sound enabled..");
-            sound1 = TRUE;
-            soundsmenu(id);
-        }
         else if (message == "Black"){
             llSetLinkTexture(LINK_THIS, blackTexture, ALL_SIDES);
             texturesmenu(id);
@@ -516,10 +503,8 @@ default
         if(llGetAgentInfo(llGetObjectOwner()) & AGENT_WALKING){
             llSetTimerEvent(Walking_Sound_Speed);
             if(walking == FALSE){
-                if(On == TRUE){
-                    if (sound1 == TRUE)
-                        llPlaySound(sound_1, Volume_For_Sounds);
-                }
+                if(WalkingSound == TRUE)
+                    llPlaySound(sound_1, Volume_For_Sounds);
                 else
                     soundsOFF();
                 walking = TRUE;
