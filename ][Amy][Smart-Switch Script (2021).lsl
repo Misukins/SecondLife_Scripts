@@ -1,69 +1,50 @@
-/*
+float soundVolume     = 1.0;
 
-//FIX - Rewrite whole thing again!
-
-*/
-
-/*
 integer link_num;
-
-integer _ledlight_;
-integer _cfan_;
-
+integer ledlight_living;
+integer ledlight_living1;
+integer ledlight_living2;
+integer ledlight_mainroom;
+integer ledlight_melroom;
+integer ledlight_questroom;
+integer ledlight_bathroom;
 integer LIGHT_SIDE = 1;
-*/
 
 integer channel;
 integer listen_handle;
 
 integer VoiceChannel    = 0;
-integer soundVolume     = 1.0;
-
 integer Group_Only      = FALSE;
-integer Owner_Only      = FALSE;
+integer Owner_Only      = TRUE;
 integer Public_Access   = FALSE;
 
 integer Debug           = FALSE;
 
 key owner;
 
-list main_menu =                    [ "LivingRoom", "Amys Room", "Hennas Room", "Kenzis Room", "BathRoom", "+-Lights-+", "Access", "Exit" ];
-list AllLights_Menu =               [ "+-On-+", "+-Off-+", "Back", "Exit" ];
-list LivingRoomOptions_Menu =       [ "Lights", "CeilingFan", "Back", "Exit" ];
-list CeilingFanRotation_Menu =      [ "+VerySlow+", "+Slow+", "+Medium+", "+Fast+", "+VeryFast+", "+Off+", "Back", "Exit" ];
+list main_menu              = [ "LivingRoom", "MainBedRoom", "MelBedRoom", "QuestBedRoom", "BathRoom", "All-Lights", "Access", "Exit" ];
+list AccessList_Menu        = [ "Group", "Private", "Public", "Back", "Exit" ];
 
-list BedRoomOptions_Menu =          [ ">+Lights+<", "Back", "Exit" ]; //Amy's Room
-list BedRoomLights_Menu =           [ ">+Low+<", ">+Medium+<", ">+High+<", ">+Off+<", "Back", "Exit" ];
+list LivingRoom_Menu        = [ "Lights", "CeilingFan", "Back", "Exit" ];
+list CeilingFan_Menu        = [ "++VerySlow++", "++Slow++", "++Medium++", "++Fast++", "++VeryFast++", "++Off++", "Back", "Exit" ];
 
-list BedRoom1Options_Menu =          [ "-+Lights+-", "Back", "Exit" ]; //Henna's Room
-list BedRoom1Lights_Menu =           [ "-Low-", "-Medium-", "-High-", "-Off-", "Back", "Exit" ];
-
-list BedRoom2Options_Menu =          [ "++Lights++", "Back", "Exit" ]; //"Kenzis room"
-list BedRoom2Lights_Menu =           [ "++Low++", "++Medium++", "++High++", "++Off++", "Back", "Exit" ];
-
-list BathRoomLights_Menu =          [ "->Low<-", "->Medium<-", "->High<-", "->Off<-", "Back", "Exit" ];
-
-list KitchenLights_Menu =          [ ">Low<", ">Medium<", ">High<", ">Off<", "Back", "Exit" ];
-list AccessList_Menu =              [ "Group", "Private", "Public", "Back", "Exit" ];
+list LivingRoomLights_Menu  = [ "+Low", "+Medium", "+High", "+Off", "Back", "Exit" ];
+list MainRoom_Menu          = [ "-Low", "-Medium", "-High", "-Off", "Back", "Exit" ];
+list MelRoom_Menu           = [ "*Low", "*Medium", "*High", "*Off", "Back", "Exit" ];
+list QuestRoom_Menu         = [ ">Low", ">Medium", ">High", ">Off", "Back", "Exit" ];
+list BathRoom_Menu          = [ "|Low", "|Medium", "|High", "|Off", "Back", "Exit" ];
+list AllLights_Menu         = [ "+-On-+", "+-Off-+", "Back", "Exit" ];
 
 string  confirmedSound      = "69743cb2-e509-ed4d-4e52-e697dc13d7ac";
 string  accessDeniedSound   = "58da0f9f-42e5-8a8f-ee51-4fac6c247c98";
-string  helpNotecart        = "Amy's - SmartHome Commands";
 
-/*
-string _LEDLIGHT = "][Kenzi][LedLight"; //NOTE - MIGHT CHANGE FOR EVERY ROOM!
-string _CFAN     = "Ceiling Fan Blades";
-*/
-
-/*
-][Kenzi][LedLight: 19 - 
-][Kenzi][LedLight: 21 - 
-][Kenzi][LedLight: 20 - 
-][Kenzi][LedLight: 24 - 
-][Kenzi][LedLight: 22 - 
-][Kenzi][LedLight: 23 - 
-Ceiling Fan Blades: 4 - 
-*/
+string _LEDLIGHT_LIVING     = "LedLight-LivingRoom";
+string _LEDLIGHT_LIVING1    = "LedLight-LivingRoom1";
+string _LEDLIGHT_LIVING2    = "LedLight-LivingRoom2";
+string _LEDLIGHT_MAINROOM   = "LedLight-MainRoom";
+string _LEDLIGHT_MELROOM    = "LedLight-MelRoom";
+string _LEDLIGHT_QUESTROOM  = "LedLight-QuestRoom";
+string _LEDLIGHT_BATHROOM   = "LedLight-BathRoom";
 
 doMenu(key id){
     llListenRemove(listen_handle);
@@ -81,52 +62,68 @@ doAccessListMenu(key id){
     llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", AccessList_Menu, channel);
 }
 
+doLivingRoomMenu(key id){
+    llListenRemove(listen_handle);
+    channel = llFloor(llFrand(2000000));
+    listen_handle = llListen(channel, "", id, "");
+    list name = llParseString2List(llGetDisplayName(id), [""], []);
+    llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", LivingRoom_Menu, channel);
+}
+
+doLivingRoomLightsMenu(key id){
+    llListenRemove(listen_handle);
+    channel = llFloor(llFrand(2000000));
+    listen_handle = llListen(channel, "", id, "");
+    list name = llParseString2List(llGetDisplayName(id), [""], []);
+    llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", LivingRoomLights_Menu, channel);
+}
+
+doCeilingFanMenu(key id){
+    llListenRemove(listen_handle);
+    channel = llFloor(llFrand(2000000));
+    listen_handle = llListen(channel, "", id, "");
+    list name = llParseString2List(llGetDisplayName(id), [""], []);
+    llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", CeilingFan_Menu, channel);
+}
+
+doMainRoomMenu(key id){
+    llListenRemove(listen_handle);
+    channel = llFloor(llFrand(2000000));
+    listen_handle = llListen(channel, "", id, "");
+    list name = llParseString2List(llGetDisplayName(id), [""], []);
+    llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", MainRoom_Menu, channel);
+}
+
+doMelRoomMenu(key id){
+    llListenRemove(listen_handle);
+    channel = llFloor(llFrand(2000000));
+    listen_handle = llListen(channel, "", id, "");
+    list name = llParseString2List(llGetDisplayName(id), [""], []);
+    llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", MelRoom_Menu, channel);
+}
+
+doQuestRoomMenu(key id){
+    llListenRemove(listen_handle);
+    channel = llFloor(llFrand(2000000));
+    listen_handle = llListen(channel, "", id, "");
+    list name = llParseString2List(llGetDisplayName(id), [""], []);
+    llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", QuestRoom_Menu, channel);
+}
+
+doBathRoomMenu(key id){
+    llListenRemove(listen_handle);
+    channel = llFloor(llFrand(2000000));
+    listen_handle = llListen(channel, "", id, "");
+    list name = llParseString2List(llGetDisplayName(id), [""], []);
+    llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", BathRoom_Menu, channel);
+}
+
 doAllLightsMenu(key id){
     llListenRemove(listen_handle);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", id, "");
     list name = llParseString2List(llGetDisplayName(id), [""], []);
     llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", AllLights_Menu, channel);
-}
-
-doLivingRoomOptionsMenu(key id){
-    llListenRemove(listen_handle);
-    channel = llFloor(llFrand(2000000));
-    listen_handle = llListen(channel, "", id, "");
-    list name = llParseString2List(llGetDisplayName(id), [""], []);
-    llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", LivingRoomOptions_Menu, channel);
-}
-
-doCeilingFanRotationMenu(key id){
-    llListenRemove(listen_handle);
-    channel = llFloor(llFrand(2000000));
-    listen_handle = llListen(channel, "", id, "");
-    list name = llParseString2List(llGetDisplayName(id), [""], []);
-    llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", CeilingFanRotation_Menu, channel);
-}
-
-doBedRoomOptionsMenu(key id){
-    llListenRemove(listen_handle);
-    channel = llFloor(llFrand(2000000));
-    listen_handle = llListen(channel, "", id, "");
-    list name = llParseString2List(llGetDisplayName(id), [""], []);
-    llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", BedRoomOptions_Menu, channel);
-}
-
-doBedRoomLightsMenu(key id){
-    llListenRemove(listen_handle);
-    channel = llFloor(llFrand(2000000));
-    listen_handle = llListen(channel, "", id, "");
-    list name = llParseString2List(llGetDisplayName(id), [""], []);
-    llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", BedRoomLights_Menu, channel);
-}
-
-doBathRoomLightsMenu(key id){
-    llListenRemove(listen_handle);
-    channel = llFloor(llFrand(2000000));
-    listen_handle = llListen(channel, "", id, "");
-    list name = llParseString2List(llGetDisplayName(id), [""], []);
-    llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", BathRoomLights_Menu, channel);
 }
 
 AccessSound(){
@@ -138,47 +135,90 @@ DeniedSound(){
     llTriggerSound(accessDeniedSound, soundVolume);
 }
 
-/*
-determine_display_links()
-{
+determine_display_links(){
     integer i = link_num;
     integer found = 0;
     do{
-        if(llGetLinkName(i) == _LEDLIGHT){
-            _ledlight_ = i;
+        if(llGetLinkName(i) == _LEDLIGHT_LIVING){
+            ledlight_living = i;
             found++;
         }
-        else if (llGetLinkName(i) == _CFAN){
-            _cfan_ = i;
+        else if(llGetLinkName(i) == _LEDLIGHT_LIVING1){
+            ledlight_living1 = i;
+            found++;
+        }
+        else if(llGetLinkName(i) == _LEDLIGHT_LIVING2){
+            ledlight_living2 = i;
+            found++;
+        }
+        else if(llGetLinkName(i) == _LEDLIGHT_MAINROOM){
+            ledlight_mainroom = i;
+            found++;
+        }
+        else if(llGetLinkName(i) == _LEDLIGHT_MELROOM){
+            ledlight_melroom = i;
+            found++;
+        }
+        else if(llGetLinkName(i) == _LEDLIGHT_QUESTROOM){
+            ledlight_questroom = i;
+            found++;
+        }
+        else if(llGetLinkName(i) == _LEDLIGHT_BATHROOM){
+            ledlight_bathroom = i;
             found++;
         }
     }
-    while (i-- && found < 3);
+    while (i-- && found < 7);
 }
-*/
 
-/*
-        if (msg == "Low"){
-            llSetLinkPrimitiveParamsFast(_ledlight_, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
-            llSetLinkPrimitiveParamsFast(_ledlight_, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.200, 4.0, 0.150 ]);
-            llSetLinkPrimitiveParamsFast(_ledlight_, [PRIM_GLOW,LIGHT_SIDE,0.15]);
-        }
-        else if (msg == "Medium"){
-            llSetLinkPrimitiveParamsFast(_ledlight_, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
-            llSetLinkPrimitiveParamsFast(_ledlight_, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.600, 4.0, 0.550 ]);
-            llSetLinkPrimitiveParamsFast(_ledlight_, [PRIM_GLOW,LIGHT_SIDE,0.25]);
-        }
-        else if (msg == "High"){
-            llSetLinkPrimitiveParamsFast(_ledlight_, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
-            llSetLinkPrimitiveParamsFast(_ledlight_, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 1.000, 10.0, 2.0 ]);
-            llSetLinkPrimitiveParamsFast(_ledlight_, [PRIM_GLOW,LIGHT_SIDE,0.55]);
-        }
-        else if (msg == "Off"){
-            llSetLinkPrimitiveParamsFast(_ledlight_, [PRIM_FULLBRIGHT,LIGHT_SIDE,FALSE]);
-            llSetLinkPrimitiveParamsFast(_ledlight_, [PRIM_POINT_LIGHT, FALSE,<1.000, 0.867, 0.733>, 0.200, 4.0, 1.0 ]);
-            llSetLinkPrimitiveParamsFast(_ledlight_, [PRIM_GLOW,LIGHT_SIDE,0.0]);
-        }
-*/
+AllLightON(){
+    llSetLinkPrimitiveParamsFast(ledlight_living, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
+    llSetLinkPrimitiveParamsFast(ledlight_living, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.600, 4.0, 0.550 ]);
+    llSetLinkPrimitiveParamsFast(ledlight_living, [PRIM_GLOW,LIGHT_SIDE,0.25]);
+    llSetLinkPrimitiveParamsFast(ledlight_living1, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
+    llSetLinkPrimitiveParamsFast(ledlight_living1, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.600, 4.0, 0.550 ]);
+    llSetLinkPrimitiveParamsFast(ledlight_living1, [PRIM_GLOW,LIGHT_SIDE,0.25]);
+    llSetLinkPrimitiveParamsFast(ledlight_living2, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
+    llSetLinkPrimitiveParamsFast(ledlight_living2, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.600, 4.0, 0.550 ]);
+    llSetLinkPrimitiveParamsFast(ledlight_living2, [PRIM_GLOW,LIGHT_SIDE,0.25]);
+    llSetLinkPrimitiveParamsFast(ledlight_mainroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
+    llSetLinkPrimitiveParamsFast(ledlight_mainroom, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.600, 4.0, 0.550 ]);
+    llSetLinkPrimitiveParamsFast(ledlight_mainroom, [PRIM_GLOW,LIGHT_SIDE,0.25]);
+    llSetLinkPrimitiveParamsFast(ledlight_melroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
+    llSetLinkPrimitiveParamsFast(ledlight_melroom, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.600, 4.0, 0.550 ]);
+    llSetLinkPrimitiveParamsFast(ledlight_melroom, [PRIM_GLOW,LIGHT_SIDE,0.25]);
+    llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
+    llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.600, 4.0, 0.550 ]);
+    llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_GLOW,LIGHT_SIDE,0.25]);
+    llSetLinkPrimitiveParamsFast(ledlight_bathroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
+    llSetLinkPrimitiveParamsFast(ledlight_bathroom, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.600, 4.0, 0.550 ]);
+    llSetLinkPrimitiveParamsFast(ledlight_bathroom, [PRIM_GLOW,LIGHT_SIDE,0.25]);
+}
+
+AllLightOFF(){
+    llSetLinkPrimitiveParamsFast(ledlight_living, [PRIM_FULLBRIGHT,LIGHT_SIDE,FALSE]);
+    llSetLinkPrimitiveParamsFast(ledlight_living, [PRIM_POINT_LIGHT, FALSE,<1.000, 0.867, 0.733>, 0.200, 4.0, 1.0 ]);
+    llSetLinkPrimitiveParamsFast(ledlight_living, [PRIM_GLOW,LIGHT_SIDE,0.0]);
+    llSetLinkPrimitiveParamsFast(ledlight_living1, [PRIM_FULLBRIGHT,LIGHT_SIDE,FALSE]);
+    llSetLinkPrimitiveParamsFast(ledlight_living1, [PRIM_POINT_LIGHT, FALSE,<1.000, 0.867, 0.733>, 0.200, 4.0, 1.0 ]);
+    llSetLinkPrimitiveParamsFast(ledlight_living1, [PRIM_GLOW,LIGHT_SIDE,0.0]);
+    llSetLinkPrimitiveParamsFast(ledlight_living2, [PRIM_FULLBRIGHT,LIGHT_SIDE,FALSE]);
+    llSetLinkPrimitiveParamsFast(ledlight_living2, [PRIM_POINT_LIGHT, FALSE,<1.000, 0.867, 0.733>, 0.200, 4.0, 1.0 ]);
+    llSetLinkPrimitiveParamsFast(ledlight_living2, [PRIM_GLOW,LIGHT_SIDE,0.0]);
+    llSetLinkPrimitiveParamsFast(ledlight_mainroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,FALSE]);
+    llSetLinkPrimitiveParamsFast(ledlight_mainroom, [PRIM_POINT_LIGHT, FALSE,<1.000, 0.867, 0.733>, 0.200, 4.0, 1.0 ]);
+    llSetLinkPrimitiveParamsFast(ledlight_mainroom, [PRIM_GLOW,LIGHT_SIDE,0.0]);
+    llSetLinkPrimitiveParamsFast(ledlight_melroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,FALSE]);
+    llSetLinkPrimitiveParamsFast(ledlight_melroom, [PRIM_POINT_LIGHT, FALSE,<1.000, 0.867, 0.733>, 0.200, 4.0, 1.0 ]);
+    llSetLinkPrimitiveParamsFast(ledlight_melroom, [PRIM_GLOW,LIGHT_SIDE,0.0]);
+    llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,FALSE]);
+    llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_POINT_LIGHT, FALSE,<1.000, 0.867, 0.733>, 0.200, 4.0, 1.0 ]);
+    llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_GLOW,LIGHT_SIDE,0.0]);
+    llSetLinkPrimitiveParamsFast(ledlight_bathroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,FALSE]);
+    llSetLinkPrimitiveParamsFast(ledlight_bathroom, [PRIM_POINT_LIGHT, FALSE,<1.000, 0.867, 0.733>, 0.200, 4.0, 1.0 ]);
+    llSetLinkPrimitiveParamsFast(ledlight_bathroom, [PRIM_GLOW,LIGHT_SIDE,0.0]);
+}
+
 default
 {
     on_rez(integer start_param)
@@ -188,10 +228,8 @@ default
     
     state_entry()
     {
-        /*
         link_num = llGetNumberOfPrims();
         determine_display_links();
-        */
         llPreloadSound(confirmedSound);
         llPreloadSound(accessDeniedSound);
         llListen(VoiceChannel, "", "", "");
@@ -225,157 +263,20 @@ default
         
         if (chan == VoiceChannel){
             if (msg == "lights on"){
-                llMessageLinked(LINK_SET, 0, "Medium", NULL_KEY);
-                llMessageLinked(LINK_SET, 0, "-Medium-", NULL_KEY);
-                llMessageLinked(LINK_SET, 0, ">Medium<", NULL_KEY);
-                llMessageLinked(LINK_SET, 0, "-+Medium+-", NULL_KEY);
-                llMessageLinked(LINK_SET, 0, "++Medium++", NULL_KEY);
+                AllLightON();
                 AccessSound();     
             }
             else if (msg == "lights off"){
-                llMessageLinked(LINK_SET, 0, "Off", NULL_KEY);
-                llMessageLinked(LINK_SET, 0, "-Off-", NULL_KEY);
-                llMessageLinked(LINK_SET, 0, ">Off<", NULL_KEY);
-                llMessageLinked(LINK_SET, 0, "-+Off+-", NULL_KEY);
-                llMessageLinked(LINK_SET, 0, "++Off++", NULL_KEY);
+                AllLightOFF();
                 AccessSound();
             }
             else if (msg == "fan on"){
-                llMessageLinked(LINK_SET, 0, "+Medium+", NULL_KEY);
+                llMessageLinked(LINK_SET, 0, "++Medium++", NULL_KEY);
                 AccessSound();     
             }
             else if (msg == "fan off"){
-                llMessageLinked(LINK_SET, 0, "+Off+", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "livingroom lights low"){
-                llMessageLinked(LINK_SET, 0, "Low", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "livingroom lights medium"){
-                llMessageLinked(LINK_SET, 0, "Medium", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "livingroom lights high"){
-                llMessageLinked(LINK_SET, 0, "High", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "livingroom lights off"){
-                llMessageLinked(LINK_SET, 0, "Off", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "livingroom ceilingfan very slow"){
-                llMessageLinked(LINK_SET, 0, "+VerySlow+", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "livingroom ceilingfan slow"){
-                llMessageLinked(LINK_SET, 0, "+Slow+", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "livingroom ceilingfan medium"){
-                llMessageLinked(LINK_SET, 0, "+Medium+", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "livingroom ceilingfan fast"){
-                llMessageLinked(LINK_SET, 0, "+Fast+", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "livingroom ceilingfan very fast"){
-                llMessageLinked(LINK_SET, 0, "+VeryFast+", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "livingroom ceilingfan off"){
-                llMessageLinked(LINK_SET, 0, "+Off+", NULL_KEY);
-                AccessSound();
-            }
-            //NOTE Amy
-            else if (msg == "amy room lights low"){
-                llMessageLinked(LINK_SET, 0, ">+Low+<", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "amy room lights medium"){
-                llMessageLinked(LINK_SET, 0, ">+Medium+<", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "amy room lights high"){
-                llMessageLinked(LINK_SET, 0, ">+High+<", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "amy room lights off"){
-                llMessageLinked(LINK_SET, 0, ">+Off+<", NULL_KEY);
-                AccessSound();
-            }
-            //NOTE Henna
-            else if (msg == "henna room lights low"){
-                llMessageLinked(LINK_SET, 0, "-+Low+-", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "henna room lights medium"){
-                llMessageLinked(LINK_SET, 0, "-+Medium+-", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "henna room lights high"){
-                llMessageLinked(LINK_SET, 0, "-+High+-", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "henna room lights off"){
-                llMessageLinked(LINK_SET, 0, "-+Off+-", NULL_KEY);
-                AccessSound();
-            }
-            //NOTE Kenzi
-            else if (msg == "kenzi room lights low"){
-                llMessageLinked(LINK_SET, 0, "++Low++", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "kenzi room lights medium"){
-                llMessageLinked(LINK_SET, 0, "++Medium++", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "kenzi room lights high"){
-                llMessageLinked(LINK_SET, 0, "++High++", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "kenzi room lights off"){
                 llMessageLinked(LINK_SET, 0, "++Off++", NULL_KEY);
                 AccessSound();
-            }
-            //NOTE Kitchen
-            else if (msg == "kitchen lights low"){
-                llMessageLinked(LINK_SET, 0, ">Low<", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "kitchen lights medium"){
-                llMessageLinked(LINK_SET, 0, ">Medium<", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "kitchen lights high"){
-                llMessageLinked(LINK_SET, 0, ">High<", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "kitchen lights off"){
-                llMessageLinked(LINK_SET, 0, ">Off<", NULL_KEY);
-                AccessSound();
-            }
-            //NOTE Bathroom
-            else if (msg == "bathroom lights low"){
-                llMessageLinked(LINK_SET, 0, "->Low<-", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "bathroom lights medium"){
-                llMessageLinked(LINK_SET, 0, "->Medium<-", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "bathroom lights high"){
-                llMessageLinked(LINK_SET, 0, "->High<-", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "bathroom lights off"){
-                llMessageLinked(LINK_SET, 0, "->Off<-", NULL_KEY);
-                AccessSound();
-            }
-            else if (msg == "help"){
-                llInstantMessage(id, "Notecart Send...");
-                llGiveInventory(id, helpNotecart);
             }
         }
 
@@ -397,24 +298,21 @@ default
             }
         }
         else if (msg == "LivingRoom")
-            doLivingRoomOptionsMenu(id);
+            doLivingRoomMenu(id);
         else if (msg == "Lights")
-            doCeilingFanLightsMenu(id);
+            doLivingRoomLightsMenu(id);
         else if (msg == "CeilingFan")
-            doCeilingFanRotationMenu(id);
-        else if (msg == "BedRoom")
-            doBedRoomOptionsMenu(id);
+            doCeilingFanMenu(id);
+        else if (msg == "MainBedRoom")
+            doMainRoomMenu(id);
+        else if (msg == "MelBedRoom")
+            doMelRoomMenu(id);
+        else if (msg == "QuestBedRoom")
+            doQuestRoomMenu(id);
         else if (msg == "BathRoom")
-            doBathRoomLightsMenu(id);
-        else if (msg == "+-Lights-+")
+            doBathRoomMenu(id);
+        else if (msg == "All-Lights")
             doAllLightsMenu(id);
-        else if (msg == ">+Lights+<")
-            doBedRoomLightsMenu(id);
-        else if (msg == "**Room1**")
-            doUpstairsRoomOptionsMenu(id);
-        else if (msg == "-+Lights+-")
-            doUpstairsRoomLightsMenu(id);
-        
         else if (msg == "Group"){
             Group_Only      = TRUE;
             Owner_Only      = FALSE;
@@ -436,224 +334,191 @@ default
         
         //ALLLIGHTS ON/OFF
         else if (msg == "+-On-+"){
-            llMessageLinked(LINK_SET, 0, "Medium", NULL_KEY);
-            llMessageLinked(LINK_SET, 0, "-Medium-", NULL_KEY);
-            llMessageLinked(LINK_SET, 0, ">Medium<", NULL_KEY);
-            llMessageLinked(LINK_SET, 0, "-+Medium+-", NULL_KEY);
-            llMessageLinked(LINK_SET, 0, "++Medium++", NULL_KEY);
+            AllLightON();
             AccessSound();
-            
         }
         else if (msg == "+-Off-+"){
-            llMessageLinked(LINK_SET, 0, "Off", NULL_KEY);
-            llMessageLinked(LINK_SET, 0, "-Off-", NULL_KEY);
-            llMessageLinked(LINK_SET, 0, ">Off<", NULL_KEY);
-            llMessageLinked(LINK_SET, 0, "-+Off+-", NULL_KEY);
+            AllLightOFF();
+            AccessSound();
+        }
+
+        //CeilingFan
+        else if (msg == "++VerySlow++"){
+            llMessageLinked(LINK_SET, 0, "++VerySlow++", NULL_KEY);
+            AccessSound();
+        }
+        else if (msg == "++Slow++"){
+            llMessageLinked(LINK_SET, 0, "++Slow++", NULL_KEY);
+            AccessSound();
+        }
+        else if (msg == "++Medium++"){
+            llMessageLinked(LINK_SET, 0, "++Medium++", NULL_KEY);
+            AccessSound();
+        }
+        else if (msg == "++Fast++"){
+            llMessageLinked(LINK_SET, 0, "++Fast++", NULL_KEY);
+            AccessSound();
+        }
+        else if (msg == "++VeryFast++"){
+            llMessageLinked(LINK_SET, 0, "++VeryFast++", NULL_KEY);
+            AccessSound();
+        }
+        else if (msg == "++Off++"){
             llMessageLinked(LINK_SET, 0, "++Off++", NULL_KEY);
             AccessSound();
         }
         
-        //LIVINGROOMFANLIGHTS
-        else if (msg == "Low"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
+        //LivingRoom
+        else if (msg == "+Low"){
+            llSetLinkPrimitiveParamsFast(ledlight_living, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
+            llSetLinkPrimitiveParamsFast(ledlight_living, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.200, 4.0, 0.150 ]);
+            llSetLinkPrimitiveParamsFast(ledlight_living, [PRIM_GLOW,LIGHT_SIDE,0.15]);
+            llSetLinkPrimitiveParamsFast(ledlight_living1, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
+            llSetLinkPrimitiveParamsFast(ledlight_living1, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.200, 4.0, 0.150 ]);
+            llSetLinkPrimitiveParamsFast(ledlight_living1, [PRIM_GLOW,LIGHT_SIDE,0.15]);
+            llSetLinkPrimitiveParamsFast(ledlight_living2, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
+            llSetLinkPrimitiveParamsFast(ledlight_living2, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.200, 4.0, 0.150 ]);
+            llSetLinkPrimitiveParamsFast(ledlight_living2, [PRIM_GLOW,LIGHT_SIDE,0.15]);
             AccessSound();
         }
-        else if (msg == "Medium"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
+        else if (msg == "+Medium"){
+            llSetLinkPrimitiveParamsFast(ledlight_living, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
+            llSetLinkPrimitiveParamsFast(ledlight_living, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.600, 4.0, 0.550 ]);
+            llSetLinkPrimitiveParamsFast(ledlight_living, [PRIM_GLOW,LIGHT_SIDE,0.25]);
+            llSetLinkPrimitiveParamsFast(ledlight_living1, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
+            llSetLinkPrimitiveParamsFast(ledlight_living1, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.600, 4.0, 0.550 ]);
+            llSetLinkPrimitiveParamsFast(ledlight_living1, [PRIM_GLOW,LIGHT_SIDE,0.25]);
+            llSetLinkPrimitiveParamsFast(ledlight_living2, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
+            llSetLinkPrimitiveParamsFast(ledlight_living2, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.600, 4.0, 0.550 ]);
+            llSetLinkPrimitiveParamsFast(ledlight_living2, [PRIM_GLOW,LIGHT_SIDE,0.25]);
             AccessSound();
         }
-        else if (msg == "High"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
+        else if (msg == "+High"){
+            llSetLinkPrimitiveParamsFast(ledlight_living, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
+            llSetLinkPrimitiveParamsFast(ledlight_living, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 1.000, 10.0, 2.0 ]);
+            llSetLinkPrimitiveParamsFast(ledlight_living, [PRIM_GLOW,LIGHT_SIDE,0.55]);
+            llSetLinkPrimitiveParamsFast(ledlight_living1, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
+            llSetLinkPrimitiveParamsFast(ledlight_living1, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 1.000, 10.0, 2.0 ]);
+            llSetLinkPrimitiveParamsFast(ledlight_living1, [PRIM_GLOW,LIGHT_SIDE,0.55]);
+            llSetLinkPrimitiveParamsFast(ledlight_living2, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
+            llSetLinkPrimitiveParamsFast(ledlight_living2, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 1.000, 10.0, 2.0 ]);
+            llSetLinkPrimitiveParamsFast(ledlight_living2, [PRIM_GLOW,LIGHT_SIDE,0.55]);
             AccessSound();
         }
-        else if (msg == "Off"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
+        else if (msg == "+Off"){
+            llSetLinkPrimitiveParamsFast(ledlight_living, [PRIM_FULLBRIGHT,LIGHT_SIDE,FALSE]);
+            llSetLinkPrimitiveParamsFast(ledlight_living, [PRIM_POINT_LIGHT, FALSE,<1.000, 0.867, 0.733>, 0.200, 4.0, 1.0 ]);
+            llSetLinkPrimitiveParamsFast(ledlight_living, [PRIM_GLOW,LIGHT_SIDE,0.0]);
+            llSetLinkPrimitiveParamsFast(ledlight_living1, [PRIM_FULLBRIGHT,LIGHT_SIDE,FALSE]);
+            llSetLinkPrimitiveParamsFast(ledlight_living1, [PRIM_POINT_LIGHT, FALSE,<1.000, 0.867, 0.733>, 0.200, 4.0, 1.0 ]);
+            llSetLinkPrimitiveParamsFast(ledlight_living1, [PRIM_GLOW,LIGHT_SIDE,0.0]);
+            llSetLinkPrimitiveParamsFast(ledlight_living2, [PRIM_FULLBRIGHT,LIGHT_SIDE,FALSE]);
+            llSetLinkPrimitiveParamsFast(ledlight_living2, [PRIM_POINT_LIGHT, FALSE,<1.000, 0.867, 0.733>, 0.200, 4.0, 1.0 ]);
+            llSetLinkPrimitiveParamsFast(ledlight_living2, [PRIM_GLOW,LIGHT_SIDE,0.0]);
             AccessSound();
         }
-        
-        //LIVINGROOMFANROTATION
-        else if (msg == "+VerySlow+") {
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
+
+        //mainRoom
+        if (msg == "-Low"){
+            llSetLinkPrimitiveParamsFast(ledlight_mainroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
+            llSetLinkPrimitiveParamsFast(ledlight_mainroom, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.200, 4.0, 0.150 ]);
+            llSetLinkPrimitiveParamsFast(ledlight_mainroom, [PRIM_GLOW,LIGHT_SIDE,0.15]);
             AccessSound();
         }
-        else if (msg == "+Slow+"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
+        else if (msg == "-Medium"){
+            llSetLinkPrimitiveParamsFast(ledlight_mainroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
+            llSetLinkPrimitiveParamsFast(ledlight_mainroom, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.600, 4.0, 0.550 ]);
+            llSetLinkPrimitiveParamsFast(ledlight_mainroom, [PRIM_GLOW,LIGHT_SIDE,0.25]);
             AccessSound();
         }
-        else if (msg == "+Medium+"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
+        else if (msg == "-High"){
+            llSetLinkPrimitiveParamsFast(ledlight_mainroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
+            llSetLinkPrimitiveParamsFast(ledlight_mainroom, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 1.000, 10.0, 2.0 ]);
+            llSetLinkPrimitiveParamsFast(ledlight_mainroom, [PRIM_GLOW,LIGHT_SIDE,0.55]);
             AccessSound();
         }
-        else if (msg == "+Fast+"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
+        else if (msg == "-Off"){
+            llSetLinkPrimitiveParamsFast(ledlight_mainroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,FALSE]);
+            llSetLinkPrimitiveParamsFast(ledlight_mainroom, [PRIM_POINT_LIGHT, FALSE,<1.000, 0.867, 0.733>, 0.200, 4.0, 1.0 ]);
+            llSetLinkPrimitiveParamsFast(ledlight_mainroom, [PRIM_GLOW,LIGHT_SIDE,0.0]);
             AccessSound();
         }
-        else if (msg == "+VeryFast+"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
+
+        //melRoom
+        if (msg == "*Low"){
+            llSetLinkPrimitiveParamsFast(ledlight_melroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
+            llSetLinkPrimitiveParamsFast(ledlight_melroom, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.200, 4.0, 0.150 ]);
+            llSetLinkPrimitiveParamsFast(ledlight_melroom, [PRIM_GLOW,LIGHT_SIDE,0.15]);
             AccessSound();
         }
-        else if (msg == "+Off+"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
+        else if (msg == "*Medium"){
+            llSetLinkPrimitiveParamsFast(ledlight_melroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
+            llSetLinkPrimitiveParamsFast(ledlight_melroom, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.600, 4.0, 0.550 ]);
+            llSetLinkPrimitiveParamsFast(ledlight_melroom, [PRIM_GLOW,LIGHT_SIDE,0.25]);
             AccessSound();
         }
-        
-        //BEDROOMLIGHTS
-        else if (msg == "-Low-"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
+        else if (msg == "*High"){
+            llSetLinkPrimitiveParamsFast(ledlight_melroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
+            llSetLinkPrimitiveParamsFast(ledlight_melroom, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 1.000, 10.0, 2.0 ]);
+            llSetLinkPrimitiveParamsFast(ledlight_melroom, [PRIM_GLOW,LIGHT_SIDE,0.55]);
             AccessSound();
         }
-        else if (msg == "-Medium-"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
-            AccessSound();
-        }
-        else if (msg == "-High-"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
-            AccessSound();
-        }
-        else if (msg == "-Off-"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
-            AccessSound();
-        }
-        
-        //BEDROOMCEILINGFAN
-        else if (msg == ">+VerySlow+<"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
-            AccessSound();
-        }
-        else if (msg == ">+Slow+<"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
-            AccessSound();
-        }
-        else if (msg == ">+Medium+<"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
-            AccessSound();
-        }
-        else if (msg == ">+Fast+<"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
-            AccessSound();
-        }
-        else if (msg == ">+VeryFast+<"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
-            AccessSound();
-        }
-        else if (msg == ">+Off+<"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
-            AccessSound();
-        }
-        
-        //BATHROOMLIGHTS
-        else if (msg == ">Low<"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
-            AccessSound();
-        }
-        else if (msg == ">Medium<"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
-            AccessSound();
-        }
-        else if (msg == ">High<"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
-            AccessSound();
-        }
-        else if (msg == ">Off<"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
+        else if (msg == "*Off"){
+            llSetLinkPrimitiveParamsFast(ledlight_melroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,FALSE]);
+            llSetLinkPrimitiveParamsFast(ledlight_melroom, [PRIM_POINT_LIGHT, FALSE,<1.000, 0.867, 0.733>, 0.200, 4.0, 1.0 ]);
+            llSetLinkPrimitiveParamsFast(ledlight_melroom, [PRIM_GLOW,LIGHT_SIDE,0.0]);
             AccessSound();
         }
         
-        //UPSTAIRSROOMFANLIGHTS
-        else if (msg == "-+Low+-"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
+        //questRoom
+        if (msg == ">Low"){
+            llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
+            llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.200, 4.0, 0.150 ]);
+            llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_GLOW,LIGHT_SIDE,0.15]);
             AccessSound();
         }
-        else if (msg == "-+Medium+-"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
+        else if (msg == ">Medium"){
+            llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
+            llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.600, 4.0, 0.550 ]);
+            llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_GLOW,LIGHT_SIDE,0.25]);
             AccessSound();
         }
-        else if (msg == "-+High+-"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
+        else if (msg == ">High"){
+            llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
+            llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 1.000, 10.0, 2.0 ]);
+            llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_GLOW,LIGHT_SIDE,0.55]);
             AccessSound();
         }
-        else if (msg == "-+Off+-"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
-            AccessSound();
-        }
-        
-        //UPSTAIRSROOMFAN
-        else if (msg == "-*VerySlow*-"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
-            AccessSound();
-        }
-        else if (msg == "-*Slow*-"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
-            AccessSound();
-        }
-        else if (msg == "-*Medium*-"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
-            AccessSound();
-        }
-        else if (msg == "-*Fast*-"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
-            AccessSound();
-        }
-        else if (msg == "-*VeryFast*-"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
-            AccessSound();
-        }
-        else if (msg == "-*Off*-"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
+        else if (msg == ">Off"){
+            llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,FALSE]);
+            llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_POINT_LIGHT, FALSE,<1.000, 0.867, 0.733>, 0.200, 4.0, 1.0 ]);
+            llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_GLOW,LIGHT_SIDE,0.0]);
             AccessSound();
         }
         
-        //UPSTAIRSBEDROOMFANLIGHTS
-        else if (msg == "++Low++"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
+        //bathRoom
+        if (msg == "|Low"){
+            llSetLinkPrimitiveParamsFast(ledlight_bathroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
+            llSetLinkPrimitiveParamsFast(ledlight_bathroom, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.200, 4.0, 0.150 ]);
+            llSetLinkPrimitiveParamsFast(ledlight_bathroom, [PRIM_GLOW,LIGHT_SIDE,0.15]);
             AccessSound();
         }
-        else if (msg == "++Medium++"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
+        else if (msg == "|Medium"){
+            llSetLinkPrimitiveParamsFast(ledlight_bathroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
+            llSetLinkPrimitiveParamsFast(ledlight_bathroom, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.600, 4.0, 0.550 ]);
+            llSetLinkPrimitiveParamsFast(ledlight_bathroom, [PRIM_GLOW,LIGHT_SIDE,0.25]);
             AccessSound();
         }
-        else if (msg == "++High++"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
+        else if (msg == "|High"){
+            llSetLinkPrimitiveParamsFast(ledlight_bathroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
+            llSetLinkPrimitiveParamsFast(ledlight_bathroom, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 1.000, 10.0, 2.0 ]);
+            llSetLinkPrimitiveParamsFast(ledlight_bathroom, [PRIM_GLOW,LIGHT_SIDE,0.55]);
             AccessSound();
         }
-        else if (msg == "++Off++"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
-            AccessSound();
-        }
-        
-        //UPSTAIRSBEDROOMFAN
-        else if (msg == "*+VerySlow+*"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
-            AccessSound();
-        }
-        else if (msg == "*+Slow+*"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
-            AccessSound();
-        }
-        else if (msg == "*+Medium+*"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
-            AccessSound();
-        }
-        else if (msg == "*+Fast+*"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
-            AccessSound();
-        }
-        else if (msg == "*+VeryFast+*"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
-            AccessSound();
-        }
-        else if (msg == "*+Off+*"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
-            AccessSound();
-        }
-            
-        //Door/Windows tint
-        else if (msg == "*Open*"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
-            AccessSound();
-        }
-        else if (msg == "*Closed*"){
-            llMessageLinked(LINK_SET, 0, (string)msg, NULL_KEY);
+        else if (msg == "|Off"){
+            llSetLinkPrimitiveParamsFast(ledlight_bathroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,FALSE]);
+            llSetLinkPrimitiveParamsFast(ledlight_bathroom, [PRIM_POINT_LIGHT, FALSE,<1.000, 0.867, 0.733>, 0.200, 4.0, 1.0 ]);
+            llSetLinkPrimitiveParamsFast(ledlight_bathroom, [PRIM_GLOW,LIGHT_SIDE,0.0]);
             AccessSound();
         }
     }
