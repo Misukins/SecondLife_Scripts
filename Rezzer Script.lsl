@@ -31,10 +31,10 @@ default
 {
     state_entry()
     {
-        llSay(0,"♡ Ready ♡");
+        //llSay(0,"♡ Ready ♡");
         llListen(HE_channel,"",NULL_KEY,"ping");
         menuPosition = 0;
-        menu_listen = llListen(menu_channel, "", "", ""); 
+        menu_listen = llListen(menu_channel, "", "", "");
     }
 
     touch_start(integer total_number)
@@ -58,7 +58,7 @@ default
             else
             {
                 clear_scene();
-                llRezAtRoot(message, <0.0, 0.06, 0.035>+llGetPos(), ZERO_VECTOR, llEuler2Rot(< 0, 90, 90> * DEG_TO_RAD), 1);
+                llRezAtRoot(message, <-0.02, 0.06, 0.015>+llGetPos(), ZERO_VECTOR, llEuler2Rot(< 0, 0, 270> * DEG_TO_RAD), 1);
             }
         }
     }
