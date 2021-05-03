@@ -17,10 +17,14 @@ default
         send_volume = send_volume/20;
         llPreloadSound(TypingSound);
         llPreloadSound(send_sound);
-        if(SoundsOn)
+        if(SoundsOn){
             llSetTimerEvent(0.2);
-        else
+            llOwnerSay("Sounds are On!");
+        }
+        else{
             llSetTimerEvent(0);
+            llOwnerSay("Sounds are Off!");
+        }
     }
 
     listen(integer ch, string nm, key id, string ms)
