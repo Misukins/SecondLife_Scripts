@@ -72,10 +72,26 @@ init()
     owner = llGetOwner();
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", owner, "");
+    globalListenHandle = llListen(ll_channel, "", llGetOwner(), "");
     llPreloadSound(sound_6);
     llPreloadSound(sound_7);
     llParticleSystem([]);
     llSetStatus(STATUS_PHANTOM, TRUE);
+    llOwnerSay("Type /" +  (string)ll_channel + "menu for Menu");
+    if (CollisionOn)
+        llOwnerSay("Collision is now On..");
+    else
+        llOwnerSay("Collision is now Off..");
+        
+    if (ParticleOn)
+        llOwnerSay("Particles are On..");
+    else
+        llOwnerSay("Particles are Off..");
+
+    if (SoundsOn)
+        llOwnerSay("Sounds are On..");
+    else
+        llOwnerSay("Sounds are Off..");
 }
 
 soundsOFF()
@@ -193,23 +209,13 @@ default
 
     changed(integer change)
     {
-        if (change & CHANGED_OWNER)
+        if(change & (CHANGED_OWNER | CHANGED_INVENTORY))
             llResetScript();
     }
 
     state_entry()
     {
-        globalListenHandle = llListen(ll_channel, "", llGetOwner(), "");
         init();
-        llOwnerSay("Type /" +  (string)ll_channel + "menu for Menu");
-        if (CollisionOn)
-            llOwnerSay("Collision is now On..");
-        else
-            llOwnerSay("Collision is now Off..");
-        if (ParticleOn)
-            llOwnerSay("Particles are On..");
-        else
-            llOwnerSay("Particles are Off..");
     }
 
     listen(integer channel, string name, key id, string message)
