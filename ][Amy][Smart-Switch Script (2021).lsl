@@ -1,9 +1,11 @@
 float soundVolume     = 1.0;
 
 integer link_num;
+
 integer ledlight_living;
 integer ledlight_living1;
 integer ledlight_living2;
+integer ledlight_living3;
 integer ledlight_mainroom;
 integer ledlight_melroom;
 integer ledlight_questroom;
@@ -12,7 +14,16 @@ integer ledlight_garage;
 integer ledlight_garage1;
 integer ledlight_garage2;
 integer ledlight_garage3;
+integer window_shades1;
+integer window_shades2;
+integer window_shades3;
+integer door_window;
+
 integer LIGHT_SIDE = 1;
+integer WINDOW_FACE1 = 1;
+integer WINDOW_FACE2 = 3;
+integer DOOR_FACE1 = 1;
+integer DOOR_FACE2 = 2;
 
 integer channel;
 integer listen_handle;
@@ -26,7 +37,7 @@ integer Debug           = FALSE;
 
 key owner;
 
-list main_menu              = [ "LivingRoom", "MainBedRoom", "MelBedRoom", "QuestBedRoom", "BathRoom", "Garage", "All-Lights", "Access", "Exit" ];
+list main_menu              = [ "LivingRoom", "MainBedRoom", "MelBedRoom", "QuestBedRoom", "BathRoom", "Garage", "Windows", "All-Lights", "Access", "Exit" ];
 list AccessList_Menu        = [ "Group", "Private", "Public", "Back", "Exit" ];
 
 list LivingRoom_Menu        = [ "Lights", "CeilingFan", "Back", "Exit" ];
@@ -38,6 +49,7 @@ list MelRoom_Menu           = [ "*Low", "*Medium", "*High", "*Off", "Back", "Exi
 list QuestRoom_Menu         = [ ">Low", ">Medium", ">High", ">Off", "Back", "Exit" ];
 list BathRoom_Menu          = [ "|Low", "|Medium", "|High", "|Off", "Back", "Exit" ];
 list Garage_Menu            = [ "|Low|", "|Medium|", "|High|", "|Off|", "Back", "Exit" ];
+list WindowTint_Menu        = [ "Tint On", "Tint Off", "Back", "Exit" ];
 list AllLights_Menu         = [ "+-On-+", "+-Off-+", "Back", "Exit" ];
 
 string  confirmedSound      = "69743cb2-e509-ed4d-4e52-e697dc13d7ac";
@@ -46,6 +58,7 @@ string  accessDeniedSound   = "58da0f9f-42e5-8a8f-ee51-4fac6c247c98";
 string _LEDLIGHT_LIVING     = "LedLight-LivingRoom";
 string _LEDLIGHT_LIVING1    = "LedLight-LivingRoom1";
 string _LEDLIGHT_LIVING2    = "LedLight-LivingRoom2";
+string _LEDLIGHT_LIVING3    = "LedLight-LivingRoom3";
 string _LEDLIGHT_MAINROOM   = "LedLight-MainRoom";
 string _LEDLIGHT_MELROOM    = "LedLight-MelRoom";
 string _LEDLIGHT_QUESTROOM  = "LedLight-QuestRoom";
@@ -54,6 +67,10 @@ string _LEDLIGHT_GARAGE     = "LedLight-Garage";
 string _LEDLIGHT_GARAGE1    = "LedLight-Garage1";
 string _LEDLIGHT_GARAGE2    = "LedLight-Garage2";
 string _LEDLIGHT_GARAGE3    = "LedLight-Garage3";
+string _WINDOW_SHADES1      = "MainWindow1";
+string _WINDOW_SHADES2      = "MainWindow2";
+string _WINDOW_SHADES3      = "MainWindow3";
+string _DOOR_WINDOW         = "FrontDoor";
 
 doMenu(key id){
     llListenRemove(listen_handle);
@@ -135,6 +152,14 @@ doGarageMenu(key id){
     llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", Garage_Menu, channel);
 }
 
+doWindowTintMenu(key id){
+    llListenRemove(listen_handle);
+    channel = llFloor(llFrand(2000000));
+    listen_handle = llListen(channel, "", id, "");
+    list name = llParseString2List(llGetDisplayName(id), [""], []);
+    llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", WindowTint_Menu, channel);
+}
+
 doAllLightsMenu(key id){
     llListenRemove(listen_handle);
     channel = llFloor(llFrand(2000000));
@@ -166,6 +191,10 @@ determine_display_links(){
         }
         else if(llGetLinkName(i) == _LEDLIGHT_LIVING2){
             ledlight_living2 = i;
+            found++;
+        }
+        else if(llGetLinkName(i) == _LEDLIGHT_LIVING3){
+            ledlight_living3 = i;
             found++;
         }
         else if(llGetLinkName(i) == _LEDLIGHT_MAINROOM){
@@ -200,8 +229,24 @@ determine_display_links(){
             ledlight_garage3 = i;
             found++;
         }
+        else if(llGetLinkName(i) == _WINDOW_SHADES1){
+            window_shades1 = i;
+            found++;
+        }
+        else if(llGetLinkName(i) == _WINDOW_SHADES2){
+            window_shades2 = i;
+            found++;
+        }
+        else if(llGetLinkName(i) == _WINDOW_SHADES3){
+            window_shades3 = i;
+            found++;
+        }
+        else if(llGetLinkName(i) == _DOOR_WINDOW){
+            door_window = i;
+            found++;
+        }
     }
-    while (i-- && found < 11);
+    while (i-- && found < 16);
 }
 
 AllLightON(){
@@ -276,6 +321,32 @@ AllLightOFF(){
     llSetLinkPrimitiveParamsFast(ledlight_garage3, [PRIM_GLOW,LIGHT_SIDE,0.0]);
 }
 
+BlindsON(){
+    llSetLinkPrimitiveParamsFast(window_shades1, [PRIM_ALPHA_MODE, WINDOW_FACE1, PRIM_ALPHA_MODE_NONE, 0]);
+    llSetLinkPrimitiveParamsFast(window_shades1, [PRIM_ALPHA_MODE, WINDOW_FACE2, PRIM_ALPHA_MODE_NONE, 0]);
+    llSetLinkPrimitiveParamsFast(window_shades2, [PRIM_ALPHA_MODE, WINDOW_FACE1, PRIM_ALPHA_MODE_NONE, 0]);
+    llSetLinkPrimitiveParamsFast(window_shades2, [PRIM_ALPHA_MODE, WINDOW_FACE2, PRIM_ALPHA_MODE_NONE, 0]);
+    llSetLinkPrimitiveParamsFast(window_shades3, [PRIM_ALPHA_MODE, WINDOW_FACE1, PRIM_ALPHA_MODE_NONE, 0]);
+    llSetLinkPrimitiveParamsFast(window_shades3, [PRIM_ALPHA_MODE, WINDOW_FACE2, PRIM_ALPHA_MODE_NONE, 0]);
+    llSetLinkPrimitiveParamsFast(door_window, [PRIM_ALPHA_MODE, DOOR_FACE1, PRIM_ALPHA_MODE_NONE, 0]);
+    llSetLinkPrimitiveParamsFast(door_window, [PRIM_ALPHA_MODE, DOOR_FACE2, PRIM_ALPHA_MODE_NONE, 0]);
+    llSetLinkPrimitiveParamsFast(door_window, [PRIM_ALPHA_MODE, DOOR_FACE1, PRIM_ALPHA_MODE_NONE, 0]);
+    llSetLinkPrimitiveParamsFast(door_window, [PRIM_ALPHA_MODE, DOOR_FACE2, PRIM_ALPHA_MODE_NONE, 0]);
+}
+
+BlindsOFF(){
+    llSetLinkPrimitiveParamsFast(window_shades1, [PRIM_ALPHA_MODE, WINDOW_FACE1, PRIM_ALPHA_MODE_BLEND, 0]);
+    llSetLinkPrimitiveParamsFast(window_shades1, [PRIM_ALPHA_MODE, WINDOW_FACE2, PRIM_ALPHA_MODE_BLEND, 0]);
+    llSetLinkPrimitiveParamsFast(window_shades2, [PRIM_ALPHA_MODE, WINDOW_FACE1, PRIM_ALPHA_MODE_BLEND, 0]);
+    llSetLinkPrimitiveParamsFast(window_shades2, [PRIM_ALPHA_MODE, WINDOW_FACE2, PRIM_ALPHA_MODE_BLEND, 0]);
+    llSetLinkPrimitiveParamsFast(window_shades3, [PRIM_ALPHA_MODE, WINDOW_FACE1, PRIM_ALPHA_MODE_BLEND, 0]);
+    llSetLinkPrimitiveParamsFast(window_shades3, [PRIM_ALPHA_MODE, WINDOW_FACE2, PRIM_ALPHA_MODE_BLEND, 0]);
+    llSetLinkPrimitiveParamsFast(door_window, [PRIM_ALPHA_MODE, DOOR_FACE1, PRIM_ALPHA_MODE_BLEND, 0]);
+    llSetLinkPrimitiveParamsFast(door_window, [PRIM_ALPHA_MODE, DOOR_FACE2, PRIM_ALPHA_MODE_BLEND, 0]);
+    llSetLinkPrimitiveParamsFast(door_window, [PRIM_ALPHA_MODE, DOOR_FACE1, PRIM_ALPHA_MODE_BLEND, 0]);
+    llSetLinkPrimitiveParamsFast(door_window, [PRIM_ALPHA_MODE, DOOR_FACE2, PRIM_ALPHA_MODE_BLEND, 0]);
+}
+
 default
 {
     on_rez(integer start_param)
@@ -335,6 +406,14 @@ default
                 llMessageLinked(LINK_SET, 0, "++Off++", NULL_KEY);
                 AccessSound();
             }
+            if (msg == "tint on"){
+                BlindsON();
+                AccessSound();
+            }
+            else if (msg == "tint off"){
+                BlindsOFF();
+                AccessSound();
+            }
         }
 
         //Defaults
@@ -370,6 +449,8 @@ default
             doBathRoomMenu(id);
         else if (msg == "Garage")
             doGarageMenu(id);
+        else if (msg == "Windows")
+            doWindowTintMenu(id);
         else if (msg == "All-Lights")
             doAllLightsMenu(id);
         else if (msg == "Group"){
@@ -640,6 +721,14 @@ default
             llSetLinkPrimitiveParamsFast(ledlight_garage3, [PRIM_FULLBRIGHT,LIGHT_SIDE,FALSE]);
             llSetLinkPrimitiveParamsFast(ledlight_garage3, [PRIM_POINT_LIGHT, FALSE,<1.000, 0.867, 0.733>, 0.200, 4.0, 1.0 ]);
             llSetLinkPrimitiveParamsFast(ledlight_garage3, [PRIM_GLOW,LIGHT_SIDE,0.0]);
+            AccessSound();
+        }
+        else if (msg == "Tint On"){
+            BlindsON();
+            AccessSound();
+        }
+        else if (msg == "Tint Off"){
+            BlindsOFF();
             AccessSound();
         }
     }
