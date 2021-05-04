@@ -66,8 +66,7 @@ integer random_chance(){
     return FALSE;
 }
 
-init()
-{
+init(){
     llListenRemove(listen_handle);
     owner = llGetOwner();
     channel = llFloor(llFrand(2000000));
@@ -78,32 +77,31 @@ init()
     llParticleSystem([]);
     llSetStatus(STATUS_PHANTOM, TRUE);
     llOwnerSay("Type /" +  (string)ll_channel + "menu for Menu");
-    if (CollisionOn)
-        llOwnerSay("Collision is now On..");
-    else
-        llOwnerSay("Collision is now Off..");
-        
-    if (ParticleOn)
-        llOwnerSay("Particles are On..");
-    else
-        llOwnerSay("Particles are Off..");
 
-    if (SoundsOn)
-        llOwnerSay("Sounds are On..");
+    /* if(!CollisionOn)
+        _CollisionON();
     else
-        llOwnerSay("Sounds are Off..");
+        _CollisionOFF();
+
+    if (!ParticleOn)
+        _ParticlesON();
+    else
+        _ParticlesOFF();
+
+    if (!SoundsOn)
+        _WalkSoundON();
+    else
+        _WalkSoundOFF(); */
 }
 
-soundsOFF()
-{
+soundsOFF(){
     Running = FALSE;
     llParticleSystem([]);
     llSetStatus(STATUS_PHANTOM, TRUE);
     llSetTimerEvent(0);
 }
 
-Particle_System ()
-{
+Particle_System(){
     list Parameters =
     [
         PSYS_PART_FLAGS,
@@ -138,11 +136,10 @@ Particle_System ()
         PSYS_SRC_MAX_AGE, Life,
         PSYS_SRC_TEXTURE, Texture
     ];
-    llParticleSystem (Parameters);
+    llParticleSystem(Parameters);
 }
 
-MyParticle (key myTarget)
-{
+MyParticle(key myTarget){
     Texture = "53e5859e-f122-87dc-a31a-21270e53d37a";
     Interpolate_Scale = TRUE;
     Start_Scale = <0.04,0.04, 0>;
@@ -171,11 +168,10 @@ MyParticle (key myTarget)
     Acceleration = < 0, 0, 0 >;
     Target = TRUE;
     Target_Key = myTarget;
-    Particle_System ();
+    Particle_System();
 }
 
-doMenu(key id)
-{
+doMenu(key id){
     if((CollisionOn == TRUE) && (ParticleOn == TRUE)  && (SoundsOn == TRUE))
         main_menu = [ "■Collision", "■Particles", "■Sounds", "▼" ];
     else if((CollisionOn == TRUE) && (ParticleOn == FALSE)  && (SoundsOn == TRUE))
@@ -198,6 +194,36 @@ doMenu(key id)
     globalListenHandle = llListen(channel, "", id, "");
     if (id == llGetOwner())
         llDialog(id, (string)owner_name + "'s TV Menu\nChoose an option! " + (string)name + "?", main_menu, channel);
+}
+
+_CollisionON(){
+    llOwnerSay("Collision is now On..");
+    CollisionOn = TRUE;
+}
+
+_CollisionOFF(){
+    llOwnerSay("Collision is now Off..");
+    CollisionOn = FALSE;
+}
+
+_ParticlesON(){
+    llOwnerSay("Particles is now On..");
+    ParticleOn = TRUE;
+}
+
+_ParticlesOFF(){
+    llOwnerSay("Particles is now Off..");
+    ParticleOn = FALSE;
+}
+
+_WalkSoundON(){
+    llOwnerSay("Walk Sounds are On..");
+    SoundsOn = TRUE;
+}
+
+_WalkSoundOFF(){
+    llOwnerSay("Walk Sounds are Off..");
+    SoundsOn = FALSE;
 }
 
 default
@@ -224,38 +250,31 @@ default
             if (message == "▼")
                 return;
             else if (message == "■Collision"){
-                llOwnerSay("Collision is now Off..");
-                CollisionOn     = FALSE;
+                _CollisionOFF();
                 doMenu(id);
             }
             else if (message == "□Collision"){
-                llOwnerSay("Collision is now On..");
-                CollisionOn     = TRUE;
+                _CollisionON();
                 doMenu(id);
             }
             else if (message == "■Particles"){
-                llOwnerSay("Particles are now Off..");
-                ParticleOn      = FALSE;
+                _ParticlesOFF();
                 doMenu(id);
             }
             else if (message == "□Particles"){
-                llOwnerSay("Particles are now On..");
-                ParticleOn      = TRUE;
+                _ParticlesON();
                 doMenu(id);
             }
             else if (message == "■Sounds"){
-                llOwnerSay("Sounds are now Off..");
-                SoundsOn      = FALSE;
+                _WalkSoundOFF();
                 doMenu(id);
             }
             else if (message == "□Sounds"){
-                llOwnerSay("Sounds are now On..");
-                SoundsOn      = TRUE;
+                _WalkSoundON();
                 doMenu(id);
             }
-            else if (message == "menu"){
+            else if (message == "menu")
                 doMenu(id);
-            }
             else if (message == "Reset")
                 llResetScript();
         }
@@ -297,7 +316,7 @@ default
 
             if(CollisionOn){
                 llSetObjectName("");
-                llOwnerSay("secondlife:///app/agent/" + (string)llDetectedKey(0) + "/about) Touched you!");
+                llOwnerSay("secondlife:///app/agent/" + (string)llDetectedKey(0) + "/about Touched you!");
                 llSetObjectName(origName);
             }
         }
