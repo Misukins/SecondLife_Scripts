@@ -37,7 +37,7 @@ integer Debug           = FALSE;
 
 key owner;
 
-list main_menu              = [ "LivingRoom", "MainBedRoom", "MelBedRoom", "QuestBedRoom", "BathRoom", "Garage", "Windows", "All-Lights", "Access", "Exit" ];
+list main_menu              = [ "LivingRoom", "MainBedRoom", "MelBedRoom", "QuestBedRoom", "BathRoom", "Kitchen", "Windows", "All-Lights", "Access", "Exit" ];
 list AccessList_Menu        = [ "Group", "Private", "Public", "Back", "Exit" ];
 
 list LivingRoom_Menu        = [ "Lights", "CeilingFan", "Back", "Exit" ];
@@ -447,7 +447,7 @@ default
             doQuestRoomMenu(id);
         else if (msg == "BathRoom")
             doBathRoomMenu(id);
-        else if (msg == "Garage")
+        else if (msg == "Kitchen")
             doGarageMenu(id);
         else if (msg == "Windows")
             doWindowTintMenu(id);
