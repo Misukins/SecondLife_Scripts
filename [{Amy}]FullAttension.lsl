@@ -1,10 +1,8 @@
 /* 
-
 NOTE - this is just stupid
-
-NOTE - NOT COMPELTED YET!!!!
-
 */
+
+string TRIGGER = "amy you ready";
 
 integer random_chance(){
     if (llFrand(1.0) < 0.5)
@@ -20,14 +18,18 @@ default
     }
 
     listen(integer ch, string name, key id, string msg){
+        string origName = llGetObjectName();
+        list owner_name = llParseString2List(llGetDisplayName(llGetOwnerKey(llGetKey())), [""], []);
         if (llSubStringIndex (llToLower (msg), llToLower (TRIGGER)) != -1){
-            if (voice_random_chance()){
+            if (random_chance()){
                 llSetObjectName("");
-                llOwnerSay("secondlife:///app/agent/" + (string)llDetectedKey(0) + "/about");
+                llSay(0, "Yes " + (string)owner_name + " has full attension now!");
                 llSetObjectName(origName);
             }
             else{
-
+                llSetObjectName("");
+                llSay(0, "No " + (string)owner_name + " dont know who you are?! please remind her.");
+                llSetObjectName(origName);
             }
         }
     }
