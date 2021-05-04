@@ -58,7 +58,7 @@ default
             else
             {
                 clear_scene();
-                llRezAtRoot(message, <-0.02, 0.06, 0.015>+llGetPos(), ZERO_VECTOR, llEuler2Rot(< 0, 0, 270> * DEG_TO_RAD), 1);
+                llRezAtRoot(message, <-0.02, 0.06, 0.015>+llGetPos(), ZERO_VECTOR, llEuler2Rot(< 0, 0, 270>+llGetRot() * DEG_TO_RAD), 1);
             }
         }
     }
