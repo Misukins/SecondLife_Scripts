@@ -42,9 +42,9 @@ integer LOCKMEISTER = -8888;
 
 list g_lLeashPrims; */
 list main_menu;
-//list sounds_menu    = [ "Bell 1", "Back", "Exit"];
-list textures_menu  = ["Black", "White", "Back", "Exit"];
-list users_menu     = ["Add", "Remove", "List", "Clear", "Back", "Exit"];
+//list sounds_menu    = [ "Bell 1", "Back", "▼"];
+list textures_menu  = ["Black", "White", "Back", "▼"];
+//list users_menu     = ["Add", "Remove", "List", "Clear", "Back", "▼"];
 list accessList     = [];
 
 /* //NOTE Coming soon.. (walk sounds) with on/off option
@@ -111,9 +111,9 @@ CheckMemory(){
 
 menu(key _id){
     if (!leshedON)
-        main_menu = ["Leash", "Exit"];
+        main_menu = ["Leash", "▼"];
     else
-        main_menu = ["Unleash", "Exit"];
+        main_menu = ["Unleash", "▼"];
     list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", _id, "");
@@ -122,9 +122,9 @@ menu(key _id){
 
 ownermenu(key _id){
     if(!WalkingSound)
-        main_menu = ["On", "Textures", "Users", "Reset", "Exit"];
+        main_menu = ["On", "Textures", "Users", "List", "Reset", "▼"];
     else
-        main_menu = ["Off", "Textures", "Users", "Reset", "Exit"];
+        main_menu = ["Off", "Textures", "Users", "List", "Reset", "▼"];
     list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", _id, "");
@@ -329,9 +329,10 @@ default
     state_entry()
     {
         //init();
+        dumpAccessList();
         CheckMemory();
         globalListenHandle = llListen(ll_channel, "", llGetOwner(), "");
-        llSetObjectName(llKey2Name(llGetOwner())+ "'s Collar");
+        llSetObjectName(llKey2Name(llGetOwner()) + "'s Collar");
         llOwnerSay("Type /" +  (string)ll_channel + "menu for Menu");
         if(llGetAttached() != 0){
             llSetTimerEvent(seconds_to_check_when_avatar_walks);
@@ -387,7 +388,7 @@ default
         //g_kParticleTarget = id;
         list owner = llParseString2List(llGetDisplayName(llGetOwner()), [""], []);
         llListenRemove(listen_handle);
-        if (message == "Exit")
+        if (message == "▼")
             return;
         else if ((message == "Leash") || (message == "Unleash")){
             if(leshedON){
@@ -436,9 +437,15 @@ default
             else
                 return;
         }
-        else if (message == "menu"){
-            ownermenu(id);
+        else if (message == "List")
+        {
+            if(id == llGetOwner())
+                dumpAccessList();
+            else
+                return;
         }
+        else if (message == "menu")
+            ownermenu(id);
         else if (message == "Reset")
             llResetScript();
     }
@@ -523,7 +530,8 @@ state Owner
     state_entry()
     {
         llListen(1, "", llGetOwner(), "");
-        llOwnerSay("type /1add (username) or if you wihs to remove users then type /1del (username)");
+        llOwnerSay("type /1add (username) or if you wihs to remove users then type /1del (username), you have 1min (60seconds)!");
+        llSetTimerEvent(60);
         dumpAccessList();
     }
 
@@ -540,7 +548,7 @@ state Owner
                     if (llListFindList(accessList, [avatar]) == -1) {
                         accessList = llListInsertList(accessList, [avatar], 0);
                         llOwnerSay("Added: " + avatar + " to access list");
-                        llInstantMessage(targetKey, " secondlife:///app/agent/" + (string)id + "/about added you to her Collar");
+                        llInstantMessage(targetKey, "secondlife:///app/agent/" + (string)id + "/about added you to her Collar");
                         state default;
                     }
                 }
@@ -549,12 +557,18 @@ state Owner
                     if (pos >= 0) {
                         accessList = llDeleteSubList(accessList, pos, pos);
                         llOwnerSay("Added: " + avatar + " to access list");
-                        llInstantMessage(targetKey, " secondlife:///app/agent/" + (string)id + "/about removed you from her Collar");
+                        llInstantMessage(targetKey, "secondlife:///app/agent/" + (string)id + "/about removed you from her Collar");
                         dumpAccessList();
                         state default;
                     }
                 }
             }
         }
+    }
+
+    timer()
+    {
+        llOwnerSay("Users add/delete time expired!");
+        state default;
     }
 }
