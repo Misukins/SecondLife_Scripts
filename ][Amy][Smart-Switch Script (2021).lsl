@@ -8,12 +8,9 @@ integer ledlight_living2;
 integer ledlight_living3;
 integer ledlight_mainroom;
 integer ledlight_melroom;
-integer ledlight_questroom;
 integer ledlight_bathroom;
 integer ledlight_garage;
 integer ledlight_garage1;
-integer ledlight_garage2;
-integer ledlight_garage3;
 integer window_shades1;
 integer window_shades2;
 integer window_shades3;
@@ -46,7 +43,6 @@ list CeilingFan_Menu        = [ "++VerySlow++", "++Slow++", "++Medium++", "++Fas
 list LivingRoomLights_Menu  = [ "+Low", "+Medium", "+High", "+Off", "Back", "Exit" ];
 list MainRoom_Menu          = [ "-Low", "-Medium", "-High", "-Off", "Back", "Exit" ];
 list MelRoom_Menu           = [ "*Low", "*Medium", "*High", "*Off", "Back", "Exit" ];
-list QuestRoom_Menu         = [ ">Low", ">Medium", ">High", ">Off", "Back", "Exit" ];
 list BathRoom_Menu          = [ "|Low", "|Medium", "|High", "|Off", "Back", "Exit" ];
 list Garage_Menu            = [ "|Low|", "|Medium|", "|High|", "|Off|", "Back", "Exit" ];
 list WindowTint_Menu        = [ "Tint On", "Tint Off", "Back", "Exit" ];
@@ -61,12 +57,9 @@ string _LEDLIGHT_LIVING2    = "LedLight-LivingRoom2";
 string _LEDLIGHT_LIVING3    = "LedLight-LivingRoom3";
 string _LEDLIGHT_MAINROOM   = "LedLight-MainRoom";
 string _LEDLIGHT_MELROOM    = "LedLight-MelRoom";
-string _LEDLIGHT_QUESTROOM  = "LedLight-QuestRoom";
 string _LEDLIGHT_BATHROOM   = "LedLight-BathRoom";
 string _LEDLIGHT_GARAGE     = "LedLight-Garage";
 string _LEDLIGHT_GARAGE1    = "LedLight-Garage1";
-string _LEDLIGHT_GARAGE2    = "LedLight-Garage2";
-string _LEDLIGHT_GARAGE3    = "LedLight-Garage3";
 string _WINDOW_SHADES1      = "MainWindow1";
 string _WINDOW_SHADES2      = "MainWindow2";
 string _WINDOW_SHADES3      = "MainWindow3";
@@ -126,14 +119,6 @@ doMelRoomMenu(key id){
     listen_handle = llListen(channel, "", id, "");
     list name = llParseString2List(llGetDisplayName(id), [""], []);
     llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", MelRoom_Menu, channel);
-}
-
-doQuestRoomMenu(key id){
-    llListenRemove(listen_handle);
-    channel = llFloor(llFrand(2000000));
-    listen_handle = llListen(channel, "", id, "");
-    list name = llParseString2List(llGetDisplayName(id), [""], []);
-    llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", QuestRoom_Menu, channel);
 }
 
 doBathRoomMenu(key id){
@@ -205,10 +190,6 @@ determine_display_links(){
             ledlight_melroom = i;
             found++;
         }
-        else if(llGetLinkName(i) == _LEDLIGHT_QUESTROOM){
-            ledlight_questroom = i;
-            found++;
-        }
         else if(llGetLinkName(i) == _LEDLIGHT_BATHROOM){
             ledlight_bathroom = i;
             found++;
@@ -219,14 +200,6 @@ determine_display_links(){
         }
         else if(llGetLinkName(i) == _LEDLIGHT_GARAGE1){
             ledlight_garage1 = i;
-            found++;
-        }
-        else if(llGetLinkName(i) == _LEDLIGHT_GARAGE2){
-            ledlight_garage2 = i;
-            found++;
-        }
-        else if(llGetLinkName(i) == _LEDLIGHT_GARAGE3){
-            ledlight_garage3 = i;
             found++;
         }
         else if(llGetLinkName(i) == _WINDOW_SHADES1){
@@ -246,7 +219,7 @@ determine_display_links(){
             found++;
         }
     }
-    while (i-- && found < 16);
+    while (i-- && found < 14);
 }
 
 AllLightON(){
@@ -265,9 +238,6 @@ AllLightON(){
     llSetLinkPrimitiveParamsFast(ledlight_melroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
     llSetLinkPrimitiveParamsFast(ledlight_melroom, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.600, 4.0, 0.550 ]);
     llSetLinkPrimitiveParamsFast(ledlight_melroom, [PRIM_GLOW,LIGHT_SIDE,0.25]);
-    llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
-    llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.600, 4.0, 0.550 ]);
-    llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_GLOW,LIGHT_SIDE,0.25]);
     llSetLinkPrimitiveParamsFast(ledlight_bathroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
     llSetLinkPrimitiveParamsFast(ledlight_bathroom, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.600, 4.0, 0.550 ]);
     llSetLinkPrimitiveParamsFast(ledlight_bathroom, [PRIM_GLOW,LIGHT_SIDE,0.25]);
@@ -277,12 +247,6 @@ AllLightON(){
     llSetLinkPrimitiveParamsFast(ledlight_garage1, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
     llSetLinkPrimitiveParamsFast(ledlight_garage1, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.600, 4.0, 0.550 ]);
     llSetLinkPrimitiveParamsFast(ledlight_garage1, [PRIM_GLOW,LIGHT_SIDE,0.25]);
-    llSetLinkPrimitiveParamsFast(ledlight_garage2, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
-    llSetLinkPrimitiveParamsFast(ledlight_garage2, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.600, 4.0, 0.550 ]);
-    llSetLinkPrimitiveParamsFast(ledlight_garage2, [PRIM_GLOW,LIGHT_SIDE,0.25]);
-    llSetLinkPrimitiveParamsFast(ledlight_garage3, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
-    llSetLinkPrimitiveParamsFast(ledlight_garage3, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.600, 4.0, 0.550 ]);
-    llSetLinkPrimitiveParamsFast(ledlight_garage3, [PRIM_GLOW,LIGHT_SIDE,0.25]);
 }
 
 AllLightOFF(){
@@ -301,9 +265,6 @@ AllLightOFF(){
     llSetLinkPrimitiveParamsFast(ledlight_melroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,FALSE]);
     llSetLinkPrimitiveParamsFast(ledlight_melroom, [PRIM_POINT_LIGHT, FALSE,<1.000, 0.867, 0.733>, 0.200, 4.0, 1.0 ]);
     llSetLinkPrimitiveParamsFast(ledlight_melroom, [PRIM_GLOW,LIGHT_SIDE,0.0]);
-    llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,FALSE]);
-    llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_POINT_LIGHT, FALSE,<1.000, 0.867, 0.733>, 0.200, 4.0, 1.0 ]);
-    llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_GLOW,LIGHT_SIDE,0.0]);
     llSetLinkPrimitiveParamsFast(ledlight_bathroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,FALSE]);
     llSetLinkPrimitiveParamsFast(ledlight_bathroom, [PRIM_POINT_LIGHT, FALSE,<1.000, 0.867, 0.733>, 0.200, 4.0, 1.0 ]);
     llSetLinkPrimitiveParamsFast(ledlight_bathroom, [PRIM_GLOW,LIGHT_SIDE,0.0]);
@@ -313,12 +274,6 @@ AllLightOFF(){
     llSetLinkPrimitiveParamsFast(ledlight_garage1, [PRIM_FULLBRIGHT,LIGHT_SIDE,FALSE]);
     llSetLinkPrimitiveParamsFast(ledlight_garage1, [PRIM_POINT_LIGHT, FALSE,<1.000, 0.867, 0.733>, 0.200, 4.0, 1.0 ]);
     llSetLinkPrimitiveParamsFast(ledlight_garage1, [PRIM_GLOW,LIGHT_SIDE,0.0]);
-    llSetLinkPrimitiveParamsFast(ledlight_garage2, [PRIM_FULLBRIGHT,LIGHT_SIDE,FALSE]);
-    llSetLinkPrimitiveParamsFast(ledlight_garage2, [PRIM_POINT_LIGHT, FALSE,<1.000, 0.867, 0.733>, 0.200, 4.0, 1.0 ]);
-    llSetLinkPrimitiveParamsFast(ledlight_garage2, [PRIM_GLOW,LIGHT_SIDE,0.0]);
-    llSetLinkPrimitiveParamsFast(ledlight_garage3, [PRIM_FULLBRIGHT,LIGHT_SIDE,FALSE]);
-    llSetLinkPrimitiveParamsFast(ledlight_garage3, [PRIM_POINT_LIGHT, FALSE,<1.000, 0.867, 0.733>, 0.200, 4.0, 1.0 ]);
-    llSetLinkPrimitiveParamsFast(ledlight_garage3, [PRIM_GLOW,LIGHT_SIDE,0.0]);
 }
 
 BlindsON(){
@@ -443,8 +398,6 @@ default
             doMainRoomMenu(id);
         else if (msg == "MelBedRoom")
             doMelRoomMenu(id);
-        else if (msg == "QuestBedRoom")
-            doQuestRoomMenu(id);
         else if (msg == "BathRoom")
             doBathRoomMenu(id);
         else if (msg == "Kitchen")
@@ -610,32 +563,6 @@ default
             AccessSound();
         }
 
-        //questRoom
-        if (msg == ">Low"){
-            llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
-            llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.200, 4.0, 0.150 ]);
-            llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_GLOW,LIGHT_SIDE,0.15]);
-            AccessSound();
-        }
-        else if (msg == ">Medium"){
-            llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
-            llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.600, 4.0, 0.550 ]);
-            llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_GLOW,LIGHT_SIDE,0.25]);
-            AccessSound();
-        }
-        else if (msg == ">High"){
-            llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
-            llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 1.000, 10.0, 2.0 ]);
-            llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_GLOW,LIGHT_SIDE,0.55]);
-            AccessSound();
-        }
-        else if (msg == ">Off"){
-            llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,FALSE]);
-            llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_POINT_LIGHT, FALSE,<1.000, 0.867, 0.733>, 0.200, 4.0, 1.0 ]);
-            llSetLinkPrimitiveParamsFast(ledlight_questroom, [PRIM_GLOW,LIGHT_SIDE,0.0]);
-            AccessSound();
-        }
-
         //bathRoom
         if (msg == "|Low"){
             llSetLinkPrimitiveParamsFast(ledlight_bathroom, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
@@ -670,12 +597,6 @@ default
             llSetLinkPrimitiveParamsFast(ledlight_garage1, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
             llSetLinkPrimitiveParamsFast(ledlight_garage1, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.200, 4.0, 0.150 ]);
             llSetLinkPrimitiveParamsFast(ledlight_garage1, [PRIM_GLOW,LIGHT_SIDE,0.15]);
-            llSetLinkPrimitiveParamsFast(ledlight_garage2, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
-            llSetLinkPrimitiveParamsFast(ledlight_garage2, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.200, 4.0, 0.150 ]);
-            llSetLinkPrimitiveParamsFast(ledlight_garage2, [PRIM_GLOW,LIGHT_SIDE,0.15]);
-            llSetLinkPrimitiveParamsFast(ledlight_garage3, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
-            llSetLinkPrimitiveParamsFast(ledlight_garage3, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.200, 4.0, 0.150 ]);
-            llSetLinkPrimitiveParamsFast(ledlight_garage3, [PRIM_GLOW,LIGHT_SIDE,0.15]);
             AccessSound();
         }
         else if (msg == "|Medium|"){
@@ -685,12 +606,6 @@ default
             llSetLinkPrimitiveParamsFast(ledlight_garage1, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
             llSetLinkPrimitiveParamsFast(ledlight_garage1, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.600, 4.0, 0.550 ]);
             llSetLinkPrimitiveParamsFast(ledlight_garage1, [PRIM_GLOW,LIGHT_SIDE,0.25]);
-            llSetLinkPrimitiveParamsFast(ledlight_garage2, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
-            llSetLinkPrimitiveParamsFast(ledlight_garage2, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.600, 4.0, 0.550 ]);
-            llSetLinkPrimitiveParamsFast(ledlight_garage2, [PRIM_GLOW,LIGHT_SIDE,0.25]);
-            llSetLinkPrimitiveParamsFast(ledlight_garage3, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
-            llSetLinkPrimitiveParamsFast(ledlight_garage3, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 0.600, 4.0, 0.550 ]);
-            llSetLinkPrimitiveParamsFast(ledlight_garage3, [PRIM_GLOW,LIGHT_SIDE,0.25]);
             AccessSound();
         }
         else if (msg == "|High|"){
@@ -700,12 +615,6 @@ default
             llSetLinkPrimitiveParamsFast(ledlight_garage1, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
             llSetLinkPrimitiveParamsFast(ledlight_garage1, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 1.000, 10.0, 2.0 ]);
             llSetLinkPrimitiveParamsFast(ledlight_garage1, [PRIM_GLOW,LIGHT_SIDE,0.55]);
-            llSetLinkPrimitiveParamsFast(ledlight_garage2, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
-            llSetLinkPrimitiveParamsFast(ledlight_garage2, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 1.000, 10.0, 2.0 ]);
-            llSetLinkPrimitiveParamsFast(ledlight_garage2, [PRIM_GLOW,LIGHT_SIDE,0.55]);
-            llSetLinkPrimitiveParamsFast(ledlight_garage3, [PRIM_FULLBRIGHT,LIGHT_SIDE,TRUE]);
-            llSetLinkPrimitiveParamsFast(ledlight_garage3, [PRIM_POINT_LIGHT,TRUE,<1.000, 0.867, 0.733>, 1.000, 10.0, 2.0 ]);
-            llSetLinkPrimitiveParamsFast(ledlight_garage3, [PRIM_GLOW,LIGHT_SIDE,0.55]);
             AccessSound();
         }
         else if (msg == "|Off|"){
@@ -715,12 +624,6 @@ default
             llSetLinkPrimitiveParamsFast(ledlight_garage1, [PRIM_FULLBRIGHT,LIGHT_SIDE,FALSE]);
             llSetLinkPrimitiveParamsFast(ledlight_garage1, [PRIM_POINT_LIGHT, FALSE,<1.000, 0.867, 0.733>, 0.200, 4.0, 1.0 ]);
             llSetLinkPrimitiveParamsFast(ledlight_garage1, [PRIM_GLOW,LIGHT_SIDE,0.0]);
-            llSetLinkPrimitiveParamsFast(ledlight_garage2, [PRIM_FULLBRIGHT,LIGHT_SIDE,FALSE]);
-            llSetLinkPrimitiveParamsFast(ledlight_garage2, [PRIM_POINT_LIGHT, FALSE,<1.000, 0.867, 0.733>, 0.200, 4.0, 1.0 ]);
-            llSetLinkPrimitiveParamsFast(ledlight_garage2, [PRIM_GLOW,LIGHT_SIDE,0.0]);
-            llSetLinkPrimitiveParamsFast(ledlight_garage3, [PRIM_FULLBRIGHT,LIGHT_SIDE,FALSE]);
-            llSetLinkPrimitiveParamsFast(ledlight_garage3, [PRIM_POINT_LIGHT, FALSE,<1.000, 0.867, 0.733>, 0.200, 4.0, 1.0 ]);
-            llSetLinkPrimitiveParamsFast(ledlight_garage3, [PRIM_GLOW,LIGHT_SIDE,0.0]);
             AccessSound();
         }
         else if (msg == "Tint On"){
