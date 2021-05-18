@@ -34,7 +34,8 @@ integer Debug           = FALSE;
 
 key owner;
 
-list main_menu              = [ "LivingRoom", "MainBedRoom", "MelBedRoom", "QuestBedRoom", "BathRoom", "Kitchen", "Windows", "All-Lights", "Access", "Exit" ];
+list main_menu              = [ "LivingRoom", "MainBedRoom", "MelBedRoom", "QuestBedRoom", "BathRoom", "Kitchen", "Windows", "All-Lights", "Exit" ];
+list admin_menu             = [ "LivingRoom", "MainBedRoom", "MelBedRoom", "QuestBedRoom", "BathRoom", "Kitchen", "Windows", "All-Lights", "Access", "Reset", "Exit" ];
 list AccessList_Menu        = [ "Group", "Private", "Public", "Back", "Exit" ];
 
 list LivingRoom_Menu        = [ "Lights", "CeilingFan", "Back", "Exit" ];
@@ -71,6 +72,14 @@ doMenu(key id){
     listen_handle = llListen(channel, "", id, "");
     list name = llParseString2List(llGetDisplayName(id), [""], []);
     llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", main_menu, channel);
+}
+
+doAdminMenu(key id){
+    llListenRemove(listen_handle);
+    channel = llFloor(llFrand(2000000));
+    listen_handle = llListen(channel, "", id, "");
+    list name = llParseString2List(llGetDisplayName(id), [""], []);
+    llDialog(id, "Hey " + (string)name + ".\nPlease select your option:", admin_menu, channel);
 }
 
 doAccessListMenu(key id){
@@ -302,6 +311,11 @@ BlindsOFF(){
     llSetLinkPrimitiveParamsFast(door_window, [PRIM_ALPHA_MODE, DOOR_FACE2, PRIM_ALPHA_MODE_BLEND, 0]);
 }
 
+Reset(){
+    llOwnerSay("Script Reset!");
+    llResetScript();
+}
+
 default
 {
     on_rez(integer start_param)
@@ -323,8 +337,10 @@ default
         key id = llDetectedKey(0);
         key owner = llGetOwner();
         integer sameGroup = llSameGroup(id);
-        if (Group_Only == TRUE){
-            if (sameGroup || id == owner)
+        if (id == owner)
+            doAdminMenu(id);
+        else if (Group_Only == TRUE){
+            if (sameGroup)
                 doMenu(id);
             else
                 DeniedSound();
@@ -380,14 +396,10 @@ default
             doMenu(id);
 
         //MAINPRIM
-        else if (msg == "Access"){
-            if (id == llGetOwner())
-                doAccessListMenu(id);
-            else{
-                DeniedSound();
-                return;
-            }
-        }
+        else if (msg == "Access")
+            doAccessListMenu(id);
+        else if (msg == "Reset")
+            Reset();
         else if (msg == "LivingRoom")
             doLivingRoomMenu(id);
         else if (msg == "Lights")
