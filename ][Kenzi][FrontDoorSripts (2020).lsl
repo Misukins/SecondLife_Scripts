@@ -9,7 +9,7 @@ string      windowsClosed       = "8a0f2798-e308-7616-3b86-c0baa091b3a3";
 
 integer     windowsFACE         = 1;
 float       windowsClosedTrans  = 1.0;
-float       windowsOpenedTrans  = 0.5;
+float       windowsOpenedTrans  = 0.6;
 
 float       autoCloseTime       = 10.0;
 integer     allowGroupToo       = TRUE;
@@ -187,11 +187,9 @@ default
     link_message(integer sender_num, integer num, string str, key id)
     {
         if (str == "*Open*"){
-            llSetLinkTexture(LINK_THIS, windowsOpened, WindowsFACE);
             llSetLinkAlpha(LINK_THIS, WindowsOpenedTrans, WindowsFACE);
         }
         else if (str == "*Closed*"){
-            llSetLinkTexture(LINK_THIS, windowsClosed, WindowsFACE);
             llSetLinkAlpha(LINK_THIS, WindowsClosedTrans, WindowsFACE);
         }
         else if (str == "*Lock Door*"){
