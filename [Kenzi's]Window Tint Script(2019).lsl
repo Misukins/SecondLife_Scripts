@@ -4,7 +4,7 @@ default
     {
         llResetScript();
     }
-    
+
     state_entry()
     {
         //
@@ -12,15 +12,15 @@ default
 
     link_message(integer sender, integer num, string str, key id)
     {
-        if (str == "*Open*")
-        {
-            llSetLinkTexture(LINK_THIS, "1d20b793-99ec-3360-af57-3c404a62a350", 1);
-            llSetLinkAlpha(LINK_THIS, 0.5, 1);
+        if (str == "*Open*"){
+            llSetLinkAlpha(LINK_THIS, 0.5, 2);
+            llSetLinkTexture(LINK_THIS, "1d20b793-99ec-3360-af57-3c404a62a350", 2);
+            llSetLinkColor(LINK_THIS, <0.128, 0.128, 0.128>, 2);
         }
-        else if (str == "*Closed*")
-        {
-            llSetLinkTexture(LINK_THIS, "8a0f2798-e308-7616-3b86-c0baa091b3a3" , 1);
-            llSetLinkAlpha(LINK_THIS, 1, 1);
+        else if (str == "*Closed*"){
+            llSetLinkAlpha(LINK_THIS, 1, 2);
+            llSetLinkTexture(LINK_THIS, "5748decc-f629-461c-9a36-a35a221fe21f", 2);
+            llSetLinkColor(LINK_THIS, <0, 0, 0>, 2);
         }
     }
 }
