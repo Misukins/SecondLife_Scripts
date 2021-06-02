@@ -1,7 +1,5 @@
-//UNUSED
-
-/* integer g_iMychannel = -8888;
-integer DEBUG = TRUE;
+integer g_iMychannel = -8888;
+integer DEBUG = FALSE;
 
 string g_sListenfor;
 string g_sResponse;
@@ -10,7 +8,7 @@ AnnounceLeashHolder()
 {
     llSay(g_iMychannel, g_sResponse);
     if(DEBUG)
-        llOwnerSay("DEBUG: AnnounceLeashHolder() - heard (-8888, " + g_iMychannel + ", " + g_sResponse + ")");
+        llOwnerSay("DEBUG: AnnounceLeashHolder() - heard (" + (string)g_iMychannel + ", " + (string)g_sResponse + ")");
 }
 
 default
@@ -64,4 +62,3 @@ default
         AnnounceLeashHolder();
     }
 }
- */
