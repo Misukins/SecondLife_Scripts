@@ -1,8 +1,8 @@
 key targetKey           = NULL_KEY;
-/* key NULLKEY             = "";
+key NULLKEY             = "";
 key g_kLeashedTo        = ""; //NULLKEY;
 key g_kLeashToPoint     = ""; //NULLKEY;
-key g_kParticleTarget   = ""; //NULLKEY; */
+key g_kParticleTarget   = ""; //NULLKEY;
 
 float DELAY = 0.5;
 float RANGE = 2.0;
@@ -12,27 +12,27 @@ float Walking_Sound_Speed = 1.0;
 float Volume_For_Sounds = 0.05;
 float Volume_For_Bell = 0.2;
 float seconds_to_check_when_avatar_walks = 0.01;
-/* float g_fLeashLength;
+float g_fLeashLength;
 float g_fParticleAge = 1.0;
 float g_fParticleAlpha = 1.0;
-float g_fBurstRate = 0.04; */
+float g_fBurstRate = 0.04;
 
 integer DEBUG           = FALSE;
 integer WalkingSound;
 integer walking         = FALSE;
 integer leshedON        = FALSE;
 integer announced       = FALSE;
-/* integer g_bLeashedToAvi; */
+integer g_bLeashedToAvi;
 integer ll_channel      = 665;
 
 integer globalListenHandle  = -0;
 integer channel;
 integer listen_handle;
-/* integer g_iLMListener;
-integer g_iLMListernerDetach; */
+integer g_iLMListener;
+integer g_iLMListernerDetach;
 integer tid = 0;
 
-/* integer g_iParticleCount = 1;
+integer g_iParticleCount = 1;
 integer g_bLeashActive;
 integer g_iLoop;
 integer g_bParticleGlow = TRUE;
@@ -40,7 +40,7 @@ integer g_bInvisibleLeash = FALSE;
 integer COMMAND_PARTICLE = 20000;
 integer LOCKMEISTER = -8888;
 
-list g_lLeashPrims; */
+list g_lLeashPrims;
 list main_menu;
 //list sounds_menu    = [ "Bell 1", "Back", "▼"];
 list textures_menu  = ["Black", "White", "Back", "▼"];
@@ -72,12 +72,12 @@ string API_Start_Sound;
 string API_Stop_Sound;
 string targetName = "";
 string objectName = "(TEMP): Collar - Leash";
-/* string CTYPE = "collar";
-string g_sCheck; */
+string CTYPE = "collar";
+string g_sCheck;
 
 //TODO -START
-/* string g_sParticleTexture;
-string g_sParticleTextureID = "9a342cda-d62a-ae1f-fc32-a77a24a85d73"; */
+string g_sParticleTexture;
+string g_sParticleTextureID = "4cde01ac-4279-2742-71e1-47ff81cc3529";
 
 /*
 9a342cda-d62a-ae1f-fc32-a77a24a85d73 //Rope UUID
@@ -86,9 +86,9 @@ bd7d7770-39c2-d4c8-e371-0342ecf20921 //Transparent UUID
 */
 //TODO -END
 
-/* vector g_vLeashColor    = <1,1,1>;
-vector g_vLeashSize     = <0.07, 0.07, 1.0>;
-vector g_vLeashGravity  = <0.0,0.0,-1.0>; */
+vector g_vLeashColor    = <0, 0, 0>;
+vector g_vLeashSize     = <0.05, 0.05, 1.0>;
+vector g_vLeashGravity  = <0.0, 0.0, -1.0>;
 
 // TODO list START
 /* //NOTE so far this works 100% but leash goesto Avi Center looks stupid!!
@@ -122,9 +122,9 @@ menu(key _id){
 
 ownermenu(key _id){
     if(!WalkingSound)
-        main_menu = ["On", "Textures", "Users", "List", "Reset", "▼"];
+        main_menu = ["On", "Follow", "Textures", "Users", "List", "Reset", "▼"];
     else
-        main_menu = ["Off", "Textures", "Users", "List", "Reset", "▼"];
+        main_menu = ["Off", "Follow", "Textures", "Users", "List", "Reset", "▼"];
     list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", _id, "");
@@ -172,20 +172,17 @@ key llGetObjectOwner(){
     return (key)llList2CSV(details);
 }
 
-/* LMSay()
-{
+LMSay(){
     llShout(LOCKMEISTER, (string)llGetOwnerKey(g_kLeashedTo) + "collar");
     llShout(LOCKMEISTER, (string)llGetOwnerKey(g_kLeashedTo) + "handle");
-} */
-
-/*
-init(){
-    //FindLinkedPrims();
-    //StopParticles(TRUE);
-    //llListen(COMMAND_PARTICLE,"","","");
-    //llParticleSystem([]);
 }
-*/
+
+init(){
+    FindLinkedPrims();
+    StopParticles(TRUE);
+    llListen(COMMAND_PARTICLE,"","","");
+    llParticleSystem([]);
+}
 
 soundsOFF(){
     walking = FALSE;
@@ -242,7 +239,7 @@ debug(string sText){
     llOwnerSay(llGetScriptName() + " DEBUG: " + sText);
 }
 
-/* FindLinkedPrims()
+FindLinkedPrims()
 {
     integer linkcount = llGetNumberOfPrims();
     for (g_iLoop = 2; g_iLoop <= linkcount; g_iLoop++)
@@ -272,8 +269,7 @@ debug(string sText){
     }
 }
 
-Particles(integer iLink, key id)
-{
+Particles(integer iLink, key id){
     if (id == NULLKEY){
         return;
     }
@@ -291,12 +287,11 @@ Particles(integer iLink, key id)
         PSYS_SRC_TARGET_KEY,id,
         PSYS_SRC_MAX_AGE, 0,
         PSYS_SRC_TEXTURE, g_sParticleTextureID
-            ];
+    ];
     llLinkParticleSystem(iLink, lTemp);
 }
 
-StartParticles(key id)
-{
+StartParticles(key id){
     for (g_iLoop = 0; g_iLoop < llGetListLength(g_lLeashPrims); g_iLoop = g_iLoop + 3){
         if ((integer)llList2String(g_lLeashPrims, g_iLoop + 2)){
             Particles((integer)llList2String(g_lLeashPrims, g_iLoop + 1), id);
@@ -305,8 +300,7 @@ StartParticles(key id)
     g_bLeashActive = TRUE;
 }
 
-StopParticles(integer iEnd)
-{
+StopParticles(integer iEnd){
     for (g_iLoop = 0; g_iLoop < llGetListLength(g_lLeashPrims); g_iLoop++){
         llLinkParticleSystem((integer)llList2String(g_lLeashPrims, g_iLoop + 1), []);
     }
@@ -317,7 +311,7 @@ StopParticles(integer iEnd)
         g_kParticleTarget = NULLKEY;
         llSensorRemove();
     }
-} */
+}
 
 default
 {
@@ -328,7 +322,7 @@ default
 
     state_entry()
     {
-        //init();
+        init();
         dumpAccessList();
         CheckMemory();
         globalListenHandle = llListen(ll_channel, "", llGetOwner(), "");
@@ -340,7 +334,7 @@ default
         }
         else
             llSetTimerEvent(0);
-        
+
         if (WalkingSound)
             llOwnerSay("Bell is now On..");
         else
@@ -385,7 +379,7 @@ default
 
     listen(integer channel, string name, key id, string message)
     {
-        //g_kParticleTarget = id;
+        g_kParticleTarget = id;
         list owner = llParseString2List(llGetDisplayName(llGetOwner()), [""], []);
         llListenRemove(listen_handle);
         if (message == "▼")
@@ -393,15 +387,15 @@ default
         else if ((message == "Leash") || (message == "Unleash")){
             if(leshedON){
                 llInstantMessage(id, (string)owner + " is no longer following you.");
-                //llMessageLinked(LINK_ALL_OTHERS, COMMAND_PARTICLE, "leash|" + (string)g_kParticleTarget, g_kLeashedTo);
+                llMessageLinked(LINK_ALL_OTHERS, COMMAND_PARTICLE, "leash|" + (string)g_kParticleTarget, g_kLeashedTo);
                 stopFollowing();
-                //StopParticles(TRUE);
+                StopParticles(TRUE);
             }
             else{
                 llInstantMessage(id, (string)owner + " is now following you.");
-                //llMessageLinked(LINK_ALL_OTHERS, COMMAND_PARTICLE, "unleash", g_kLeashedTo);
+                llMessageLinked(LINK_ALL_OTHERS, COMMAND_PARTICLE, "unleash", g_kLeashedTo);
                 startFollowingKey(id);
-                //StartParticles(g_kParticleTarget);
+                StartParticles(g_kParticleTarget);
             }
             leshedON = !leshedON;
         }
@@ -448,9 +442,27 @@ default
             ownermenu(id);
         else if (message == "Reset")
             llResetScript();
+
+        if (channel == LOCKMEISTER){
+            if (message == (string)g_kLeashedTo + "handle detached"){
+                g_kParticleTarget = g_kLeashedTo;
+                StartParticles(g_kParticleTarget);
+            }
+            if (llGetOwnerKey(id) == g_kLeashedTo){
+                message = llGetSubString(message, 36, -1);
+                if (message == "collar ok"){
+                    g_kParticleTarget = id;
+                    StartParticles(g_kParticleTarget);
+                }
+                if (message == "handle ok"){
+                    g_kParticleTarget = id;
+                    StartParticles(g_kParticleTarget);
+                }
+            }
+        }
     }
 
-    /* link_message(integer iSenderPrim, integer iNum, string sMessage, key kMessageID)
+    link_message(integer iSenderPrim, integer iNum, string sMessage, key kMessageID)
     {
         if (iNum == COMMAND_PARTICLE)
         {
@@ -482,7 +494,7 @@ default
                 }
             }
         }
-    } */
+    }
 
     attach(key kAttached)
     {
