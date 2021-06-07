@@ -16,7 +16,7 @@ integer sit     = FALSE;
 integer handle;
 integer menuchan;
 
-list MenuOwn    = [ "TODO", "TODO", "Exit" ];
+list MenuOwn    = [ "TODO", "TODO", "Help", "Exit" ]; //"Back",
 
 string Bname;
 
