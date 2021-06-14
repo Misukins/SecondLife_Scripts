@@ -35,28 +35,28 @@ menu(key id)
         llListenRemove(listener);
         menuchannel = llFloor(llFrand(2000000));
         listener = llListen(menuchannel, "", llGetOwner(), "");
-        list main_menu = [ "□ Scanner", "□ Scripts", "√ BothOn", "√ SpyAvatar", "Exit" ];
+        list main_menu = [ "□ Scanner", "□ Scripts", "√ BothOn", "√ SpyAvatar", "▼" ];
         llDialog(id, "Choose an option...", main_menu, menuchannel);
     }
     else if ((ScannerOn == FALSE) && (ScriptOn == TRUE)){
         llListenRemove(listener);
         menuchannel = llFloor(llFrand(2000000));
         listener = llListen(menuchannel, "", llGetOwner(), "");
-        list main_menu = [ "□ Scanner", "■ Scripts", "√ BothOn", "√ SpyAvatar", "Exit" ];
+        list main_menu = [ "□ Scanner", "■ Scripts", "√ BothOn", "√ SpyAvatar", "▼" ];
         llDialog(id, "Choose an option...", main_menu, menuchannel);
     }
     else if ((ScannerOn == TRUE) && (ScriptOn == TRUE)){
         llListenRemove(listener);
         menuchannel = llFloor(llFrand(2000000));
         listener = llListen(menuchannel, "", llGetOwner(), "");
-        list main_menu = [ "■ Scanner", "■ Scripts", "√ BothOn", "√ SpyAvatar", "Exit" ];
+        list main_menu = [ "■ Scanner", "■ Scripts", "√ BothOn", "√ SpyAvatar", "▼" ];
         llDialog(id, "Choose an option...", main_menu, menuchannel);
     }
     else if ((ScannerOn == TRUE) && (ScriptOn == FALSE)){
         llListenRemove(listener);
         menuchannel = llFloor(llFrand(2000000));
         listener = llListen(menuchannel, "", llGetOwner(), "");
-        list main_menu = [ "■ Scanner", "□ Scripts", "√ BothOn", "√ SpyAvatar", "Exit" ];
+        list main_menu = [ "■ Scanner", "□ Scripts", "√ BothOn", "√ SpyAvatar", "▼" ];
         llDialog(id, "Choose an option...", main_menu, menuchannel);
     }
 }
@@ -203,7 +203,7 @@ default
 
     listen(integer channel, string name, key id, string message)
     {
-        if (message == "Exit")
+        if (message == "▼")
             return;
         else if ((message == "□ Scanner") || (message == "■ Scanner")){
             if (!ScannerOn){
@@ -259,7 +259,7 @@ state Sniffing
         BothOn    = FALSE;
         ScriptOn  = FALSE;
         llPlaySound(_sound_on, _volume);
-        /* llOwnerSay("Listen Scanner is now Online.."); */
+        llOwnerSay("Listen Scanner is now Online..");
         llSetText("",<1,1,1>,1);
         StartSniffing();
     }
@@ -281,7 +281,7 @@ state Sniffing
     state_exit()
     {
         ScannerOn = FALSE;
-        /* llOwnerSay("Listen Scanner is now Offline.."); */
+        llOwnerSay("Listen Scanner is now Offline..");
         llPlaySound(_sound_off, _volume);
     }
 }
@@ -295,7 +295,7 @@ state Script
         ScannerOn = FALSE;
         BothOn    = FALSE;
         llPlaySound(_sound_on, _volume);
-        /* llOwnerSay("Scripts Counter is now Online.."); */
+        llOwnerSay("Scripts Counter is now Online..");
         llSetTimerEvent(1);
     }
 
@@ -324,7 +324,7 @@ state Script
     {
         llSetTimerEvent(0);
         ScriptOn = FALSE;
-        /* llOwnerSay("Scripts Counter is now Offline.."); */
+        llOwnerSay("Scripts Counter is now Offline..");
         llPlaySound(_sound_off, _volume);
     }
 }
@@ -339,7 +339,7 @@ state BothOnState
         BothOn      = TRUE;
         llSetTimerEvent(1);
         llPlaySound(_sound_on, _volume);
-        /* llOwnerSay("Scripts Counter and Channel Sniffer are now Online.."); */
+        llOwnerSay("Scripts Counter and Channel Sniffer are now Online..");
         StartSniffing();
     }
 
@@ -349,7 +349,7 @@ state BothOnState
         ScannerOn   = FALSE;
         ScriptOn    = FALSE;
         BothOn      = FALSE;
-        /* llOwnerSay("Scripts Counter and Channel Sniffer are now Offline.."); */
+        llOwnerSay("Scripts Counter and Channel Sniffer are now Offline..");
         llPlaySound(_sound_off, _volume);
         state default;
     }
@@ -381,7 +381,7 @@ state BothOnState
 
     state_exit()
     {
-        //!
+        //FIX
     }
 }
 
@@ -520,18 +520,18 @@ state SpyAvatar
                     integer i;
                     string fb;
                     fb += "\n====================";
-                    fb += "\nAttachment Report of " + cbcAgentProfile(agentKey);//+ " [scripts / prims]";
+                    fb += "\nAttachment Report of " + cbcAgentProfile(agentKey) + " [scripts / prims]";
                     fb += "\n====================";
                     fb += "\n ";
                     for (i = 0; i < itemTotal; i++) {
                         string objKey = llList2String(items, i);
-                        list objDetails = llGetObjectDetails(objKey, [OBJECT_ATTACHED_POINT, OBJECT_TOTAL_SCRIPT_COUNT/*OBJECT_PRIM_EQUIVALENCE*/, OBJECT_PRIM_COUNT]);
+                        list objDetails = llGetObjectDetails(objKey, [OBJECT_ATTACHED_POINT, OBJECT_TOTAL_SCRIPT_COUNT, OBJECT_PRIM_EQUIVALENCE, OBJECT_PRIM_COUNT]);
                         integer scripts = llList2Integer(objDetails, 1);
                         integer prims = llList2Integer(objDetails, 2);
                         string fbx;
                         fbx += "\n" + llKey2Name(objKey);
-                        fbx += "\n[" + cbcAgentProfile(llList2String(llGetObjectDetails(objKey, [OBJECT_CREATOR]), 0)) + " Creator] | " + (string)scripts + " scripts | " + llToUpper(llList2String(attPoints, llList2Integer(objDetails, 0)));//+ " / " + (string)prims + "]";
-                        //fbx += "\nCreator: " + cbcAgentProfile(llList2String(llGetObjectDetails(objKey, [OBJECT_CREATOR]), 0)) + " [" + (string)scripts + " scripts]";//+ " / " + (string)prims + "]";
+                        fbx += "\nOwner: " + cbcAgentProfile(llList2String(llGetObjectDetails(objKey, [OBJECT_OWNER]), 0)) + " | " + (string)scripts + " scripts | " + llToUpper(llList2String(attPoints, llList2Integer(objDetails, 0))) + " / " + (string)prims + " prims";
+                        fbx += "\nCreator: " + cbcAgentProfile(llList2String(llGetObjectDetails(objKey, [OBJECT_CREATOR]), 0)) + " [" + (string)scripts + " scripts]" + " / [" + (string)prims + " prims]";
                         fbx += "\n ";
                         if (llStringLength(fb) + llStringLength(fbx) > 1024) {
                             llOwnerSay(fb);
@@ -570,7 +570,7 @@ state SpyAvatar
                         llOwnerSay(fb);
                     }
                     llSetObjectName(objName);
-                    state BothOnState;
+                    state default;
                 }
             }
         }
