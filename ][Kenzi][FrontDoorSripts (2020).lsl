@@ -13,7 +13,6 @@ float       windowsOpenedTrans  = 0.6;
 
 float       autoCloseTime       = 10.0;
 integer     allowGroupToo       = TRUE;
-list        allowedAgentUUIDs   = [""];
 integer     listenChannel       = 0;
 
 integer     isLocked            = FALSE;
@@ -29,8 +28,6 @@ key         closerKey           = NULL_KEY;
 integer     isSetup             = FALSE;
 integer     listenHandle        = 0;
 string      avatarName          = "";
-
-integer DoorChannel = 14743;
 
 mySayName(integer channel, string objectName, string message)
 {
@@ -108,8 +105,6 @@ integer myPermissionCheck(key id)
         hasPermission = TRUE;
     else if (allowGroupToo == TRUE && llSameGroup(id))
         hasPermission = TRUE;
-    else if (llListFindList(allowedAgentUUIDs, [(string)id]) != -1)
-        hasPermission = TRUE;
     return hasPermission;
 }
 
@@ -165,7 +160,6 @@ default
     state_entry()
     {
         listenHandle = llListen(listenChannel, "", NULL_KEY, "");
-        llListen(DoorChannel, "", "", "");
         myGetDoorParams();
     }
 
@@ -197,16 +191,12 @@ default
                 isLocked = TRUE;
                 mySoundConfirmed();
             }
-            else
-                mySoundAccessDenied();
         }
         else if (str == "*Unlock Door*"){
             if (myPermissionCheck(id) == TRUE){
                 isLocked = FALSE;
                 mySoundConfirmed();
             }
-            else
-                mySoundAccessDenied();
         }
 
         if (num == llGetLinkNumber()){
