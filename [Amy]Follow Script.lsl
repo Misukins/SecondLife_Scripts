@@ -15,7 +15,7 @@ integer dlgChannel;
 integer gMenuPosition;
 
 string targetName = "";
-string objectName = "][Amy][Camera Mod - Follower";
+string objectName = "[{Amy}]Camera Mod v3 - Follower";
 
 list avatarList = [];
 list avatarUUIDs = [];
@@ -139,6 +139,7 @@ default
 {
   state_entry()
   {
+    llSetObjectName(objectName);
     dlgChannel = -1 - (integer)("0x" + llGetSubString( (string)llGetKey(), -7, -1) );
     init();
   }
