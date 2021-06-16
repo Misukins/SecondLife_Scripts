@@ -122,9 +122,9 @@ menu(key _id){
 
 ownermenu(key _id){
     if(!WalkingSound)
-        main_menu = ["On", "Follow", "Textures", "Users", "List", "Reset", "▼"];
+        main_menu = ["On", "Follow", "Textures", "List", "Reset", "▼"];
     else
-        main_menu = ["Off", "Follow", "Textures", "Users", "List", "Reset", "▼"];
+        main_menu = ["Off", "Follow", "Textures", "List", "Reset", "▼"];
     list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", _id, "");
@@ -182,6 +182,8 @@ init(){
     StopParticles(TRUE);
     llListen(COMMAND_PARTICLE,"","","");
     llParticleSystem([]);
+    llListen(1, "", llGetOwner(), "");
+    llOwnerSay("type /1add (username) or type /1del (username).");
 }
 
 soundsOFF(){
@@ -381,6 +383,7 @@ default
     {
         g_kParticleTarget = id;
         list owner = llParseString2List(llGetDisplayName(llGetOwner()), [""], []);
+        key targetKey;
         llListenRemove(listen_handle);
         if (message == "▼")
             return;
@@ -424,13 +427,6 @@ default
             llSetLinkTexture(LINK_THIS, whiteTexture, ALL_SIDES);
             texturesmenu(id);
         }
-        else if (message == "Users")
-        {
-            if(id == llGetOwner())
-                state Owner;
-            else
-                return;
-        }
         else if (message == "List")
         {
             if(id == llGetOwner())
@@ -457,6 +453,33 @@ default
                 if (message == "handle ok"){
                     g_kParticleTarget = id;
                     StartParticles(g_kParticleTarget);
+                }
+            }
+        }
+
+        if (id == llGetOwner()){
+            integer space = llSubStringIndex(message, " ");
+            if (space > 0) {
+                string command = llGetSubString(message, 0, space - 1);
+                string avatar = llGetSubString(message, space + 1, -1);
+                targetKey = llName2Key(avatar);
+                if (command == "add"){
+                    if (llListFindList(accessList, [avatar]) == -1) {
+                        accessList = llListInsertList(accessList, [avatar], 0);
+                        llOwnerSay("Added: " + avatar + " to access list");
+                        llInstantMessage(targetKey, "secondlife:///app/agent/" + (string)id + "/about added you to her Collar");
+                        state default;
+                    }
+                }
+                else if (command == "del"){
+                    integer pos = llListFindList(accessList, [avatar]);
+                    if (pos >= 0) {
+                        accessList = llDeleteSubList(accessList, pos, pos);
+                        llOwnerSay("Added: " + avatar + " to access list");
+                        llInstantMessage(targetKey, "secondlife:///app/agent/" + (string)id + "/about removed you from her Collar");
+                        dumpAccessList();
+                        state default;
+                    }
                 }
             }
         }
@@ -541,15 +564,15 @@ state Owner
 {
     state_entry()
     {
-        llListen(1, "", llGetOwner(), "");
+        /* llListen(1, "", llGetOwner(), "");
         llOwnerSay("type /1add (username) or if you wihs to remove users then type /1del (username), you have 1min (60seconds)!");
         llSetTimerEvent(60);
-        dumpAccessList();
+        dumpAccessList(); */
     }
 
     listen(integer channel, string name, key id, string message)
     {
-        key targetKey;
+        /* key targetKey;
         if (id == llGetOwner()){
             integer space = llSubStringIndex(message, " ");
             if (space > 0) {
@@ -575,12 +598,12 @@ state Owner
                     }
                 }
             }
-        }
+        } */
     }
 
     timer()
     {
-        llOwnerSay("Users add/delete time expired!");
-        state default;
+        /* llOwnerSay("Users add/delete time expired!");
+        state default; */
     }
 }
