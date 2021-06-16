@@ -18,6 +18,8 @@ integer sitcamOn            = FALSE;
 
 integer DEBUG               = TRUE;
 
+string objName = "[{Amy}]Camera Mod v3";
+
 debug(string message)
 {
     if(DEBUG == TRUE)
@@ -32,42 +34,42 @@ info(string message)
 menu(key id)
 {
     if (cameraOn == FALSE){
-        list main_menu = [ "■ Off ■", "□ Cinema □", "□ Adult □", "□ Teen □", "□ Child □", "□ Petite □", "† Reset †", "† Exit †" ];
+        list main_menu = [ "■ Off ■", "□ Cinema □", "□ Adult □", "□ Teen □", "□ Child □", "□ Petite □", "TP2Cam", "† Reset †", "† Exit †" ];
         llListenRemove(listener);
         channel = -1000000000 - (integer)(llFrand(1000000000));
         listener = llListen(channel, "", "", "");
         llDialog(id, "Choose an option...", main_menu, channel);
     }
     else if ((adultcamOn == TRUE) && (cameraOn == TRUE)){
-        list main_menu = [ "□ Off □", "□ Cinema □", "■ Adult ■", "□ Teen □", "□ Child □", "□ Petite □", "† Reset †", "† Exit †" ];
+        list main_menu = [ "□ Off □", "□ Cinema □", "■ Adult ■", "□ Teen □", "□ Child □", "□ Petite □", "TP2Cam", "† Reset †", "† Exit †" ];
         llListenRemove(listener);
         channel = -1000000000 - (integer)(llFrand(1000000000));
         listener = llListen(channel, "", "", "");
         llDialog(id, "Choose an option...", main_menu, channel);
     }
     else if ((teencamOn == TRUE) && (cameraOn == TRUE)){
-        list main_menu = [ "□ Off □", "□ Cinema □", "□ Adult □", "■ Teen ■", "□ Child □", "□ Petite □", "† Reset †", "† Exit †" ];
+        list main_menu = [ "□ Off □", "□ Cinema □", "□ Adult □", "■ Teen ■", "□ Child □", "□ Petite □", "TP2Cam", "† Reset †", "† Exit †" ];
         llListenRemove(listener);
         channel = -1000000000 - (integer)(llFrand(1000000000));
         listener = llListen(channel, "", "", "");
         llDialog(id, "Choose an option...", main_menu, channel);
     }
     else if ((childcamOn == TRUE) && (cameraOn == TRUE)){
-        list main_menu = [ "□ Off □", "□ Cinema □", "□ Adult □", "□ Teen □", "■ Child ■", "□ Petite □", "† Reset †", "† Exit †" ];
+        list main_menu = [ "□ Off □", "□ Cinema □", "□ Adult □", "□ Teen □", "■ Child ■", "□ Petite □", "TP2Cam", "† Reset †", "† Exit †" ];
         llListenRemove(listener);
         channel = -1000000000 - (integer)(llFrand(1000000000));
         listener = llListen(channel, "", "", "");
         llDialog(id, "Choose an option...", main_menu, channel);
     }
     else if ((petitecamOn == TRUE) && (cameraOn == TRUE)){
-        list main_menu = [ "□ Off □", "□ Cinema □", "□ Adult □", "□ Teen □", "□ Child □", "■ Petite ■", "† Reset †", "† Exit †" ];
+        list main_menu = [ "□ Off □", "□ Cinema □", "□ Adult □", "□ Teen □", "□ Child □", "■ Petite ■", "TP2Cam", "† Reset †", "† Exit †" ];
         llListenRemove(listener);
         channel = -1000000000 - (integer)(llFrand(1000000000));
         listener = llListen(channel, "", "", "");
         llDialog(id, "Choose an option...", main_menu, channel);
     }
     else if ((cinematiccamOn == TRUE) && (cameraOn == TRUE)){
-        list main_menu = [ "□ Off □", "■ Cinema ■", "□ Adult □", "□ Teen □", "□ Child □", "□ Petite □", "† Reset †", "† Exit †" ];
+        list main_menu = [ "□ Off □", "■ Cinema ■", "□ Adult □", "□ Teen □", "□ Child □", "□ Petite □", "TP2Cam", "† Reset †", "† Exit †" ];
         llListenRemove(listener);
         channel = -1000000000 - (integer)(llFrand(1000000000));
         listener = llListen(channel, "", "", "");
@@ -273,7 +275,7 @@ default
 {
     state_entry()
     {
-
+        llSetObjectName(objName);
         llSetLinkColor(LINK_THIS, _redState, ALL_SIDES);
         llSitTarget(<0.0, 0.0, 0.1>, ZERO_ROTATION);
         llPreloadSound(_sound_on);
@@ -326,10 +328,6 @@ default
                 llTriggerSound(_sound_on, 0.4);
                 return;
             }
-            /*else if (message == "† Exit †"){
-                llTriggerSound(_sound_on, 0.4);
-                return;
-            }*/
             else{
                 llTriggerSound(_sound_on, 0.4);
                 return;
@@ -343,6 +341,9 @@ default
     {
         if (perm & PERMISSION_CONTROL_CAMERA)
             llSetCameraParams([CAMERA_ACTIVE, 1]);
+        else{
+           llResetScript();
+        }
     }
 
     changed(integer change)
