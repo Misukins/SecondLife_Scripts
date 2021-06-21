@@ -1,5 +1,3 @@
-key AvatarKey;
-
 integer agentTotal;
 integer targetIndex = -1;
 integer objChan;
@@ -19,8 +17,6 @@ list agentKeys;
 list agentNames;
 list controls;
 list menuControls = ["←", "→"];
-
-integer tid = 0;
 
 cbcDisplayPage()
 {
