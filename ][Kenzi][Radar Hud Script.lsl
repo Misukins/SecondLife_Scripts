@@ -1,7 +1,7 @@
 integer counter = 0;
 key owner = NULL_KEY;
 integer RStat = TRUE;
- 
+
 set_time(float Stime, string Stext, integer Scounter)
 {
     llSetText(Stext, <0.667, 0.667, 0.667>, 1.0);
