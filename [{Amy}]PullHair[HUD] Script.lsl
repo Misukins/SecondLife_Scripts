@@ -10,7 +10,7 @@ string origName = "[{Amy}]PullHair[HUD]";
 list avatarList = [];
 list avatarUUIDs = [];
 
-list main_menu      = [ "PullHair", "PlayHair", "Reset", "Exit" ];
+list main_menu      = [ "※MessHair", "※PullHair", "※PlayHair", "※Reset", "※Quit" ];
 
 menu()
 {
@@ -45,31 +45,111 @@ default
         llParticleSystem([]);
         llListen(listenChannel, "", llGetOwner(), "");
     }
-    
+
     attach(key attached)
     {
-        if(attached != NULL_KEY){
+        if(attached != NULL_KEY)
             llResetScript();
-        }
     }
-    
+
     touch_start(integer total_number)
     {
         key id = llDetectedKey(0);
         if (id == llGetOwner())
             menu();
     }
-    
+
     listen(integer channel, string name, key id, string message)
     {
-        if (id == llGetOwner() && message == "PullHair")
+        if (message == "※MessHair")
+            state MessUp;
+        else if (message == "※PullHair")
             state Pull;
-        else if (id == llGetOwner() && message == "PlayHair")
+        else if (message == "※PlayHair")
             state Play;
-        else if (message == "Reset")
+        else if (message == "※Reset")
             reset();
-        else if (message == "Exit")
+        else if (message == "※Quit")
             return;
+    }
+}
+
+state MessUp
+{
+    state_entry()
+    {
+        llListen(listenChannel, "", llGetOwner(), "");
+        avatarList = [];
+        avatarUUIDs = [];
+        llSensor("", NULL_KEY, AGENT, 15.0, PI);
+    }
+
+    sensor(integer num_detected)
+    {
+        integer i;
+        while((i < num_detected) && (i < 9)){
+            if (llDetectedKey(i) != llGetOwner()){
+                avatarList += [llDetectedName(i)];
+                avatarUUIDs += [llDetectedKey(i)];
+            }
+            ++i;
+        }
+        if (llGetListLength(avatarList) > 0)
+            state MessUpDialog;
+    }
+
+    touch_start(integer total_number)
+    {
+        key id = llDetectedKey(0);
+        if (id == llGetOwner())
+            menu();
+    }
+
+    listen(integer channel, string name, key id, string message)
+    {
+        if (message == "※MessHair")
+            state MessUp;
+        else if (message == "※Reset")
+            resetInfo();
+        else if (message == "※Quit")
+            return;
+    }
+}
+
+state MessUpDialog
+{
+    state_entry()
+    {
+        llListen(listenChannel, "", llGetOwner(), "");
+        dlgHandle = llListen(dlgChannel, "", llGetOwner(), "");
+        llSetTimerEvent(30.0);
+        avatarList += ["※Cancel"];
+        llDialog(llGetOwner(), "Please select an avatar you want", avatarList, dlgChannel);
+        llOwnerSay("You have 30seconds to send this.. or else you have to sctart over!");
+    }
+
+    listen(integer channel, string name, key id, string message)
+    {
+        if ((channel == dlgChannel) && (llListFindList(avatarList, [message]) != -1)){
+            if (message != "※Cancel"){
+                list owner_name = llParseString2List(llGetDisplayName(llGetOwnerKey(llGetKey())), [""], []);
+                list targetName = [];
+                key targetKey;
+                targetName += [message];
+                string targetID = (key)llList2String(targetName,0);
+                targetKey = llName2Key(targetID);
+                llSetObjectName("");
+                llSay(0, llGetDisplayName(llGetOwner()) + " messes up " + llGetDisplayName(targetKey) + " hair!");
+            }
+            reset();
+            state default;
+        }
+    }
+
+    timer()
+    {
+        reset();
+        state default;
     }
 }
 
@@ -82,7 +162,7 @@ state Pull
         avatarUUIDs = [];
         llSensor("", NULL_KEY, AGENT, 15.0, PI);
     }
-    
+
     sensor(integer num_detected)
     {
         integer i;
@@ -94,27 +174,27 @@ state Pull
             ++i;
         }
         if (llGetListLength(avatarList) > 0)
-          state PullDialog;
+            state PullDialog;
     }
-    
+
     touch_start(integer total_number)
     {
         key id = llDetectedKey(0);
         if (id == llGetOwner())
             menu();
     }
-    
+
     listen(integer channel, string name, key id, string message)
     {
-        if (id == llGetOwner() && message == "PullHair")
+        if (message == "※PullHair")
             state Pull;
-        else if (id == llGetOwner() && message == "Reset")
+        else if (message == "※Reset")
             resetInfo();
-        else if (id == llGetOwner() && message == "Exit")
+        else if (message == "※Quit")
             return;
     }
 }
- 
+
 state PullDialog
 {
     state_entry()
@@ -122,15 +202,15 @@ state PullDialog
         llListen(listenChannel, "", llGetOwner(), "");
         dlgHandle = llListen(dlgChannel, "", llGetOwner(), "");
         llSetTimerEvent(30.0);
-        avatarList += ["Cancel"];
+        avatarList += ["※Cancel"];
         llDialog(llGetOwner(), "Please select an avatar you want", avatarList, dlgChannel);
         llOwnerSay("You have 30seconds to send this.. or else you have to sctart over!");
     }
-    
+
     listen(integer channel, string name, key id, string message)
     {
         if ((channel == dlgChannel) && (llListFindList(avatarList, [message]) != -1)){
-            if (message != "Cancel"){
+            if (message != "※Cancel"){
                 list owner_name = llParseString2List(llGetDisplayName(llGetOwnerKey(llGetKey())), [""], []);
                 list targetName = [];
                 key targetKey;
@@ -144,7 +224,7 @@ state PullDialog
             state default;
         }
     }
-    
+
     timer()
     {
         reset();
@@ -161,7 +241,7 @@ state Play
         avatarUUIDs = [];
         llSensor("", NULL_KEY, AGENT, 15.0, PI);
     }
-    
+
     sensor(integer num_detected)
     {
         integer i;
@@ -173,27 +253,27 @@ state Play
             ++i;
         }
         if (llGetListLength(avatarList) > 0)
-          state PlayDialog;
+            state PlayDialog;
     }
-    
+
     touch_start(integer total_number)
     {
         key id = llDetectedKey(0);
         if (id == llGetOwner())
             menu();
     }
-    
+
     listen(integer channel, string name, key id, string message)
     {
-        if (id == llGetOwner() && message == "PlayHair")
+        if (message == "※PlayHair")
             state Play;
-        else if (id == llGetOwner() && message == "Reset")
+        else if (message == "※Reset")
             resetInfo();
-        else if (id == llGetOwner() && message == "Exit")
+        else if (message == "※Quit")
             return;
     }
 }
- 
+
 state PlayDialog
 {
     state_entry()
@@ -201,15 +281,15 @@ state PlayDialog
         llListen(listenChannel, "", llGetOwner(), "");
         dlgHandle = llListen(dlgChannel, "", llGetOwner(), "");
         llSetTimerEvent(30.0);
-        avatarList += ["Cancel"];
+        avatarList += ["※Cancel"];
         llDialog(llGetOwner(), "Please select an avatar you want", avatarList, dlgChannel);
         llOwnerSay("You have 30seconds to send this.. or else you have to sctart over!");
     }
-    
+
     listen(integer channel, string name, key id, string message)
     {
         if ((channel == dlgChannel) && (llListFindList(avatarList, [message]) != -1)){
-            if (message != "Cancel"){
+            if (message != "※Cancel"){
                 list owner_name = llParseString2List(llGetDisplayName(llGetOwnerKey(llGetKey())), [""], []);
                 list targetName = [];
                 key targetKey;
@@ -223,7 +303,7 @@ state PlayDialog
             state default;
         }
     }
-    
+
     timer()
     {
         reset();
