@@ -6,6 +6,7 @@ integer channel;
 integer listen_handle;
 
 string origName = "[{Amy}]PullHair[HUD]";
+string desc_    = "(c)Amy (meljonna Resident) -";
 
 list avatarList = [];
 list avatarUUIDs = [];
@@ -41,6 +42,7 @@ default
 {
     state_entry()
     {
+        llSetObjectDesc(desc_);
         dlgChannel = -1 - (integer)("0x" + llGetSubString( (string)llGetKey(), -7, -1) );
         llParticleSystem([]);
         llListen(listenChannel, "", llGetOwner(), "");
@@ -125,7 +127,7 @@ state MessUpDialog
         llSetTimerEvent(30.0);
         avatarList += ["※Cancel"];
         llDialog(llGetOwner(), "Please select an avatar you want", avatarList, dlgChannel);
-        llOwnerSay("You have 30seconds to send this.. or else you have to sctart over!");
+        llOwnerSay("You have 30seconds to send this.. or else you have to start over!");
     }
 
     listen(integer channel, string name, key id, string message)
@@ -139,7 +141,7 @@ state MessUpDialog
                 string targetID = (key)llList2String(targetName,0);
                 targetKey = llName2Key(targetID);
                 llSetObjectName("");
-                llSay(0, llGetDisplayName(llGetOwner()) + " messes up " + llGetDisplayName(targetKey) + " hair!");
+                llSay(0, llGetDisplayName(llGetOwner()) + " messes up " + llGetDisplayName(targetKey) + "'s hair!");
             }
             reset();
             state default;
@@ -204,7 +206,7 @@ state PullDialog
         llSetTimerEvent(30.0);
         avatarList += ["※Cancel"];
         llDialog(llGetOwner(), "Please select an avatar you want", avatarList, dlgChannel);
-        llOwnerSay("You have 30seconds to send this.. or else you have to sctart over!");
+        llOwnerSay("You have 30seconds to send this.. or else you have to start over!");
     }
 
     listen(integer channel, string name, key id, string message)
@@ -218,7 +220,7 @@ state PullDialog
                 string targetID = (key)llList2String(targetName,0);
                 targetKey = llName2Key(targetID);
                 llSetObjectName("");
-                llSay(0, llGetDisplayName(llGetOwner()) + " pulls " + llGetDisplayName(targetKey) + " ponytail!");
+                llSay(0, llGetDisplayName(llGetOwner()) + " pulls " + llGetDisplayName(targetKey) + "'s ponytail!");
             }
             reset();
             state default;
@@ -283,7 +285,7 @@ state PlayDialog
         llSetTimerEvent(30.0);
         avatarList += ["※Cancel"];
         llDialog(llGetOwner(), "Please select an avatar you want", avatarList, dlgChannel);
-        llOwnerSay("You have 30seconds to send this.. or else you have to sctart over!");
+        llOwnerSay("You have 30seconds to send this.. or else you have to start over!");
     }
 
     listen(integer channel, string name, key id, string message)
@@ -297,7 +299,7 @@ state PlayDialog
                 string targetID = (key)llList2String(targetName,0);
                 targetKey = llName2Key(targetID);
                 llSetObjectName("");
-                llSay(0, llGetDisplayName(llGetOwner()) + " plays with " + llGetDisplayName(targetKey) + " hair!");
+                llSay(0, llGetDisplayName(llGetOwner()) + " plays with " + llGetDisplayName(targetKey) + "'s hair!");
             }
             reset();
             state default;
