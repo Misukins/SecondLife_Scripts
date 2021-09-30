@@ -11,7 +11,7 @@ integer minPage;
 integer maxPage;
 
 string objOwner;
-string objName = "[{Amy}]Camera Mod v3 - Teleporter";
+string objName = "[{Amy}]Camera Mod v3 - CAM_2_AVI";
 
 list agentKeys;
 list agentNames;
@@ -133,9 +133,10 @@ default
                     list answer = llGetObjectDetails(agentKey, [OBJECT_POS]);
                     vector targetPos = llList2Vector(answer, 0);
                     float dist = llVecDist(targetPos,llGetPos());
-                    llTeleportAgent(objOwner, "", targetPos, <0.0, 0.0, 0.0>);
-                    llTargetRemove(0);
-                    llStopMoveToTarget();
+                    //llTeleportAgent(objOwner, "", targetPos, <0.0, 0.0, 0.0>);
+                    llRequestPermissions(llGetOwner(), PERMISSION_CONTROL_CAMERA);
+                    //llTargetRemove(0);
+                    //llStopMoveToTarget();
                 }
             }
         }
@@ -149,28 +150,41 @@ default
         }
     }
 
+    /* !TODO LIST!
+        link_message
+        ON - OFF - FOR CAM MOD WHEN ENABLED
+        link search and link names to help my self i quess
+
+        this script aint working yet.. so fix it i quess xD
+    */
+
     run_time_permissions(integer perm)
     {
-        id = llGetOwner();
-        if (perm & (PERMISSION_TRACK_CAMERA)){
-            /* vector CamPos = llGetCameraPos();
-            rotation CamRot = llGetCameraRot();
-            vector CamFoc = CamPos + llRot2Fwd(CamRot);
-            llTeleportAgent(id, "", CamPos, CamFoc);
+        //id = llGetOwner();
+        if ( perm & PERMISSION_CONTROL_CAMERA ){
+            vector lookAtPos = llGetPos() + (targetPos * llGetRot());
+            list detPos = llGetObjectDetails(data, [OBJECT_POS, OBJECT_NAME]);
+            string x;
+            string y;
+            string z;
+            list xyz = llCSV2List((string)targetPos);
+            string xvector = llList2String(xyz,0);
+            x = llGetSubString(xvector,1,3);
+            y = llGetSubString(xvector,12,14);
+            z = llGetSubString(xvector,22,24);
+            integer x_fin = llFloor((integer)x);
+            integer y_fin = llFloor((integer)y);
+            integer z_fin = llFloor((integer)z);
+            //vector newVec = <x_fin,y_fin,z_fin>;
+            llOwnerSay("tracking "+ llList2String(detPos, 1) +" at position "+ (string)targetPos + ".");
+            llClearCameraParams();
             llSetCameraParams([
-                CAMERA_ACTIVE, 1,
-                CAMERA_BEHINDNESS_ANGLE, 0.0,
-                CAMERA_BEHINDNESS_LAG, 0.0,
-                CAMERA_DISTANCE, 1.5,
-                CAMERA_FOCUS_LAG, 0.01 ,
-                CAMERA_FOCUS_LOCKED, FALSE,
-                CAMERA_FOCUS_THRESHOLD, 0.0,
-                CAMERA_PITCH, 10.0,
-                CAMERA_POSITION_LAG, 0.1,
-                CAMERA_POSITION_LOCKED, TRUE,
-                CAMERA_POSITION_THRESHOLD, 0.0,
-                CAMERA_FOCUS_OFFSET, <-0.5,0,CamRot>
-            ]); */
+                CAMERA_ACTIVE, TRUE,
+                CAMERA_FOCUS, targetPos,
+                CAMERA_FOCUS_LOCKED, TRUE,
+                CAMERA_POSITION, targetPos + llVecNorm(llGetPos()-targetPos),
+                CAMERA_POSITION_LOCKED, TRUE
+            ]);
         }
         else{
            llResetScript();

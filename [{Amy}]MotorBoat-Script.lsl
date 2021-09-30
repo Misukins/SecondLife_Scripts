@@ -17,7 +17,6 @@ default
     state_entry()
     {
         llSetSitText(sit_message);
-        // forward-back,left-right,updown
         llSitTarget(sit_pos, llEuler2Rot(sit_rot*DEG_TO_RAD));
         llSetCameraEyeOffset(<-12, 0.0, 5.0>);
         llSetCameraAtOffset(<1.0, 0.0, 2.0>);
@@ -52,8 +51,7 @@ default
 
     changed(integer change)
     {
-        if (change & CHANGED_LINK)
-        {
+        if (change & CHANGED_LINK){
             key agent = llAvatarOnSitTarget();
             if (agent){
                 if (agent != llGetOwner()){
@@ -87,8 +85,9 @@ default
     run_time_permissions(integer perm)
     {
         if (perm){
-            llTakeControls(CONTROL_FWD | CONTROL_BACK | CONTROL_DOWN | CONTROL_UP | CONTROL_RIGHT |
-                            CONTROL_LEFT | CONTROL_ROT_RIGHT | CONTROL_ROT_LEFT, TRUE, FALSE);
+            llTakeControls(CONTROL_FWD | CONTROL_BACK | CONTROL_DOWN | CONTROL_UP | 
+            CONTROL_RIGHT | CONTROL_LEFT | CONTROL_ROT_RIGHT | CONTROL_ROT_LEFT, 
+            TRUE, FALSE);
         }
     }
 
