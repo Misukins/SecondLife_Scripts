@@ -2,7 +2,7 @@
 NOTE - this is just stupid
 */
 
-string TRIGGER = "amy you ready";
+string TRIGGER = "Amy";
 
 integer random_chance(){
     if (llFrand(1.0) < 0.5)
