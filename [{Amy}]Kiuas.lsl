@@ -1,6 +1,7 @@
 key sauna_stove_knob    = "de01e7b3-3f5a-a565-95bb-3096c47cf60c";
 key sauna_steam         = "4814a5e9-c928-71bb-96e6-621b13544ea5";
 key sauna_stove_buzz    = "5a43fd78-eaee-6cde-ac6e-110b969f7aca";
+key sauna_ready         = "ed124764-705d-d497-167a-182cd9fa2e6c";
 key id;
 
 integer channel;
@@ -8,7 +9,7 @@ integer listen_handle;
 integer TurnedON = FALSE;
 integer addedWater = FALSE;
 integer RDYtoAddwater = FALSE;
-integer SaunaRDY4Use = 1800;
+integer SaunaRDY4Use = 180;//1800;
 integer steamDuration = 10;
 integer cancelEverything = 0;
 
@@ -135,6 +136,7 @@ state RDY
     state_entry()
     {
         RDYtoAddwater = TRUE;
+        llTriggerSound(sauna_ready, 1);
     }
 
     touch_start(integer total_number)
