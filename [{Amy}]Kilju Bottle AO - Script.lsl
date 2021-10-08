@@ -320,7 +320,6 @@ loadNoteCard() {
         notecardName = EMPTY;
         return;
     }
-    llOwnerSay( "Loading notecard '" + notecardName + "'..." );
     llMinEventDelay( 0 );
     overrides = [];
     integer i;
@@ -357,7 +356,6 @@ initialize() {
         llListenRemove( listenHandle );
     listenHandle = llListen( listenChannel, EMPTY, Owner, EMPTY );
     llListenControl( listenHandle, FALSE );
-    printFreeMemory();
 }
 
 default {
@@ -524,25 +522,18 @@ default {
             checkMultiAnim( walkingIndex, "walking" );
             checkMultiAnim( sittingIndex, "sitting" );
             checkMultiAnim( sitgroundIndex, "sitting on ground" );
-
             curStandIndex = 0;
             numStands = llGetListLength( llParseString2List(llList2String(overrides, standingIndex), 
                                          [SEPARATOR], []) );
-
             curStandAnim = findMultiAnim( standingIndex, 0 );
             curWalkAnim = findMultiAnim( walkingIndex, 0 );
             curSitAnim = findMultiAnim( sittingIndex, 0 );
             curGsitAnim = findMultiAnim( sitgroundIndex, 0 );
-
             startNewAnimation( EMPTY, noAnimIndex, lastAnimState );
             lastAnim = EMPTY;
             lastAnimSet = EMPTY;
             lastAnimIndex = noAnimIndex;
             lastAnimState = EMPTY;
-
-            llOwnerSay( "Finished reading notecard '" + notecardName + "'." );
-            printFreeMemory();
-
             endNotecardLoad();
             return;
         }

@@ -3,21 +3,11 @@ key owner;
 key lid_ON_Sound        = "36abc63f-7536-2ee9-efc4-d0fdb98c5767";
 key lid_OFF_Sound       = "549679ab-2d75-d3ec-b6e6-76c89a0759e2";
 key MakinngKilju_Sound  = "62adc742-ccee-3a69-e64b-b70b885a07cf";
-key verygoodKilju_Sound = "eade4b95-0216-6f9f-f65b-d14428ee114d";
-key letsTaste_Sound     = "3f5f7e59-8267-8354-e9b7-3e618f68dfd8";
-key yeastShit_Sound     = "48dc19bb-273f-f495-2da0-1bd761bcf8d0";
-key yeastOk_Sound       = "6f258eef-6f02-57c7-a837-d3c76af2cdb0";
-key sugarShit_Sound     = "2bcd197e-c0fa-b390-6cee-ad8117b59c71";
-key sugarOk_Sound       = "4d17f51d-439d-3988-2405-db3e4c8865be";
-key drinking_Sound      = "34e7d853-6435-5386-d0c6-c32b316edc90";
 
 string LID_             = "Lid";
 string WATER_           = "Water";
 string YEAST_           = "Yeast";
 string SUGAR_           = "Sugar";
-string PENA1_           = "Pena1";
-string PENA2_           = "Pena2";
-string PENA3_           = "Pena3";
 string KiljuBottle      = "Kilju Bottle";
 string objectname;
 
@@ -30,9 +20,6 @@ integer _lid;
 integer _water;
 integer _yeast;
 integer _sugar;
-integer _pena1;
-integer _pena2;
-integer _pena3;
 
 integer LidON = TRUE; // TRUE = 1 / FALSE = 0 :: on debug!
 integer KILJUReady = FALSE;
@@ -47,9 +34,6 @@ float Volume = 1.0;
 list main_buttons       = [];
 list main_admin_buttons = [];
 /*---------- TO HERE ----------*/
-
-integer DEBUG = FALSE;   //just 4 debug
-
 /*NOTE
     You may change this time.
     float ONE_WEEK = 604800.0; //Week
@@ -65,25 +49,37 @@ doMenu(key _id)
 {
     if ((LidON) && (WATERadded)){
         main_buttons =         [ "Finished", "▼" ];
-        main_admin_buttons =   [ "Finished", "Reset", "▼" ];
+        main_admin_buttons =   [ "Finished", "▼" ];
     }
     else if(LidON){
         main_buttons =         [ "Open Lid", "▼" ];
-        main_admin_buttons =   [ "Open Lid", "Reset", "▼" ];
+        main_admin_buttons =   [ "Open Lid", "▼" ];
     }
     else{
         main_buttons =         [ "Close Lid", "Water", "Yeast", "Sugar", "▼" ];
-        main_admin_buttons =   [ "Close Lid", "Water", "Yeast", "Sugar", "Reset", "▼" ];
+        main_admin_buttons =   [ "Close Lid", "Water", "Yeast", "Sugar", "▼" ];
     }
     list owner_name = llParseString2List(llGetDisplayName(llGetOwnerKey(llGetKey())), [""], []);
     list name = llParseString2List(llGetDisplayName(_id), [""], []);
     llListenRemove(hand);
     chan = llFloor(llFrand(2000000));
     hand = llListen(chan, "", _id, "");
-    if ( _id == llGetOwner())
-        llDialog(_id, (string)owner_name + "'s Kilju Making Menu\nChoose an option! " + (string)name + "?", main_admin_buttons, chan);
-    else
-        llDialog(_id, (string)owner_name + "'s Kilju Making Menu\nChoose an option! " + (string)name + "?", main_buttons, chan);
+    if ( _id == llGetOwner()){
+        llDialog(_id, (string)owner_name + "'s Kilju Making Menu\n
+        Current Recipe:\n"
+        + (string)YEASTcount + " Yeast "
+        + (string)SUGARcount + " Sugar "
+        + (string)WATERcount + " Water\n
+        Choose an option! " + (string)name + "?", main_admin_buttons, chan);
+    }
+    else{
+        llDialog(_id, (string)owner_name + "'s Kilju Making Menu\n
+        Current Recipe:\n"
+        + (string)YEASTcount + " Yeast "
+        + (string)SUGARcount + " Sugar "
+        + (string)WATERcount + " Water\n
+        Choose an option! " + (string)name + "?", main_buttons, chan);
+    }
 }
 
 init()
@@ -122,26 +118,11 @@ determine_bucket_links()
             _sugar = i;
             found++;
         }
-        else if(llGetLinkName(i) == PENA1_){
-            _pena1 = i;
-            found++;
-        }
-        else if(llGetLinkName(i) == PENA2_){
-            _pena2 = i;
-            found++;
-        }
-        else if(llGetLinkName(i) == PENA3_){
-            _pena3 = i;
-            found++;
-        }
     }
-    while (i-- && found < 7);
+    while (i-- && found < 4);
     llSetLinkAlpha(_water, 0, ALL_SIDES);
     llSetLinkAlpha(_yeast, 0, ALL_SIDES);
     llSetLinkAlpha(_sugar, 0, ALL_SIDES);
-    llSetLinkAlpha(_pena1, 0, ALL_SIDES);
-    llSetLinkAlpha(_pena2, 0, ALL_SIDES);
-    llSetLinkAlpha(_pena3, 0, ALL_SIDES);
 }
 
 lidOn()
@@ -149,10 +130,6 @@ lidOn()
     llSetLinkAlpha(_lid, 1, ALL_SIDES);
     llTriggerSound(lid_ON_Sound, Volume);
     LidON = TRUE;
-    if(DEBUG){
-        llOwnerSay("lidOn() :: " + (string)LidON + ".");
-        printsettings();
-    }
 }
 
 lidOff()
@@ -160,10 +137,6 @@ lidOff()
     llSetLinkAlpha(_lid, 0, ALL_SIDES);
     llTriggerSound(lid_OFF_Sound, Volume);
     LidON = FALSE;
-    if(DEBUG){
-        llOwnerSay("lidOff() :: " + (string)LidON + ".");
-        printsettings();
-    }
 }
 
 addWater()
@@ -179,14 +152,6 @@ addWater()
     else
         llSay(0, "You tryed to add too much water, it would overfill.");
         WATERcount = WATERcount++;
-    if(DEBUG){
-        llOwnerSay("addWater() :: " + (string)WATERcount + ".");
-        printsettings();
-    }
-    if(DEBUG){
-        llOwnerSay("addWater() :: " + (string)WATERadded + ".");
-        printsettings();
-    }
 }
 
 addYeast()
@@ -199,10 +164,6 @@ addYeast()
     else
         llSay(0, "You tryed to add too much yeast.");
     YEASTcount = YEASTcount++;
-    if(DEBUG){
-        llOwnerSay("addYeast() :: " + (string)YEASTcount + ".");
-        printsettings();
-    }
 }
 
 addSugar()
@@ -215,15 +176,6 @@ addSugar()
     else
         llSay(0, "You tryed to add too much sugar.");
     SUGARcount = SUGARcount++;
-    if(DEBUG){
-        llOwnerSay("addSugar() :: " + (string)SUGARcount + ".");
-        printsettings();
-    }
-}
-
-harvestKilju()
-{
-    //TODO
 }
 
 dispString(string value)
@@ -261,17 +213,6 @@ updateTimeDisp()
     dispString("\nKilju will be ready in:\n" + getTimeString(llRound(cookingtime)));
 }
 
-printsettings() //only shown in DEBUG Mode @ integer DEBUG = TRUE;
-{
-    llOwnerSay("
-    ---SETTINGS---\n"
-    + (string)WATERadded + " Water\n"
-    + (string)SUGARcount + " Sugar count\n"
-    + (string)YEASTcount + " Yeast count\n"
-    + (string)LidON + " LID status"
-    );
-}
-
 default
 {
     state_entry()
@@ -279,18 +220,7 @@ default
         llPreloadSound(lid_ON_Sound);
         llPreloadSound(lid_OFF_Sound);
         llPreloadSound(MakinngKilju_Sound);
-        llPreloadSound(verygoodKilju_Sound);
-        llPreloadSound(letsTaste_Sound);
-        llPreloadSound(yeastShit_Sound);
-        llPreloadSound(yeastOk_Sound);
-        llPreloadSound(sugarShit_Sound);
-        llPreloadSound(sugarOk_Sound);
-        llPreloadSound(drinking_Sound);
         init();
-        if(DEBUG){
-            llOwnerSay("state default");
-            printsettings();
-        }
     }
 
     on_rez(integer num)
@@ -331,10 +261,6 @@ default
             saveData();
             state MakingKilju;
         }
-        else if (_message == "Reset")
-            llResetScript();
-        else if (_message == "print")
-            printsettings();
         else if (_message == "▼")
             return;
     }
@@ -344,10 +270,6 @@ state MakingKilju
 {
     state_entry()
     {
-        if(DEBUG){
-            llOwnerSay("state MakingKilju " + llGetObjectDesc());
-            printsettings();
-        }
         updateTimeDisp();
         llResetTime();
         llSetTimerEvent(updateInterval);
@@ -371,24 +293,9 @@ state KiljuReady
 {
     state_entry()
     {
-        if(DEBUG){
-            llOwnerSay("state KiljuReady");
-            printsettings();
-        }
         KILJUReady = TRUE; //just in case if i add more features with this.
         llSetText("Kilju is ready to drink!", <0.553, 1.000, 0.553>, 1);
         llGetObjectDesc();
-        llSetLinkAlpha(_pena1, 1, ALL_SIDES);
-        llSetLinkAlpha(_pena2, 1, ALL_SIDES);
-        llSetLinkAlpha(_pena3, 1, ALL_SIDES);
-         //for now
-        //state default; //FIX for new features.... COMING SOON...
-        //NOTE more to come!!!!
-        /*
-        i need to add so you can take Mehukaitti bottles and to those add
-        you can drink them and get drunk in SL :D with AO and anims!!! 
-        wowweeeeee!!!!
-        */
     }
 
     touch_start(integer num_detected)
@@ -397,14 +304,11 @@ state KiljuReady
         lidOff();
         string origName = llGetObjectName();
         llSetObjectName("Pena");
-        llTriggerSound(letsTaste_Sound, Volume);
         llSay(0, "Let me taste it..");
         llSleep(8.0);
-        llTriggerSound(drinking_Sound, Volume);
         llSay(0, "*drinks*");
         llSleep(10.0);
-        if((WATERcount == 4) && (YEASTcount == 1) && (SUGARcount == 6)){
-            llTriggerSound(verygoodKilju_Sound, Volume);
+        if((WATERcount == 4) && (YEASTcount == 1) && (SUGARcount == 6)){ //perfect
             llSay(0, "This is VeryGood shit!");
             llGiveInventory(_id, KiljuBottle);
             llGiveInventory(_id, KiljuBottle);
@@ -413,31 +317,35 @@ state KiljuReady
             llGiveInventory(_id, KiljuBottle);
             llGiveInventory(_id, KiljuBottle);
         }
+        //i might need more of these.. but really????
         else if ((YEASTcount == 1) && (SUGARcount < 6))
         {
-            llTriggerSound(yeastOk_Sound, Volume);
-            llSleep(10.0);
-            llTriggerSound(sugarShit_Sound, Volume);
-            llSay(0, "You added too much Sugar... im gonna puke!");
+            llSay(0, "You added too little sugar.");
             llGiveInventory(_id, KiljuBottle);
             llGiveInventory(_id, KiljuBottle);
             llGiveInventory(_id, KiljuBottle);
         }
         else if ((YEASTcount > 1) && (SUGARcount == 6))
         {
-            llTriggerSound(yeastShit_Sound, Volume);
-            llSleep(10.0);
-            llTriggerSound(sugarOk_Sound, Volume);
-            llSay(0, "You added too much Yeast... tastes like vinegar!");
+            llSay(0, "You added too much yeast.");
+            llGiveInventory(_id, KiljuBottle);
+        }
+        else if (WATERcount < 4)
+        {
+            llSay(0, "You added too little water.");
+            llGiveInventory(_id, KiljuBottle);
+            llGiveInventory(_id, KiljuBottle);
+        }
+        else if (WATERcount > 4)
+        {
+            llSay(0, "You added too much water.");
+            llGiveInventory(_id, KiljuBottle);
+            llGiveInventory(_id, KiljuBottle);
+            llGiveInventory(_id, KiljuBottle);
             llGiveInventory(_id, KiljuBottle);
         }
         else
-        {
-            llTriggerSound(yeastShit_Sound, Volume);
-            llSleep(10.0);
-            llTriggerSound(sugarShit_Sound, Volume);
-            llSay(0, "Oh no what happened?... this tastes like shit.. more Sugar and less Yeast maybe?");
-        }
+            llSay(0, "Oh no what happened?... this aint gonna work at all...");
         llSetObjectName(origName);
         state default;
     }

@@ -1,20 +1,18 @@
 key owner;
 key _id;
-key openCap_Sound   = "36a82b3f-269c-a992-61a2-535825809028";
-key closeCap_Sound  = "0b797841-25e8-3dfa-8745-cadbcd523d9a";
+key openCap_Sound   = "b44c9095-6acf-6fa2-28f9-b435948de194";
 key drinking_Sound  = "34e7d853-6435-5386-d0c6-c32b316edc90";
 
 integer _cap;
 integer capON       = TRUE;
 integer drinking    = FALSE;
-integer kiljuAO_on  = FALSE;
+integer BeerAO_on   = FALSE;
 integer isEmpty     = FALSE;
-integer drunkTime   = 1200; //20minutes
+integer drunkTime   = 600; //10minutes
 
 integer listenid;
 integer chan;
 integer hand;
-integer link_num;
 
 float Volume = 1.0;
 float updateInterval = 10.0;
@@ -51,56 +49,31 @@ doMenu(key _id)
 init()
 {
     _id = llDetectedKey(0);
-    owner = llGetOwner();
-    link_num = llGetNumberOfPrims();
-    kiljuAO_on = FALSE;
-    determine_bucket_links();
+    BeerAO_on = FALSE;
     doMenu(_id);
-}
-
-determine_bucket_links()
-{
-    integer i = link_num;
-    integer found = 0;
-    do {
-        if(llGetLinkName(i) == CAP_){
-            _cap = i;
-            found++;
-        }
-    }
-    while (i-- && found < 1);
-}
-
-CapOn()
-{
-    llSetLinkAlpha(_cap, 1, ALL_SIDES);
-    capON = TRUE;
-    llTriggerSound(closeCap_Sound, Volume);
 }
 
 CapOff()
 {
-    llSetLinkAlpha(_cap, 0, ALL_SIDES);
     capON = FALSE;
     llTriggerSound(openCap_Sound, Volume);
 }
 
-drinkKilju(key _id)
+drinkBeer(key _id)
 {
     isEmpty = TRUE;
     drinking = TRUE;
-    kiljuAO_on = TRUE;
+    BeerAO_on = TRUE;
     list name = llParseString2List(llGetDisplayName(_id), [""], []);
     llSetObjectName("");
     llWhisper(0, (string)name + " drinks full bottle of beer.");
-    llSetObjectName("Kilju Bottle (empty)");
+    llSetObjectName("BeerBottle (empty)");
     llTriggerSound(drinking_Sound, Volume);
     llStopAnimation(rest);
     llSleep(0.1);
     llStartAnimation(drink);
     llSleep(15.0);
     llStopAnimation(drink);
-    llMessageLinked(LINK_ROOT, 0, "KILJU_AOON", NULL_KEY);
     llSetTimerEvent(drunkTime);
 }
 
@@ -108,11 +81,10 @@ timerRanOut()
 {
     isEmpty = TRUE;
     drinking = FALSE;
-    kiljuAO_on = FALSE;
-    llMessageLinked(LINK_ROOT, 0, "KILJU_AOOFF", NULL_KEY);
+    BeerAO_on = FALSE;
     llDetachFromAvatar();
     llSetTimerEvent(0);
-    llSetObjectName("Kilju Bottle (empty)");
+    llSetObjectName("BeerBottle (empty)");
     llOwnerSay("This Bottle is empty!");
 }
 
@@ -121,7 +93,6 @@ default
     state_entry()
     {
         llPreloadSound(openCap_Sound);
-        llPreloadSound(closeCap_Sound);
         llPreloadSound(drinking_Sound);
         llRequestPermissions(llGetOwner(), PERMISSION_ATTACH | PERMISSION_TRIGGER_ANIMATION | PERMISSION_TAKE_CONTROLS);
         init();
@@ -134,7 +105,7 @@ default
             doMenu(_id);
         }
         else{
-            llSetObjectName("Kilju Bottle (empty)");
+            llSetObjectName("BeerBottle (empty)");
             llOwnerSay("This Bottle is empty!");
         }
     }
@@ -145,7 +116,7 @@ default
             llAttachToAvatar(ATTACH_RHAND);
             llStartAnimation(rest);
             if(isEmpty){
-                llSetObjectName("Kilju Bottle (empty)");
+                llSetObjectName("BeerBottle (empty)");
                 llOwnerSay("This Bottle is empty!");
                 llDetachFromAvatar();
             }
@@ -158,7 +129,7 @@ default
 
     attach(key _id){
         if((_id != NULL_KEY) && (isEmpty)){
-            llSetObjectName("Kilju Bottle (empty)");
+            llSetObjectName("BeerBottle (empty)");
             llOwnerSay("This Bottle is empty!");
             llDetachFromAvatar();
         }
@@ -174,12 +145,8 @@ default
             CapOff();
             doMenu(_id);
         }
-        else if (_message == "Close Cap"){
-            CapOn();
-            doMenu(_id);
-        }
         else if ((!capON) && (_message == "Drink"))
-            drinkKilju(_id);
+            drinkBeer(_id);
         else if (_message == "Reset")
             llResetScript();
         else if (_message == "▼")
