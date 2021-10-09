@@ -92,7 +92,7 @@ drinkKilju(key _id)
     kiljuAO_on = TRUE;
     list name = llParseString2List(llGetDisplayName(_id), [""], []);
     llSetObjectName("");
-    llWhisper(0, (string)name + " drinks full bottle of beer.");
+    llSay(0, "/me " + (string)name + " drinks full bottle of kilju.");
     llSetObjectName("Kilju Bottle (empty)");
     llTriggerSound(drinking_Sound, Volume);
     llStopAnimation(rest);
@@ -110,10 +110,10 @@ timerRanOut()
     drinking = FALSE;
     kiljuAO_on = FALSE;
     llMessageLinked(LINK_ROOT, 0, "KILJU_AOOFF", NULL_KEY);
-    llDetachFromAvatar();
     llSetTimerEvent(0);
     llSetObjectName("Kilju Bottle (empty)");
     llOwnerSay("This Bottle is empty!");
+    llDetachFromAvatar();
 }
 
 default
