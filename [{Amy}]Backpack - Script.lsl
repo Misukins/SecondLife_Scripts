@@ -370,7 +370,7 @@ default
         else
         {
             list name = llParseString2List(llGetDisplayName(_id), [""], []);
-            llWhisper(0, (string)name + " grabs a " + (string)msg + " from the backpack.");
+            llSay(0, "/me " + (string)name + " grabs a " + (string)msg + " from the backpack.");
             llGiveInventory(_id, msg);
             if (itemnum == "")
                 return;
