@@ -304,12 +304,12 @@ state KiljuReady
         lidOff();
         string origName = llGetObjectName();
         llSetObjectName("Pena");
-        llSay(0, "Let me taste it..");
+        llSay(0, "/me Let me taste it..");
         llSleep(8.0);
-        llSay(0, "*drinks*");
+        llSay(0, "/me *drinks*");
         llSleep(10.0);
         if((WATERcount == 4) && (YEASTcount == 1) && (SUGARcount == 6)){ //perfect
-            llSay(0, "This is VeryGood shit!");
+            llSay(0, "/me This is VeryGood shit!");
             llGiveInventory(_id, KiljuBottle);
             llGiveInventory(_id, KiljuBottle);
             llGiveInventory(_id, KiljuBottle);
@@ -320,32 +320,32 @@ state KiljuReady
         //i might need more of these.. but really????
         else if ((YEASTcount == 1) && (SUGARcount < 6))
         {
-            llSay(0, "You added too little sugar.");
+            llSay(0, "/me You added too little sugar.");
             llGiveInventory(_id, KiljuBottle);
             llGiveInventory(_id, KiljuBottle);
             llGiveInventory(_id, KiljuBottle);
         }
         else if ((YEASTcount > 1) && (SUGARcount == 6))
         {
-            llSay(0, "You added too much yeast.");
+            llSay(0, "/me You added too much yeast.");
             llGiveInventory(_id, KiljuBottle);
         }
         else if (WATERcount < 4)
         {
-            llSay(0, "You added too little water.");
+            llSay(0, "/me You added too little water.");
             llGiveInventory(_id, KiljuBottle);
             llGiveInventory(_id, KiljuBottle);
         }
         else if (WATERcount > 4)
         {
-            llSay(0, "You added too much water.");
+            llSay(0, "/me You added too much water.");
             llGiveInventory(_id, KiljuBottle);
             llGiveInventory(_id, KiljuBottle);
             llGiveInventory(_id, KiljuBottle);
             llGiveInventory(_id, KiljuBottle);
         }
         else
-            llSay(0, "Oh no what happened?... this aint gonna work at all...");
+            llSay(0, "/me Oh no what happened?... this aint gonna work at all...");
         llSetObjectName(origName);
         state default;
     }
