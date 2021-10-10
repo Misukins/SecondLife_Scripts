@@ -70,7 +70,7 @@ list autoStop = [ 5, 6, 19 ];
 
 float autoStopTime = 1.5;
 
-integer standTimeDefault = 30;
+integer standTimeDefault = 20;
 
 float timerEventLength = 0.25;
 float minEventDelay = 0.25;

@@ -8,7 +8,7 @@ string LID_             = "Lid";
 string WATER_           = "Water";
 string YEAST_           = "Yeast";
 string SUGAR_           = "Sugar";
-string KiljuBottle      = "[{Amy}]Kilju Bottle";
+string KiljuBottle      = "[{Amy}]BeerBottle";
 string objectname;
 
 integer listenid;
@@ -42,7 +42,7 @@ list main_admin_buttons = [];
     float ONE_HHOUR = 1800.0;  //Half an Hours
     float ONE_MINUTE = 60.0;   //Minute
 */
-float ONE_DAY = 86400.0;
+float ONE_DAY = 43200.0;
 float updateInterval = 30.0;
 
 doMenu(key _id)
@@ -65,7 +65,7 @@ doMenu(key _id)
     chan = llFloor(llFrand(2000000));
     hand = llListen(chan, "", _id, "");
     if ( _id == llGetOwner()){
-        llDialog(_id, (string)owner_name + "'s Kilju Making Menu\n
+        llDialog(_id, (string)owner_name + "'s Beer Making Menu\n
         Current Recipe:\n"
         + (string)YEASTcount + " Yeast "
         + (string)SUGARcount + " Sugar "
@@ -73,7 +73,7 @@ doMenu(key _id)
         Choose an option! " + (string)name + "?", main_admin_buttons, chan);
     }
     else{
-        llDialog(_id, (string)owner_name + "'s Kilju Making Menu\n
+        llDialog(_id, (string)owner_name + "'s Beer Making Menu\n
         Current Recipe:\n"
         + (string)YEASTcount + " Yeast "
         + (string)SUGARcount + " Sugar "
@@ -210,7 +210,7 @@ string getTimeString(integer time)
 
 updateTimeDisp()
 {
-    dispString("\nKilju will be ready in:\n" + getTimeString(llRound(cookingtime)));
+    dispString("\nBeer will be ready in:\n" + getTimeString(llRound(cookingtime)));
 }
 
 default
@@ -294,7 +294,7 @@ state KiljuReady
     state_entry()
     {
         KILJUReady = TRUE; //just in case if i add more features with this.
-        llSetText("Kilju is ready to drink!", <0.553, 1.000, 0.553>, 1);
+        llSetText("Beer is ready to drink!", <0.553, 1.000, 0.553>, 1);
         llGetObjectDesc();
     }
 
