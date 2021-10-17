@@ -1,5 +1,7 @@
 /*---------- PLEASE DO NOT CHANGE ANYTHING FROM HERE ----------*/
 key owner;
+key makersID;
+key readKey;
 key lid_ON_Sound        = "36abc63f-7536-2ee9-efc4-d0fdb98c5767";
 key lid_OFF_Sound       = "549679ab-2d75-d3ec-b6e6-76c89a0759e2";
 key MakinngKilju_Sound  = "62adc742-ccee-3a69-e64b-b70b885a07cf";
@@ -10,6 +12,7 @@ string YEAST_           = "Yeast";
 string SUGAR_           = "Sugar";
 string KiljuBottle      = "[{Amy}]Kilju Bottle";
 string objectname;
+string makersName;
 
 integer listenid;
 integer chan;
@@ -33,6 +36,7 @@ float Volume = 1.0;
 
 list main_buttons       = [];
 list main_admin_buttons = [];
+list mainKilju_buttons  = [];
 /*---------- TO HERE ----------*/
 /*NOTE
     You may change this time.
@@ -42,22 +46,24 @@ list main_admin_buttons = [];
     float ONE_HHOUR = 1800.0;  //Half an Hours
     float ONE_MINUTE = 60.0;   //Minute
 */
-float ONE_DAY = 86400.0;
-float updateInterval = 30.0;
+float ONE_DAY = 86394.0; //little less than 24hours
+float updateInterval = 30.0; //DEFAULT 30SEC
+
+vector titleColor = <0.905, 0.686, 0.924>;
 
 doMenu(key _id)
 {
     if ((LidON) && (WATERadded)){
         main_buttons =         [ "Finished", "▼" ];
-        main_admin_buttons =   [ "Finished", "▼" ];
+        main_admin_buttons =   [ "Finished", "Reset", "▼" ];
     }
     else if(LidON){
         main_buttons =         [ "Open Lid", "▼" ];
-        main_admin_buttons =   [ "Open Lid", "▼" ];
+        main_admin_buttons =   [ "Open Lid", "Reset", "▼" ];
     }
     else{
         main_buttons =         [ "Close Lid", "Water", "Yeast", "Sugar", "▼" ];
-        main_admin_buttons =   [ "Close Lid", "Water", "Yeast", "Sugar", "▼" ];
+        main_admin_buttons =   [ "Close Lid", "Water", "Yeast", "Sugar", "Reset", "▼" ];
     }
     list owner_name = llParseString2List(llGetDisplayName(llGetOwnerKey(llGetKey())), [""], []);
     list name = llParseString2List(llGetDisplayName(_id), [""], []);
@@ -82,11 +88,28 @@ doMenu(key _id)
     }
 }
 
+doKiljuRDYMenu(key _id)
+{
+    if (_id == makersID)
+        mainKilju_buttons = [ "Check", "▼" ];
+    list owner_name = llParseString2List(llGetDisplayName(llGetOwnerKey(llGetKey())), [""], []);
+    list name = llParseString2List(llGetDisplayName(_id), [""], []);
+    llListenRemove(hand);
+    chan = llFloor(llFrand(2000000));
+    hand = llListen(chan, "", _id, "");
+    llDialog(_id, (string)owner_name + "'s Kilju Making Menu\n
+    Current Recipe:\n"
+    + (string)YEASTcount + " Yeast. "
+    + (string)SUGARcount + " Sugar. "
+    + (string)WATERcount + " Water.\n
+    Choose an option! " + (string)name + "?", mainKilju_buttons, chan);
+}
+
 init()
 {
     owner = llGetOwner();
     link_num = llGetNumberOfPrims();
-    llSetText("", <0.553, 1.000, 0.553>, 1);
+    llSetText("", titleColor, 1);
     llSetObjectDesc("");
     determine_bucket_links();
     KILJUReady = FALSE;
@@ -180,7 +203,7 @@ addSugar()
 
 dispString(string value)
 {
-    llSetText(value, <0.553, 1.000, 0.553>, 1);
+    llSetText(value, titleColor, 1);
 }
 
 saveData()
@@ -189,7 +212,10 @@ saveData()
     saveData += (string)YEASTcount + " Yeast";
     saveData += (string)SUGARcount + " Sugar";
     saveData += (string)WATERcount + " Water";
-    llSetObjectDesc(llDumpList2String(saveData, ", "));
+    saveData += (key)makersID;
+    saveData += (string)makersName;
+    saveData += llRound(cookingtime);
+    llSetObjectDesc(llDumpList2String(saveData, ","));
 }
 
 string getTimeString(integer time)
@@ -210,7 +236,14 @@ string getTimeString(integer time)
 
 updateTimeDisp()
 {
-    dispString("\nKilju will be ready in:\n" + getTimeString(llRound(cookingtime)));
+    list userName = llParseString2List(llGetDisplayName(makersID), [""], []);
+    dispString(
+        (string)WATERcount + " Water. "
+        + (string)YEASTcount + " Yeast. "
+        + (string)SUGARcount + " Sugar.\n"
+        + (string)userName + " (" + makersName + ")\n
+        Kilju will be ready in:\n" 
+        + getTimeString(llRound(cookingtime)));
 }
 
 default
@@ -257,10 +290,14 @@ default
             doMenu(_id);
         }
         else if ((_message == "Finished") && (LidON) && (WATERadded == TRUE)){
+            makersID   = _id;
+            makersName = llKey2Name(makersID);
             cookingtime = ONE_DAY;
             saveData();
             state MakingKilju;
         }
+        else if (_message == "Reset")
+            llResetScript();
         else if (_message == "▼")
             return;
     }
@@ -281,7 +318,6 @@ state MakingKilju
         if (timeElapsed > (updateInterval * 4))
             timeElapsed = updateInterval;
         cookingtime -= timeElapsed;
-        saveData();
         updateTimeDisp();
         llTriggerSound(MakinngKilju_Sound, Volume);
         if (cookingtime <= 0)
@@ -294,59 +330,92 @@ state KiljuReady
     state_entry()
     {
         KILJUReady = TRUE; //just in case if i add more features with this.
-        llSetText("Kilju is ready to drink!", <0.553, 1.000, 0.553>, 1);
+        list userName = llParseString2List(llGetDisplayName(makersID), [""], []);
+        llSetText(
+              (string)WATERcount + " Water.\n"
+            + (string)YEASTcount + " Yeast.\n"
+            + (string)SUGARcount + " Sugar.\n"
+            + (string)userName + " (" + makersName + ")\n
+                Kilju is ready!", titleColor, 1);
         llGetObjectDesc();
+    }
+
+    
+    dataserver(key requested, string data)
+    {
+        list savedList = llParseString2List(llGetObjectDesc(), [","], []);
+        if (llGetListLength(savedList) == 6){
+            YEASTcount      = llList2Integer(savedList, 1);
+            SUGARcount      = llList2Integer(savedList, 2);
+            WATERcount      = llList2Integer(savedList, 3);
+            makersID        = llList2Key(savedList, 4);
+            makersName      = llList2String(savedList, 5);
+            cookingtime     = llList2Integer(savedList, 6);
+        }
     }
 
     touch_start(integer num_detected)
     {
         key _id = llDetectedKey(0);
-        lidOff();
-        string origName = llGetObjectName();
-        llSetObjectName("Pena");
-        llSay(0, "/me Let me taste it..");
-        llSleep(8.0);
-        llSay(0, "/me *drinks*");
-        llSleep(10.0);
-        if((WATERcount == 4) && (YEASTcount == 1) && (SUGARcount == 6)){ //perfect
-            llSay(0, "/me This is VeryGood shit!");
-            llGiveInventory(_id, KiljuBottle);
-            llGiveInventory(_id, KiljuBottle);
-            llGiveInventory(_id, KiljuBottle);
-            llGiveInventory(_id, KiljuBottle);
-            llGiveInventory(_id, KiljuBottle);
-            llGiveInventory(_id, KiljuBottle);
-        }
-        //i might need more of these.. but really????
-        else if ((YEASTcount == 1) && (SUGARcount < 6))
-        {
-            llSay(0, "/me You added too little sugar.");
-            llGiveInventory(_id, KiljuBottle);
-            llGiveInventory(_id, KiljuBottle);
-            llGiveInventory(_id, KiljuBottle);
-        }
-        else if ((YEASTcount > 1) && (SUGARcount == 6))
-        {
-            llSay(0, "/me You added too much yeast.");
-            llGiveInventory(_id, KiljuBottle);
-        }
-        else if (WATERcount < 4)
-        {
-            llSay(0, "/me You added too little water.");
-            llGiveInventory(_id, KiljuBottle);
-            llGiveInventory(_id, KiljuBottle);
-        }
-        else if (WATERcount > 4)
-        {
-            llSay(0, "/me You added too much water.");
-            llGiveInventory(_id, KiljuBottle);
-            llGiveInventory(_id, KiljuBottle);
-            llGiveInventory(_id, KiljuBottle);
-            llGiveInventory(_id, KiljuBottle);
-        }
+        list userName = llParseString2List(llGetDisplayName(makersID), [""], []);
+        if(_id == makersID)
+            doKiljuRDYMenu(_id);
         else
-            llSay(0, "/me Oh no what happened?... this aint gonna work at all...");
-        llSetObjectName(origName);
-        state default;
+            return;
+    }
+
+    listen(integer _channel, string _name, key _id, string _message)
+    {
+        string origName = llGetObjectName();
+        if(_message == "Check"){
+            lidOff();
+            llSetObjectName("Pena");
+            llSay(0, "/me Let me taste it..");
+            llSleep(8.0);
+            llSay(0, "/me *drinks*");
+            llSleep(10.0);
+            if((WATERcount == 4) && (YEASTcount == 1) && (SUGARcount == 6)){ //perfect
+                llSay(0, "/me This is VeryGood shit!");
+                llGiveInventory(_id, KiljuBottle);
+                llGiveInventory(_id, KiljuBottle);
+                llGiveInventory(_id, KiljuBottle);
+                llGiveInventory(_id, KiljuBottle);
+                llGiveInventory(_id, KiljuBottle);
+                llGiveInventory(_id, KiljuBottle);
+            }
+            //i might need more of these.. but really????
+            else if ((YEASTcount == 1) && (SUGARcount < 6))
+            {
+                llSay(0, "/me You added too little sugar.");
+                llGiveInventory(_id, KiljuBottle);
+                llGiveInventory(_id, KiljuBottle);
+                llGiveInventory(_id, KiljuBottle);
+            }
+            else if ((YEASTcount > 1) && (SUGARcount == 6))
+            {
+                llSay(0, "/me You added too much yeast.");
+                llGiveInventory(_id, KiljuBottle);
+            }
+            else if (WATERcount < 4)
+            {
+                llSay(0, "/me You added too little water.");
+                llGiveInventory(_id, KiljuBottle);
+                llGiveInventory(_id, KiljuBottle);
+            }
+            else if (WATERcount > 4)
+            {
+                llSay(0, "/me You added too much water.");
+                llGiveInventory(_id, KiljuBottle);
+                llGiveInventory(_id, KiljuBottle);
+                llGiveInventory(_id, KiljuBottle);
+                llGiveInventory(_id, KiljuBottle);
+            }
+            else
+                llSay(0, "/me Oh no what happened?... this aint gonna work at all...");
+            llSetObjectName(origName);
+            state default;
+        }
+        else if(_message == "▼")
+            return;
     }
 }
