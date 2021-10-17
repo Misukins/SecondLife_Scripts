@@ -7,6 +7,7 @@ integer ledlight_living;
 integer ledlight_living1;
 integer ledlight_living2;
 integer LIGHTS_ON = FALSE;
+integer VoiceChannel    = 0;
 
 string  lightsON_Sound      = "6005e358-33fd-d08b-012f-6110ab27a413";
 string  lightsOFF_Sound     = "091402dc-f0ea-81d4-6ca0-728649a1c0c5";
@@ -47,17 +48,20 @@ determine_display_links(){
 
 init()
 {
+    LightOFF();
+    llPreloadSound(lightsON_Sound);
+    llPreloadSound(lightsOFF_Sound);
     rotatedON *= DEG_TO_RAD;
     rotatedOFF *= DEG_TO_RAD;
     rotON = llEuler2Rot(rotatedON);
     rotOFF = llEuler2Rot(rotatedOFF);
     link_num = llGetNumberOfPrims();
-    turnOFF();
     determine_display_links();
+    llListen(VoiceChannel, "", "", "");
     llSetLinkPrimitiveParamsFast(lights_switch, [PRIM_ROT_LOCAL, rotOFF]);
 }
 
-turnON()
+LightON()
 {
     LIGHTS_ON = TRUE;
     llSetLinkPrimitiveParamsFast(lights_switch, [PRIM_ROT_LOCAL, rotON]);
@@ -73,7 +77,7 @@ turnON()
     llTriggerSound(lightsON_Sound ,soundVolume);
 }
 
-turnOFF()
+LightOFF()
 {
     LIGHTS_ON = FALSE;
     llSetLinkPrimitiveParamsFast(lights_switch, [PRIM_ROT_LOCAL, rotOFF]);
@@ -99,9 +103,25 @@ default
     touch_start(integer total_number)
     {
         if(!LIGHTS_ON)
-            turnON();
+            LightON();
         else
-            turnOFF();
-        !LIGHTS_ON = LIGHTS_ON;
+            LightOFF();
+        //!LIGHTS_ON = LIGHTS_ON;
+    }
+
+    listen(integer chan, string name, key id, string msg)
+    {
+        if (chan == VoiceChannel){
+            if (msg == "lights on"){
+                if(!LIGHTS_ON)
+                    LightON();
+            }
+            else if (msg == "lights off"){
+                if(LIGHTS_ON)
+                    LightOFF();
+            }
+            else
+                return;
+        }
     }
 }
