@@ -1,17 +1,22 @@
 /*---------- PLEASE DO NOT CHANGE ANYTHING FROM HERE ----------*/
-//NOT RDY TO USE!!!!!!!!!!!!!
 key owner;
 key makersID;
 key readKey;
 key lid_ON_Sound        = "36abc63f-7536-2ee9-efc4-d0fdb98c5767";
 key lid_OFF_Sound       = "549679ab-2d75-d3ec-b6e6-76c89a0759e2";
-key MakinngBeer_Sound  = "62adc742-ccee-3a69-e64b-b70b885a07cf";
+key MakingBeer_Sound  = "62adc742-ccee-3a69-e64b-b70b885a07cf";
 
 string LID_             = "Lid";
-string WATER_           = "Water";
-string YEAST_           = "Yeast";
-string SUGAR_           = "Sugar";
-string BeerBottle      = "[{Amy}]Beer Bottle";
+// string WATER_                   = "Water";
+// string PILSNER_MALT_            = "Pilsner malt";
+// string MUNICH_MALT_             = "Munich malt";
+// string VIENNA_MALT_             = "Vienna malt";
+// string CARAVIENNA_MALT_         = "CaraVienne malt";
+// string AROMATIC_MUINCH_         = "Aromatic Munich";
+// string TRADITION_PELLET_HOPS_   = "Tradition pellet hops";
+// string TETTNANGER_PELLET_HOPS_  = "Tettnanger pellet hops";
+// string IRISH_MOSS_              = "Irish moss";
+string BeerBottle   = "[{Amy}]Beer Bottle";
 string objectname;
 string makersName;
 
@@ -21,19 +26,12 @@ integer hand;
 integer link_num;
 
 integer _lid;
-
-integer Pilsner_malt;
-integer Munich_malt;
-integer Vienna_malt;
-integer aromatic_Munich;
-integer CaraVienne_malt;
-integer Tradition_pellet_hops;
-integer Tettnanger_pellet_hops;
-integer Irish_moss;
 integer _water;
+integer _yeast;
+integer _sugar;
 
 integer LidON = TRUE; // TRUE = 1 / FALSE = 0 :: on debug!
-integer BeerReady = FALSE;
+integer BEERready = FALSE;
 integer WATERadded = FALSE;
 
 integer Pilsner_malt_count = 0;
@@ -52,19 +50,6 @@ float Volume = 1.0;
 list main_buttons       = [];
 list main_admin_buttons = [];
 list mainBeer_buttons  = [];
-
-/*
-Recipe
-3.5 lb. (1.6 kg) Pilsner malt
-3.5 lb. (1.6 kg) Munich malt
-4 lb. (1.8 kg) Vienna malt
-1 lb. (0.5 kg) aromatic Munich 20° L malt
-0.33 lb. (150 g) CaraVienne malt
-1.0 oz. (28 g) German Tradition pellet hops, 6% a.a. (60 min)
-1.0 oz. (28 g) German Tettnanger pellet hops, 4% a.a (20 min)
-German lager yeast with sufficient yeast starter (465 billion cells)
-0.75 tsp. (3 g) Irish moss added 15 minutes before end of the boil (optional)
-*/
 /*---------- TO HERE ----------*/
 /*NOTE
     You may change this time.
@@ -90,8 +75,14 @@ doMenu(key _id)
         main_admin_buttons =   [ "Open Lid", "Reset", "▼" ];
     }
     else{
-        main_buttons =         [ "Close Lid", "Water", "Yeast", "Sugar", "▼" ];
-        main_admin_buttons =   [ "Close Lid", "Water", "Yeast", "Sugar", "Reset", "▼" ];
+        main_buttons =         [  
+                                "Close Lid", "Pilsner", "Munich", "Vienna", "Vienna", "Aromatic", 
+                                "CaraVienne", "Tradition", "Tettnanger", "Irish", "Water", "▼" 
+                               ];
+        main_admin_buttons =   [ 
+                                "Close Lid", "Pilsner", "Munich", "Vienna", "Vienna", "Aromatic", 
+                                "CaraVienne", "Tradition", "Tettnanger", "Irish", "Water", "▼" 
+                               ];
     }
     list owner_name = llParseString2List(llGetDisplayName(llGetOwnerKey(llGetKey())), [""], []);
     list name = llParseString2List(llGetDisplayName(_id), [""], []);
@@ -101,16 +92,28 @@ doMenu(key _id)
     if ( _id == llGetOwner()){
         llDialog(_id, (string)owner_name + "'s Beer Making Menu\n
         Current Recipe:\n"
-        + (string)YEASTcount + " Yeast "
-        + (string)SUGARcount + " Sugar "
+        + (string)Pilsner_malt_count + " Pilsner malt\n"
+        + (string)Munich_malt_count + " Munich malt\n"
+        + (string)Vienna_malt_count + " Vienna malt\n"
+        + (string)aromatic_Munich_malt_count + " Aromatic Munich malt\n"
+        + (string)CaraVienne_malt_count + " CaraVienne malt\n"
+        + (string)Tradition_pellet_hops_count + " Tradition Pellet hops\n"
+        + (string)Tettnanger_pellet_hops_count + " Tettnanger Pellet hops\n"
+        + (string)Irish_moss_count + " Irish moss\n"
         + (string)WATERcount + " Water\n
         Choose an option! " + (string)name + "?", main_admin_buttons, chan);
     }
     else{
         llDialog(_id, (string)owner_name + "'s Beer Making Menu\n
         Current Recipe:\n"
-        + (string)YEASTcount + " Yeast "
-        + (string)SUGARcount + " Sugar "
+        + (string)Pilsner_malt_count + " Pilsner malt\n"
+        + (string)Munich_malt_count + " Munich malt\n"
+        + (string)Vienna_malt_count + " Vienna malt\n"
+        + (string)aromatic_Munich_malt_count + " Aromatic Munich malt\n"
+        + (string)CaraVienne_malt_count + " CaraVienne malt\n"
+        + (string)Tradition_pellet_hops_count + " Tradition Pellet hops\n"
+        + (string)Tettnanger_pellet_hops_count + " Tettnanger Pellet hops\n"
+        + (string)Irish_moss_count + " Irish moss\n"
         + (string)WATERcount + " Water\n
         Choose an option! " + (string)name + "?", main_buttons, chan);
     }
@@ -120,16 +123,22 @@ doBeerRDYMenu(key _id)
 {
     if (_id == makersID)
         mainBeer_buttons = [ "Check", "▼" ];
+    llListenRemove(hand);
     list owner_name = llParseString2List(llGetDisplayName(llGetOwnerKey(llGetKey())), [""], []);
     list name = llParseString2List(llGetDisplayName(_id), [""], []);
-    llListenRemove(hand);
     chan = llFloor(llFrand(2000000));
     hand = llListen(chan, "", _id, "");
     llDialog(_id, (string)owner_name + "'s Beer Making Menu\n
     Current Recipe:\n"
-    + (string)YEASTcount + " Yeast. "
-    + (string)SUGARcount + " Sugar. "
-    + (string)WATERcount + " Water.\n
+        + (string)Pilsner_malt_count + " Pilsner malt\n"
+        + (string)Munich_malt_count + " Munich malt\n"
+        + (string)Vienna_malt_count + " Vienna malt\n"
+        + (string)aromatic_Munich_malt_count + " Aromatic Munich malt\n"
+        + (string)CaraVienne_malt_count + " CaraVienne malt\n"
+        + (string)Tradition_pellet_hops_count + " Tradition Pellet hops\n"
+        + (string)Tettnanger_pellet_hops_count + " Tettnanger Pellet hops\n"
+        + (string)Irish_moss_count + " Irish moss\n"
+        + (string)WATERcount + " Water\n
     Choose an option! " + (string)name + "?", mainBeer_buttons, chan);
 }
 
@@ -140,10 +149,16 @@ init()
     llSetText("", titleColor, 1);
     llSetObjectDesc("");
     determine_bucket_links();
-    BeerReady = FALSE;
+    BEERready = FALSE;
     WATERadded = FALSE;
-    YEASTcount = 0;
-    SUGARcount = 0;
+    Pilsner_malt_count = 0;
+    Munich_malt_count = 0;
+    Vienna_malt_count = 0;
+    aromatic_Munich_malt_count = 0;
+    CaraVienne_malt_count = 0;
+    Tradition_pellet_hops_count = 0;
+    Tettnanger_pellet_hops_count = 0;
+    Irish_moss_count = 0;
     WATERcount = 0;
     lidOn();
 }
@@ -152,28 +167,13 @@ determine_bucket_links()
 {
     integer i = link_num;
     integer found = 0;
-    do {
+    do{
         if(llGetLinkName(i) == LID_){
             _lid = i;
             found++;
         }
-        else if (llGetLinkName(i) == WATER_){
-            _water = i;
-            found++;
-        }
-        else if (llGetLinkName(i) == YEAST_){
-            _yeast = i;
-            found++;
-        }
-        else if(llGetLinkName(i) == SUGAR_){
-            _sugar = i;
-            found++;
-        }
     }
-    while (i-- && found < 4);
-    llSetLinkAlpha(_water, 0, ALL_SIDES);
-    llSetLinkAlpha(_yeast, 0, ALL_SIDES);
-    llSetLinkAlpha(_sugar, 0, ALL_SIDES);
+    while (i-- && found < 1);
 }
 
 lidOn()
@@ -190,6 +190,94 @@ lidOff()
     LidON = FALSE;
 }
 
+AddPilsner_malt()
+{
+    if(Pilsner_malt_count < 7){
+        Pilsner_malt_count += 1;
+        llSay(0, "You added some Pilsner malt. :: Total: " + (string)Pilsner_malt_count + ".");
+    }
+    else
+        llSay(0, "You tryed to add too much Pilsner malt.");
+    Pilsner_malt_count = Pilsner_malt_count++;
+}
+
+AddMunich_malt()
+{
+    if(Munich_malt_count < 7){
+        Munich_malt_count += 1;
+        llSay(0, "You added some Vienna malt. :: Total: " + (string)Munich_malt_count + ".");
+    }
+    else
+        llSay(0, "You tryed to add too much Vienna malt.");
+    Munich_malt_count = Munich_malt_count++;
+}
+
+AddVienna_malt()
+{
+    if(Vienna_malt_count < 6){
+        Vienna_malt_count += 1;
+        llSay(0, "You added some CaraVienne malt. :: Total: " + (string)Vienna_malt_count + ".");
+    }
+    else
+        llSay(0, "You tryed to add too much CaraVienne malt.");
+    Vienna_malt_count = Vienna_malt_count++;
+}
+
+Addaromatic_Munich()
+{
+    if(aromatic_Munich_malt_count < 4){
+        aromatic_Munich_malt_count += 1;
+        llSay(0, "You added some Aromatic Munich. :: Total: " + (string)aromatic_Munich_malt_count + ".");
+    }
+    else
+        llSay(0, "You tryed to add too much Aromatic Munich.");
+    aromatic_Munich_malt_count = aromatic_Munich_malt_count++;
+}
+
+AddCaraVienne_malt()
+{
+    if(CaraVienne_malt_count < 3){
+        CaraVienne_malt_count += 1;
+        llSay(0, "You added some Tradition pellet hops. :: Total: " + (string)CaraVienne_malt_count + ".");
+    }
+    else
+        llSay(0, "You tryed to add too much Tradition pellet hops.");
+    CaraVienne_malt_count = CaraVienne_malt_count++;
+}
+
+AddTradition_pellet_hops()
+{
+    if(Tradition_pellet_hops_count < 4){
+        Tradition_pellet_hops_count += 1;
+        llSay(0, "You added some Tettnanger pellet hops. :: Total: " + (string)Tradition_pellet_hops_count + ".");
+    }
+    else
+        llSay(0, "You tryed to add too much Tettnanger pellet hops.");
+    Tradition_pellet_hops_count = Tradition_pellet_hops_count++;
+}
+
+AddTettnanger_pellet_hops()
+{
+    if(Tettnanger_pellet_hops_count < 4){
+        Tettnanger_pellet_hops_count += 1;
+        llSay(0, "You added some Tettnanger pellet hops. :: Total: " + (string)Tettnanger_pellet_hops_count + ".");
+    }
+    else
+        llSay(0, "You tryed to add too much Tettnanger pellet hops.");
+    Tettnanger_pellet_hops_count = Tettnanger_pellet_hops_count++;
+}
+
+AddIrish_moss()
+{
+    if(Irish_moss_count < 3){
+        Irish_moss_count += 1;
+        llSay(0, "You added some Irish moss. :: Total: " + (string)Irish_moss_count + ".");
+    }
+    else
+        llSay(0, "You tryed to add too much Irish moss.");
+    Irish_moss_count = Irish_moss_count++;
+}
+
 addWater()
 {
     if(!WATERadded){
@@ -198,35 +286,11 @@ addWater()
     }
     if(WATERcount < 6){
         WATERcount += 1;
-        llSay(0, "You added some water. :: Total water: " + (string)WATERcount + ".");
+        llSay(0, "You added some water. :: Total: " + (string)WATERcount + ".");
     }
     else
         llSay(0, "You tryed to add too much water, it would overfill.");
-        WATERcount = WATERcount++;
-}
-
-addYeast()
-{
-    if(YEASTcount < 5){
-        YEASTcount += 1;
-        llSetLinkAlpha(_yeast, 1, ALL_SIDES);
-        llSay(0, "You added some yeast. :: Total yeast: " + (string)YEASTcount + ".");
-    }
-    else
-        llSay(0, "You tryed to add too much yeast.");
-    YEASTcount = YEASTcount++;
-}
-
-addSugar()
-{
-    if(SUGARcount < 10){
-        SUGARcount += 1;
-        llSetLinkAlpha(_sugar, 1, ALL_SIDES);
-        llSay(0, "You added some sugar. :: Total sugar: " + (string)SUGARcount + ".");
-    }
-    else
-        llSay(0, "You tryed to add too much sugar.");
-    SUGARcount = SUGARcount++;
+    WATERcount = WATERcount++;
 }
 
 dispString(string value)
@@ -237,9 +301,15 @@ dispString(string value)
 saveData()
 {
     list saveData;
-    saveData += (string)YEASTcount + " Yeast";
-    saveData += (string)SUGARcount + " Sugar";
-    saveData += (string)WATERcount + " Water";
+    saveData += (string)Pilsner_malt_count;
+    saveData += (string)Munich_malt_count;
+    saveData += (string)Vienna_malt_count;
+    saveData += (string)aromatic_Munich_malt_count;
+    saveData += (string)CaraVienne_malt_count;
+    saveData += (string)Tradition_pellet_hops_count;
+    saveData += (string)Tettnanger_pellet_hops_count;
+    saveData += (string)Irish_moss_count;
+    saveData += (string)WATERcount;
     saveData += (key)makersID;
     saveData += (string)makersName;
     saveData += llRound(cookingtime);
@@ -266,9 +336,15 @@ updateTimeDisp()
 {
     list userName = llParseString2List(llGetDisplayName(makersID), [""], []);
     dispString(
-        (string)WATERcount + " Water. "
-        + (string)YEASTcount + " Yeast. "
-        + (string)SUGARcount + " Sugar.\n"
+        (string)Pilsner_malt_count + " Pilsner malt.\n"
+        + (string)Munich_malt_count + " Munich malt.\n"
+        + (string)Vienna_malt_count + " Vienna malt.\n"
+        + (string)aromatic_Munich_malt_count + " Aromatic Munich malt.\n"
+        + (string)CaraVienne_malt_count + " CaraVienne malt.\n"
+        + (string)Tradition_pellet_hops_count + " Tradition pellet hops.\n"
+        + (string)Tettnanger_pellet_hops_count + " Tettnanger pellet hops.\n"
+        + (string)Irish_moss_count + " Irish moss.\n"
+        + (string)WATERcount + " Water.\n"
         + (string)userName + " (" + makersName + ")\n
         Beer will be ready in:\n" 
         + getTimeString(llRound(cookingtime)));
@@ -280,7 +356,7 @@ default
     {
         llPreloadSound(lid_ON_Sound);
         llPreloadSound(lid_OFF_Sound);
-        llPreloadSound(MakinngBeer_Sound);
+        llPreloadSound(MakingBeer_Sound);
         init();
     }
 
@@ -305,16 +381,40 @@ default
             lidOn();
             doMenu(_id);
         }
+        else if ((_message == "Pilsner") && (!LidON)){
+            AddPilsner_malt();
+            doMenu(_id);
+        }
+        else if ((_message == "Munich") && (!LidON)){
+            AddMunich_malt();
+            doMenu(_id);
+        }
+        else if ((_message == "Vienna") && (!LidON)){
+            AddVienna_malt();
+            doMenu(_id);
+        }
+        else if ((_message == "Aromatic") && (!LidON)){
+            Addaromatic_Munich();
+            doMenu(_id);
+        }
+        else if ((_message == "CaraVienne") && (!LidON)){
+            AddCaraVienne_malt();
+            doMenu(_id);
+        }
+        else if ((_message == "Tradition") && (!LidON)){
+            AddTradition_pellet_hops();
+            doMenu(_id);
+        }
+        else if ((_message == "Tettnanger") && (!LidON)){
+            AddTettnanger_pellet_hops();
+            doMenu(_id);
+        }
+        else if ((_message == "Irish") && (!LidON)){
+            AddIrish_moss();
+            doMenu(_id);
+        }
         else if ((_message == "Water") && (!LidON)){
             addWater();
-            doMenu(_id);
-        }
-        else if ((_message == "Yeast") && (!LidON)){
-            addYeast();
-            doMenu(_id);
-        }
-        else if ((_message == "Sugar") && (!LidON)){
-            addSugar();
             doMenu(_id);
         }
         else if ((_message == "Finished") && (LidON) && (WATERadded == TRUE)){
@@ -347,22 +447,28 @@ state MakingBeer
             timeElapsed = updateInterval;
         cookingtime -= timeElapsed;
         updateTimeDisp();
-        llTriggerSound(MakinngBeer_Sound, Volume);
+        llTriggerSound(MakingBeer_Sound, Volume);
         if (cookingtime <= 0)
-            state BeerReady;
+            state beerReady;
     }
 }
 
-state BeerReady
+state beerReady
 {
     state_entry()
     {
-        BeerReady = TRUE; //just in case if i add more features with this.
+        BEERready = TRUE; //just in case if i add more features with this.
         list userName = llParseString2List(llGetDisplayName(makersID), [""], []);
         llSetText(
-              (string)WATERcount + " Water.\n"
-            + (string)YEASTcount + " Yeast.\n"
-            + (string)SUGARcount + " Sugar.\n"
+            (string)Pilsner_malt_count + " Pilsner malt.\n"
+            + (string)Munich_malt_count + " Munich malt.\n"
+            + (string)Vienna_malt_count + " Vienna malt.\n"
+            + (string)aromatic_Munich_malt_count + " Aromatic Munich malt.\n"
+            + (string)CaraVienne_malt_count + " CaraVienne malt.\n"
+            + (string)Tradition_pellet_hops_count + " Tradition pellet hops.\n"
+            + (string)Tettnanger_pellet_hops_count + " Tettnanger pellet hops.\n"
+            + (string)Irish_moss_count + " Irish moss.\n"
+            + (string)WATERcount + " Water.\n"
             + (string)userName + " (" + makersName + ")\n
                 Beer is ready!", titleColor, 1);
         llGetObjectDesc();
@@ -372,13 +478,19 @@ state BeerReady
     dataserver(key requested, string data)
     {
         list savedList = llParseString2List(llGetObjectDesc(), [","], []);
-        if (llGetListLength(savedList) == 6){
-            YEASTcount      = llList2Integer(savedList, 1);
-            SUGARcount      = llList2Integer(savedList, 2);
-            WATERcount      = llList2Integer(savedList, 3);
-            makersID        = llList2Key(savedList, 4);
-            makersName      = llList2String(savedList, 5);
-            cookingtime     = llList2Integer(savedList, 6);
+        if (llGetListLength(savedList) == 12){
+            Pilsner_malt_count              = llList2Integer(savedList, 1);
+            Munich_malt_count               = llList2Integer(savedList, 2);
+            Vienna_malt_count               = llList2Integer(savedList, 3);
+            aromatic_Munich_malt_count      = llList2Integer(savedList, 4);
+            CaraVienne_malt_count           = llList2Integer(savedList, 5);
+            Tradition_pellet_hops_count     = llList2Integer(savedList, 6);
+            Tettnanger_pellet_hops_count    = llList2Integer(savedList, 7);
+            Irish_moss_count                = llList2Integer(savedList, 8);
+            WATERcount                      = llList2Integer(savedList, 9);
+            makersID                        = llList2Key(savedList, 10);
+            makersName                      = llList2String(savedList, 11);
+            cookingtime                     = llList2Integer(savedList, 12);
         }
     }
 
@@ -392,6 +504,18 @@ state BeerReady
             return;
     }
 
+    /*
+        Pilsner_malt;   //4
+        Munich_malt;    //4
+        Vienna_malt;    //5
+        aromatic_Munich; //2
+        CaraVienne_malt; //1
+        Tradition_pellet_hops; //2
+        Tettnanger_pellet_hops; //2
+        Irish_moss; //1
+        _water; //5
+    */
+
     listen(integer _channel, string _name, key _id, string _message)
     {
         string origName = llGetObjectName();
@@ -402,42 +526,28 @@ state BeerReady
             llSleep(8.0);
             llSay(0, "/me *drinks*");
             llSleep(10.0);
-            if((WATERcount == 4) && (YEASTcount == 1) && (SUGARcount == 6)){ //perfect
-                llSay(0, "/me This is VeryGood shit!");
+            if((Pilsner_malt_count == 4) && 
+                (Munich_malt_count == 4) && 
+                (Vienna_malt_count == 5) && 
+                (aromatic_Munich_malt_count == 2) && 
+                (CaraVienne_malt_count == 1) && 
+                (Tradition_pellet_hops_count == 2) && 
+                (Tettnanger_pellet_hops_count == 2) && 
+                (Irish_moss_count == 1) && 
+                (WATERcount == 5)){
+                llSay(0, "/me This is beer you made is verygood shit!");
                 llGiveInventory(_id, BeerBottle);
                 llGiveInventory(_id, BeerBottle);
                 llGiveInventory(_id, BeerBottle);
                 llGiveInventory(_id, BeerBottle);
                 llGiveInventory(_id, BeerBottle);
                 llGiveInventory(_id, BeerBottle);
-            }
-            //i might need more of these.. but really????
-            else if ((YEASTcount == 1) && (SUGARcount < 6))
-            {
-                llSay(0, "/me You added too little sugar.");
-                llGiveInventory(_id, BeerBottle);
-                llGiveInventory(_id, BeerBottle);
-                llGiveInventory(_id, BeerBottle);
-            }
-            else if ((YEASTcount > 1) && (SUGARcount == 6))
-            {
-                llSay(0, "/me You added too much yeast.");
-                llGiveInventory(_id, BeerBottle);
-            }
-            else if (WATERcount < 4)
-            {
-                llSay(0, "/me You added too little water.");
-                llGiveInventory(_id, BeerBottle);
-                llGiveInventory(_id, BeerBottle);
-            }
-            else if (WATERcount > 4)
-            {
-                llSay(0, "/me You added too much water.");
                 llGiveInventory(_id, BeerBottle);
                 llGiveInventory(_id, BeerBottle);
                 llGiveInventory(_id, BeerBottle);
                 llGiveInventory(_id, BeerBottle);
             }
+            //MORE COMING SOON.....
             else
                 llSay(0, "/me Oh no what happened?... this aint gonna work at all...");
             llSetObjectName(origName);
