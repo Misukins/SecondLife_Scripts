@@ -59,7 +59,7 @@ list mainBeer_buttons  = [];
     float ONE_HHOUR = 1800.0;  //Half an Hours
     float ONE_MINUTE = 60.0;   //Minute
 */
-float ONE_DAY = 86394.0; //little less than 24hours
+float ONE_DAY = 43190.0; //little less than 12hours
 float updateInterval = 30.0; //DEFAULT 30SEC
 
 vector titleColor = <0.905, 0.686, 0.924>;
@@ -505,15 +505,15 @@ state beerReady
     }
 
     /*
-        Pilsner_malt;   //4
-        Munich_malt;    //4
-        Vienna_malt;    //5
-        aromatic_Munich; //2
-        CaraVienne_malt; //1
-        Tradition_pellet_hops; //2
-        Tettnanger_pellet_hops; //2
-        Irish_moss; //1
-        _water; //5
+        Pilsner     == //4
+        Munich      == //4
+        Vienna      == //5
+        Aromatic    == //2
+        CaraVienne  == //1
+        Tradition   == //2
+        Tettnanger  == //2
+        Irish       == //1
+        water       == //5
     */
 
     listen(integer _channel, string _name, key _id, string _message)
