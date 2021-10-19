@@ -53,6 +53,7 @@ init()
 {
     _id = llDetectedKey(0);
     BeerAO_on = FALSE;
+    llMessageLinked(LINK_ROOT, 0, "BEER_AOOFF", NULL_KEY);
     doMenu(_id);
 }
 
@@ -71,6 +72,7 @@ drinkBeer(key _id)
     origName = llGetObjectName();
     llSetObjectName("");
     llSay(0, "/me " + (string)name + " drinks full bottle of beer.");
+    llSetObjectName("Beer Bottle (empty)");
     llTriggerSound(drinking_Sound, Volume);
     llStopAnimation(rest);
     llSleep(0.1);
@@ -92,6 +94,7 @@ timerRanOut()
     llSetPrimitiveParams([PRIM_NAME, objectEmpty]);
     llSetObjectName(objectEmpty);
     llOwnerSay("This Bottle is empty!");
+    llDetachFromAvatar();
     llDie();
 }
 
@@ -129,11 +132,13 @@ default
                 llSetObjectName(objectEmpty);
                 llSetPrimitiveParams([PRIM_NAME, objectEmpty]);
                 llOwnerSay("This Bottle is empty!");
+                llDetachFromAvatar();
                 llDie();
             }
         }
         else{
             llResetAnimationOverride("ALL");
+            llDetachFromAvatar();
             llDie();
         }
     }
@@ -144,6 +149,7 @@ default
             llSetObjectName(objectEmpty);
             llSetPrimitiveParams([PRIM_NAME, objectEmpty]);
             llOwnerSay("This Bottle is empty!");
+            llDetachFromAvatar();
             llDie();
         }
         else if ((_id != NULL_KEY) && (!isEmpty)){
