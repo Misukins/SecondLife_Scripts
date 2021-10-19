@@ -113,6 +113,7 @@ timerRanOut()
     llSetTimerEvent(0);
     llSetObjectName("Kilju Bottle (empty)");
     llOwnerSay("This Bottle is empty!");
+    llDetachFromAvatar();
     llDie();
 }
 
@@ -147,11 +148,13 @@ default
             if(isEmpty){
                 llSetObjectName("Kilju Bottle (empty)");
                 llOwnerSay("This Bottle is empty!");
+                llDetachFromAvatar();
                 llDie();
             }
         }
         else{
             llResetAnimationOverride("ALL");
+            llDetachFromAvatar();
             llDie();
         }
     }
@@ -160,6 +163,7 @@ default
         if((_id != NULL_KEY) && (isEmpty)){
             llSetObjectName("Kilju Bottle (empty)");
             llOwnerSay("This Bottle is empty!");
+            llDetachFromAvatar();
             llDie();
         }
         else if ((_id != NULL_KEY) && (!isEmpty)){
