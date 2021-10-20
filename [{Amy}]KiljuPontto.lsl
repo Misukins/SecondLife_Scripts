@@ -11,6 +11,7 @@ string WATER_           = "Water";
 string YEAST_           = "Yeast";
 string SUGAR_           = "Sugar";
 string KiljuBottle      = "[{Amy}]Kilju Bottle";
+string HELPnote         = "Help me";
 string objectname;
 string makersName;
 
@@ -62,8 +63,8 @@ doMenu(key _id)
         main_admin_buttons =   [ "Open Lid", "Reset", "▼" ];
     }
     else{
-        main_buttons =         [ "Close Lid", "Water", "Yeast", "Sugar", "▼" ];
-        main_admin_buttons =   [ "Close Lid", "Water", "Yeast", "Sugar", "Reset", "▼" ];
+        main_buttons =         [ "Close Lid", "Water", "Yeast", "Sugar", "Help", "▼" ];
+        main_admin_buttons =   [ "Close Lid", "Water", "Yeast", "Sugar", "Help", "Reset", "▼" ];
     }
     list owner_name = llParseString2List(llGetDisplayName(llGetOwnerKey(llGetKey())), [""], []);
     list name = llParseString2List(llGetDisplayName(_id), [""], []);
@@ -295,6 +296,9 @@ default
             cookingtime = ONE_DAY;
             saveData();
             state MakingKilju;
+        }
+        else if ((_message == "Help") && (!LidON)){
+            llGiveInventory(_id, HELPnote);
         }
         else if (_message == "Reset")
             llResetScript();
