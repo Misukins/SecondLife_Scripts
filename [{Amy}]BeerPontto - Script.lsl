@@ -4,7 +4,7 @@ key makersID;
 key readKey;
 key lid_ON_Sound        = "36abc63f-7536-2ee9-efc4-d0fdb98c5767";
 key lid_OFF_Sound       = "549679ab-2d75-d3ec-b6e6-76c89a0759e2";
-key MakingBeer_Sound  = "62adc742-ccee-3a69-e64b-b70b885a07cf";
+key MakingBeer_Sound    = "62adc742-ccee-3a69-e64b-b70b885a07cf";
 
 string LID_             = "Lid";
 // string WATER_                   = "Water";
@@ -17,6 +17,7 @@ string LID_             = "Lid";
 // string TETTNANGER_PELLET_HOPS_  = "Tettnanger pellet hops";
 // string IRISH_MOSS_              = "Irish moss";
 string BeerBottle   = "[{Amy}]Beer Bottle";
+string HELPnote     = "Help me";
 string objectname;
 string makersName;
 
@@ -67,12 +68,12 @@ vector titleColor = <0.905, 0.686, 0.924>;
 doMenu(key _id)
 {
     if ((LidON) && (WATERadded)){
-        main_buttons =         [ "Finished", "▼" ];
-        main_admin_buttons =   [ "Finished", "Reset", "▼" ];
+        main_buttons =         [ "Finished", "Help", "▼" ];
+        main_admin_buttons =   [ "Finished", "Help", "Reset", "▼" ];
     }
     else if(LidON){
-        main_buttons =         [ "Open Lid", "▼" ];
-        main_admin_buttons =   [ "Open Lid", "Reset", "▼" ];
+        main_buttons =         [ "Open Lid", "Help", "▼" ];
+        main_admin_buttons =   [ "Open Lid", "Help", "Reset", "▼" ];
     }
     else{
         main_buttons =         [  
@@ -416,6 +417,9 @@ default
         else if ((_message == "Water") && (!LidON)){
             addWater();
             doMenu(_id);
+        }
+        else if (_message == "Help"){
+            llGiveInventory(_id, HELPnote);
         }
         else if ((_message == "Finished") && (LidON) && (WATERadded == TRUE)){
             makersID   = _id;
