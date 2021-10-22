@@ -138,12 +138,13 @@ drinksMenu(key _id)
     llDialog(_id, message, buttons, channel);
 }
 
+// √ ×
 menu(key _id)
 {
     if(animOverrideOn)
-        main_buttons = [ "AO off", "Drinks", "reset", "▼" ];
+        main_buttons = [ "AO √", "Drinks", "▼" ];
     else
-        main_buttons = [ "AO on", "Drinks", "reset", "▼" ];
+        main_buttons = [ "AO ×", "Drinks", "▼" ];
     list owner_name = llParseString2List(llGetDisplayName(llGetOwnerKey(llGetKey())), [""], []);
     list name = llParseString2List(llGetDisplayName(_id), [""], []);
     llListenRemove(listener);
@@ -240,6 +241,7 @@ animOverride()
 
 initialize()
 {
+    loadNoteCard(defaultNoteCard);
     if (animOverrideOn)
         llSetTimerEvent(timerEventLength);
     else
@@ -273,7 +275,6 @@ default
             overrides += [ "" ];
         }
         initialize();
-        loadNoteCard(defaultNoteCard);
         if (autoStopTime == 0)
             autoStop = [];
         llResetTime();
@@ -346,7 +347,7 @@ default
             llOwnerSay("Hey " + (string)name + ", We have " + (string)n + " items on stock.");
             drinksMenu(_id);
         }
-        else if (msg == "AO on"){
+        else if (msg == "AO ×"){
             llSetTimerEvent(timerEventLength);
             animOverrideOn = TRUE;
             if (gotPermission)
@@ -354,7 +355,7 @@ default
             llOwnerSay(objectname + " AO is online.");
             menu(_id);
         }
-        else if (msg == "AO off"){
+        else if (msg == "AO √"){
             llSetTimerEvent(0);
             animOverrideOn = FALSE;
             startNewAnimation("", -1, lastAnimState);
@@ -365,8 +366,6 @@ default
             drinksMenu(_id);
         else if (msg == " ")
             return;
-        else if (msg == "reset")
-            llResetScript();
         else
         {
             list name = llParseString2List(llGetDisplayName(_id), [""], []);
