@@ -12,7 +12,6 @@ string YEAST_           = "Yeast";
 string SUGAR_           = "Sugar";
 string KiljuBottle      = "[{Amy}]Kilju Bottle";
 string HELPnote         = "Help me";
-string objectname;
 string makersName;
 
 integer listenid;
@@ -74,16 +73,16 @@ doMenu(key _id)
     if ( _id == llGetOwner()){
         llDialog(_id, (string)owner_name + "'s Kilju Making Menu\n
         Current Recipe:\n"
-        + (string)YEASTcount + " Yeast "
-        + (string)SUGARcount + " Sugar "
+        + (string)YEASTcount + " Yeast\n"
+        + (string)SUGARcount + " Sugar\n"
         + (string)WATERcount + " Water\n
         Choose an option! " + (string)name + "?", main_admin_buttons, chan);
     }
     else{
         llDialog(_id, (string)owner_name + "'s Kilju Making Menu\n
         Current Recipe:\n"
-        + (string)YEASTcount + " Yeast "
-        + (string)SUGARcount + " Sugar "
+        + (string)YEASTcount + " Yeast\n"
+        + (string)SUGARcount + " Sugar\n"
         + (string)WATERcount + " Water\n
         Choose an option! " + (string)name + "?", main_buttons, chan);
     }
@@ -100,8 +99,8 @@ doKiljuRDYMenu(key _id)
     hand = llListen(chan, "", _id, "");
     llDialog(_id, (string)owner_name + "'s Kilju Making Menu\n
     Current Recipe:\n"
-    + (string)YEASTcount + " Yeast. "
-    + (string)SUGARcount + " Sugar. "
+    + (string)YEASTcount + " Yeast.\n"
+    + (string)SUGARcount + " Sugar.\n"
     + (string)WATERcount + " Water.\n
     Choose an option! " + (string)name + "?", mainKilju_buttons, chan);
 }
@@ -163,7 +162,7 @@ lidOff()
     LidON = FALSE;
 }
 
-addWater()
+addWater(key _id)
 {
     if(!WATERadded){
         WATERadded = TRUE;
@@ -171,34 +170,34 @@ addWater()
     }
     if(WATERcount < 6){
         WATERcount += 1;
-        llSay(0, "You added some water. :: Total water: " + (string)WATERcount + ".");
+        llInstantMessage(_id, "You added some water. :: Total water: " + (string)WATERcount + ".");
     }
     else
-        llSay(0, "You tryed to add too much water, it would overfill.");
+        llInstantMessage(_id, "You tryed to add too much water, it would overfill.");
         WATERcount = WATERcount++;
 }
 
-addYeast()
+addYeast(key _id)
 {
     if(YEASTcount < 5){
         YEASTcount += 1;
         llSetLinkAlpha(_yeast, 1, ALL_SIDES);
-        llSay(0, "You added some yeast. :: Total yeast: " + (string)YEASTcount + ".");
+        llInstantMessage(_id, "You added some yeast. :: Total yeast: " + (string)YEASTcount + ".");
     }
     else
-        llSay(0, "You tryed to add too much yeast.");
+        llInstantMessage(_id, "You tryed to add too much yeast.");
     YEASTcount = YEASTcount++;
 }
 
-addSugar()
+addSugar(key _id)
 {
     if(SUGARcount < 10){
         SUGARcount += 1;
         llSetLinkAlpha(_sugar, 1, ALL_SIDES);
-        llSay(0, "You added some sugar. :: Total sugar: " + (string)SUGARcount + ".");
+        llInstantMessage(_id, "You added some sugar. :: Total sugar: " + (string)SUGARcount + ".");
     }
     else
-        llSay(0, "You tryed to add too much sugar.");
+        llInstantMessage(_id, "You tryed to add too much sugar.");
     SUGARcount = SUGARcount++;
 }
 
@@ -239,8 +238,8 @@ updateTimeDisp()
 {
     list userName = llParseString2List(llGetDisplayName(makersID), [""], []);
     dispString(
-        (string)WATERcount + " Water. "
-        + (string)YEASTcount + " Yeast. "
+        (string)WATERcount + " Water.\n"
+        + (string)YEASTcount + " Yeast.\n"
         + (string)SUGARcount + " Sugar.\n"
         + (string)userName + " (" + makersName + ")\n
         Kilju will be ready in:\n" 
@@ -279,15 +278,15 @@ default
             doMenu(_id);
         }
         else if ((_message == "Water") && (!LidON)){
-            addWater();
+            addWater(_id);
             doMenu(_id);
         }
         else if ((_message == "Yeast") && (!LidON)){
-            addYeast();
+            addYeast(_id);
             doMenu(_id);
         }
         else if ((_message == "Sugar") && (!LidON)){
-            addSugar();
+            addSugar(_id);
             doMenu(_id);
         }
         else if ((_message == "Finished") && (LidON) && (WATERadded == TRUE)){
@@ -300,8 +299,10 @@ default
         else if ((_message == "Help") && (!LidON)){
             llGiveInventory(_id, HELPnote);
         }
-        else if (_message == "Reset")
+        else if (_message == "Reset"){
+            llInstantMessage(_id, "..Resetting..");
             llResetScript();
+        }
         else if (_message == "▼")
             return;
     }
@@ -361,11 +362,13 @@ state KiljuReady
     touch_start(integer num_detected)
     {
         key _id = llDetectedKey(0);
-        list userName = llParseString2List(llGetDisplayName(makersID), [""], []);
+        list userName = llParseString2List(llGetDisplayName(_id), [""], []);
         if(_id == makersID)
             doKiljuRDYMenu(_id);
-        else
+        else{
+            llInstantMessage(_id, "Sorry, " + (string)userName + " you have no access.");
             return;
+        }
     }
 
     listen(integer _channel, string _name, key _id, string _message)
@@ -373,13 +376,8 @@ state KiljuReady
         string origName = llGetObjectName();
         if(_message == "Check"){
             lidOff();
-            llSetObjectName("Pena");
-            llSay(0, "/me Let me taste it..");
-            llSleep(8.0);
-            llSay(0, "/me *drinks*");
-            llSleep(10.0);
             if((WATERcount == 4) && (YEASTcount == 1) && (SUGARcount == 6)){ //perfect
-                llSay(0, "/me This is VeryGood shit!");
+                llInstantMessage(_id, "/me This is VeryGood shit!");
                 llGiveInventory(_id, KiljuBottle);
                 llGiveInventory(_id, KiljuBottle);
                 llGiveInventory(_id, KiljuBottle);
@@ -390,33 +388,32 @@ state KiljuReady
             //i might need more of these.. but really????
             else if ((YEASTcount == 1) && (SUGARcount < 6))
             {
-                llSay(0, "/me You added too little sugar.");
+                llInstantMessage(_id, "/me You added too little sugar.");
                 llGiveInventory(_id, KiljuBottle);
                 llGiveInventory(_id, KiljuBottle);
                 llGiveInventory(_id, KiljuBottle);
             }
             else if ((YEASTcount > 1) && (SUGARcount == 6))
             {
-                llSay(0, "/me You added too much yeast.");
+                llInstantMessage(_id, "/me You added too much yeast.");
                 llGiveInventory(_id, KiljuBottle);
             }
             else if (WATERcount < 4)
             {
-                llSay(0, "/me You added too little water.");
+                llInstantMessage(_id, "/me You added too little water.");
                 llGiveInventory(_id, KiljuBottle);
                 llGiveInventory(_id, KiljuBottle);
             }
             else if (WATERcount > 4)
             {
-                llSay(0, "/me You added too much water.");
+                llInstantMessage(_id, "/me You added too much water.");
                 llGiveInventory(_id, KiljuBottle);
                 llGiveInventory(_id, KiljuBottle);
                 llGiveInventory(_id, KiljuBottle);
                 llGiveInventory(_id, KiljuBottle);
             }
             else
-                llSay(0, "/me Oh no what happened?... this aint gonna work at all...");
-            llSetObjectName(origName);
+                llInstantMessage(_id, "/me Oh no what happened?... this aint gonna work at all...");
             state default;
         }
         else if(_message == "▼")
