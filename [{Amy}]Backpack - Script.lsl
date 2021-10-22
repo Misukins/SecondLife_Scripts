@@ -19,7 +19,6 @@ integer swimmingIndex   = 26;
 integer swimupIndex     = 27;
 integer swimdownIndex   = 28;
 integer standingupIndex = 6;
-integer DEBUG           = FALSE;
 integer curStandIndex   = 0;
 integer numStands;
 integer curStandAnimIndex = 0;
@@ -89,6 +88,7 @@ string curStandAnim = "";
 string item;
 string itemnum;
 string message;
+string origName;
 
 addbutton(integer i, integer n)
 {
@@ -121,8 +121,11 @@ prepare_menu()
         addbutton(page * 3 * rows + 3 * k + 1, n);
         addbutton(page * 3 * rows + 3 * k + 2, n);
     }
-    if ( n == 0 )
+    if ( n == 0 ){
+        llSetObjectName("");
         message = "OUT OF STOCK IT!";
+        llSetObjectName(origName);
+    }
     else
         message = " ";
     for (k = 0; k < 3 * rows; k++)
@@ -201,7 +204,9 @@ loadNoteCard(string _notecard)
 {
     integer i;
     if (llGetInventoryKey(_notecard) == NULL_KEY){
+        llSetObjectName("");
         llOwnerSay("Notecard '" + _notecard + "' does not exist.");
+        llSetObjectName(origName);
         return;
     }
     notecardLinesRead = 0;
@@ -226,8 +231,9 @@ animOverride()
     underwaterAnimIndex = llListFindList(underwaterAnim, [curAnimIndex]);
     curPos              = llGetPos();
     if (curAnimIndex == -1){
-        if (DEBUG)
-            llInstantMessage(llGetOwner(), "Unknown animation state '" + curAnimState + "'");
+        llSetObjectName("");
+        llOwnerSay("Unknown animation state '" + curAnimState + "'");
+        llSetObjectName(origName);
     }
     else if (curAnimIndex == standIndex){
         startNewAnimation(curStandAnim, curStandAnimIndex, curAnimState);
@@ -241,6 +247,7 @@ animOverride()
 
 initialize()
 {
+    origName = llGetObjectName();
     loadNoteCard(defaultNoteCard);
     if (animOverrideOn)
         llSetTimerEvent(timerEventLength);
@@ -258,7 +265,9 @@ updateinv()
 {
     integer n = llGetInventoryNumber(INVENTORY_OBJECT);
     list name = llParseString2List(llGetDisplayName(llGetOwner()), [""], []);
+    llSetObjectName("");
     llOwnerSay("Hey " + (string)name + ", We have " + (string)n + " items on stock.");
+    llSetObjectName(origName);
 }
 
 default
@@ -344,7 +353,9 @@ default
         {
             integer n = llGetInventoryNumber(INVENTORY_OBJECT);
             list name = llParseString2List(llGetDisplayName(_id), [""], []);
+            llSetObjectName("");
             llOwnerSay("Hey " + (string)name + ", We have " + (string)n + " items on stock.");
+            llSetObjectName(origName);
             drinksMenu(_id);
         }
         else if (msg == "AO ×"){
@@ -352,14 +363,18 @@ default
             animOverrideOn = TRUE;
             if (gotPermission)
                 animOverride();
+            llSetObjectName("");
             llOwnerSay(objectname + " AO is online.");
+            llSetObjectName(origName);
             menu(_id);
         }
         else if (msg == "AO √"){
             llSetTimerEvent(0);
             animOverrideOn = FALSE;
             startNewAnimation("", -1, lastAnimState);
+            llSetObjectName("");
             llOwnerSay(objectname + " AO is offline.");
+            llSetObjectName(origName);
             menu(_id);
         }
         else if (msg == "Drinks")
@@ -369,7 +384,9 @@ default
         else
         {
             list name = llParseString2List(llGetDisplayName(_id), [""], []);
+            llSetObjectName("");
             llSay(0, "/me " + (string)name + " grabs a " + (string)msg + " from the backpack.");
+            llSetObjectName(origName);
             llGiveInventory(_id, msg);
             if (itemnum == "")
                 return;
