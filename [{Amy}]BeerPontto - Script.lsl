@@ -77,12 +77,12 @@ doMenu(key _id)
     }
     else{
         main_buttons =         [  
-                                "Close Lid", "Pilsner", "Munich", "Vienna", "Vienna", "Aromatic", 
+                                "Close Lid", "Pilsner", "Munich", "Vienna", "Aromatic", 
                                 "CaraVienne", "Tradition", "Tettnanger", "Irish", "Water", "▼" 
                                ];
         main_admin_buttons =   [ 
-                                "Close Lid", "Pilsner", "Munich", "Vienna", "Vienna", "Aromatic", 
-                                "CaraVienne", "Tradition", "Tettnanger", "Irish", "Water", "▼" 
+                                "Close Lid", "Pilsner", "Munich", "Vienna", "Aromatic", 
+                                "CaraVienne", "Tradition", "Tettnanger", "Irish", "Water", "Reset", "▼" 
                                ];
     }
     list owner_name = llParseString2List(llGetDisplayName(llGetOwnerKey(llGetKey())), [""], []);
@@ -191,95 +191,95 @@ lidOff()
     LidON = FALSE;
 }
 
-AddPilsner_malt()
+AddPilsner_malt(key _id)
 {
     if(Pilsner_malt_count < 7){
         Pilsner_malt_count += 1;
-        llSay(0, "You added some Pilsner malt. :: Total: " + (string)Pilsner_malt_count + ".");
+        llInstantMessage(_id, "You added some Pilsner malt. :: Total: " + (string)Pilsner_malt_count + ".");
     }
     else
-        llSay(0, "You tryed to add too much Pilsner malt.");
+        llInstantMessage(_id, "You tryed to add too much Pilsner malt.");
     Pilsner_malt_count = Pilsner_malt_count++;
 }
 
-AddMunich_malt()
+AddMunich_malt(key _id)
 {
     if(Munich_malt_count < 7){
         Munich_malt_count += 1;
-        llSay(0, "You added some Vienna malt. :: Total: " + (string)Munich_malt_count + ".");
+        llInstantMessage(_id, "You added some Munich malt. :: Total: " + (string)Munich_malt_count + ".");
     }
     else
-        llSay(0, "You tryed to add too much Vienna malt.");
+        llInstantMessage(_id, "You tryed to add too much Munich malt.");
     Munich_malt_count = Munich_malt_count++;
 }
 
-AddVienna_malt()
+AddVienna_malt(key _id)
 {
     if(Vienna_malt_count < 6){
         Vienna_malt_count += 1;
-        llSay(0, "You added some CaraVienne malt. :: Total: " + (string)Vienna_malt_count + ".");
+        llInstantMessage(_id, "You added some Vienne malt. :: Total: " + (string)Vienna_malt_count + ".");
     }
     else
-        llSay(0, "You tryed to add too much CaraVienne malt.");
+        llInstantMessage(_id, "You tryed to add too much Vienne malt.");
     Vienna_malt_count = Vienna_malt_count++;
 }
 
-Addaromatic_Munich()
+Addaromatic_Munich(key _id)
 {
     if(aromatic_Munich_malt_count < 4){
         aromatic_Munich_malt_count += 1;
-        llSay(0, "You added some Aromatic Munich. :: Total: " + (string)aromatic_Munich_malt_count + ".");
+        llInstantMessage(_id, "You added some Aromatic Munich. :: Total: " + (string)aromatic_Munich_malt_count + ".");
     }
     else
-        llSay(0, "You tryed to add too much Aromatic Munich.");
+        llInstantMessage(_id, "You tryed to add too much Aromatic Munich.");
     aromatic_Munich_malt_count = aromatic_Munich_malt_count++;
 }
 
-AddCaraVienne_malt()
+AddCaraVienne_malt(key _id)
 {
     if(CaraVienne_malt_count < 3){
         CaraVienne_malt_count += 1;
-        llSay(0, "You added some Tradition pellet hops. :: Total: " + (string)CaraVienne_malt_count + ".");
+        llInstantMessage(_id, "You added some CaraVienne malt. :: Total: " + (string)CaraVienne_malt_count + ".");
     }
     else
-        llSay(0, "You tryed to add too much Tradition pellet hops.");
+        llInstantMessage(_id, "You tryed to add too much CaraVienne malt.");
     CaraVienne_malt_count = CaraVienne_malt_count++;
 }
 
-AddTradition_pellet_hops()
+AddTradition_pellet_hops(key _id)
 {
     if(Tradition_pellet_hops_count < 4){
         Tradition_pellet_hops_count += 1;
-        llSay(0, "You added some Tettnanger pellet hops. :: Total: " + (string)Tradition_pellet_hops_count + ".");
+        llInstantMessage(_id, "You added some Tradition pellet hops. :: Total: " + (string)Tradition_pellet_hops_count + ".");
     }
     else
-        llSay(0, "You tryed to add too much Tettnanger pellet hops.");
+        llInstantMessage(_id, "You tryed to add too much Tradition pellet hops.");
     Tradition_pellet_hops_count = Tradition_pellet_hops_count++;
 }
 
-AddTettnanger_pellet_hops()
+AddTettnanger_pellet_hops(key _id)
 {
     if(Tettnanger_pellet_hops_count < 4){
         Tettnanger_pellet_hops_count += 1;
-        llSay(0, "You added some Tettnanger pellet hops. :: Total: " + (string)Tettnanger_pellet_hops_count + ".");
+        llInstantMessage(_id, "You added some Tettnanger pellet hops. :: Total: " + (string)Tettnanger_pellet_hops_count + ".");
     }
     else
-        llSay(0, "You tryed to add too much Tettnanger pellet hops.");
+        llInstantMessage(_id, "You tryed to add too much Tettnanger pellet hops.");
     Tettnanger_pellet_hops_count = Tettnanger_pellet_hops_count++;
 }
 
-AddIrish_moss()
+AddIrish_moss(key _id)
 {
     if(Irish_moss_count < 3){
         Irish_moss_count += 1;
-        llSay(0, "You added some Irish moss. :: Total: " + (string)Irish_moss_count + ".");
+        llInstantMessage(_id, "You added some Irish moss. :: Total: " + (string)Irish_moss_count + ".");
     }
     else
-        llSay(0, "You tryed to add too much Irish moss.");
+        llInstantMessage(_id, "You tryed to add too much Irish moss.");
     Irish_moss_count = Irish_moss_count++;
 }
 
-addWater()
+addWater(key _id)
 {
     if(!WATERadded){
         WATERadded = TRUE;
@@ -287,10 +287,10 @@ addWater()
     }
     if(WATERcount < 6){
         WATERcount += 1;
-        llSay(0, "You added some water. :: Total: " + (string)WATERcount + ".");
+        llInstantMessage(_id, "You added some water. :: Total: " + (string)WATERcount + ".");
     }
     else
-        llSay(0, "You tryed to add too much water, it would overfill.");
+        llInstantMessage(_id, "You tryed to add too much water, it would overfill.");
     WATERcount = WATERcount++;
 }
 
@@ -383,39 +383,39 @@ default
             doMenu(_id);
         }
         else if ((_message == "Pilsner") && (!LidON)){
-            AddPilsner_malt();
+            AddPilsner_malt(_id);
             doMenu(_id);
         }
         else if ((_message == "Munich") && (!LidON)){
-            AddMunich_malt();
+            AddMunich_malt(_id);
             doMenu(_id);
         }
         else if ((_message == "Vienna") && (!LidON)){
-            AddVienna_malt();
+            AddVienna_malt(_id);
             doMenu(_id);
         }
         else if ((_message == "Aromatic") && (!LidON)){
-            Addaromatic_Munich();
+            Addaromatic_Munich(_id);
             doMenu(_id);
         }
         else if ((_message == "CaraVienne") && (!LidON)){
-            AddCaraVienne_malt();
+            AddCaraVienne_malt(_id);
             doMenu(_id);
         }
         else if ((_message == "Tradition") && (!LidON)){
-            AddTradition_pellet_hops();
+            AddTradition_pellet_hops(_id);
             doMenu(_id);
         }
         else if ((_message == "Tettnanger") && (!LidON)){
-            AddTettnanger_pellet_hops();
+            AddTettnanger_pellet_hops(_id);
             doMenu(_id);
         }
         else if ((_message == "Irish") && (!LidON)){
-            AddIrish_moss();
+            AddIrish_moss(_id);
             doMenu(_id);
         }
         else if ((_message == "Water") && (!LidON)){
-            addWater();
+            addWater(_id);
             doMenu(_id);
         }
         else if (_message == "Help"){
@@ -428,8 +428,10 @@ default
             saveData();
             state MakingBeer;
         }
-        else if (_message == "Reset")
+        else if (_message == "Reset"){
+            llInstantMessage(_id, "..Resetting..");
             llResetScript();
+        }
         else if (_message == "▼")
             return;
     }
@@ -501,11 +503,13 @@ state beerReady
     touch_start(integer num_detected)
     {
         key _id = llDetectedKey(0);
-        list userName = llParseString2List(llGetDisplayName(makersID), [""], []);
+        list userName = llParseString2List(llGetDisplayName(_id), [""], []);
         if(_id == makersID)
             doBeerRDYMenu(_id);
-        else
+        else{
+            llInstantMessage(_id, "Sorry, " + (string)userName + " you have no access.");
             return;
+        }
     }
 
     /*
@@ -525,11 +529,6 @@ state beerReady
         string origName = llGetObjectName();
         if(_message == "Check"){
             lidOff();
-            llSetObjectName("Pena");
-            llSay(0, "/me Let me taste it..");
-            llSleep(8.0);
-            llSay(0, "/me *drinks*");
-            llSleep(10.0);
             if((Pilsner_malt_count == 4) && 
                 (Munich_malt_count == 4) && 
                 (Vienna_malt_count == 5) && 
@@ -539,7 +538,7 @@ state beerReady
                 (Tettnanger_pellet_hops_count == 2) && 
                 (Irish_moss_count == 1) && 
                 (WATERcount == 5)){
-                llSay(0, "/me This is beer you made is verygood shit!");
+                llInstantMessage(_id, "/me This is beer you made is verygood shit!");
                 llGiveInventory(_id, BeerBottle);
                 llGiveInventory(_id, BeerBottle);
                 llGiveInventory(_id, BeerBottle);
@@ -553,8 +552,7 @@ state beerReady
             }
             //MORE COMING SOON.....
             else
-                llSay(0, "/me Oh no what happened?... this aint gonna work at all...");
-            llSetObjectName(origName);
+                llInstantMessage(_id, "/me Oh no what happened?... this aint gonna work at all...");
             state default;
         }
         else if(_message == "▼")
