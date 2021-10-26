@@ -538,7 +538,7 @@ state beerReady
                 (Tettnanger_pellet_hops_count == 2) && 
                 (Irish_moss_count == 1) && 
                 (WATERcount == 5)){
-                llInstantMessage(_id, "/me This is beer you made is verygood shit!");
+                llInstantMessage(_id, "/me This is beer you made is verygood!");
                 llGiveInventory(_id, BeerBottle);
                 llGiveInventory(_id, BeerBottle);
                 llGiveInventory(_id, BeerBottle);
@@ -550,7 +550,6 @@ state beerReady
                 llGiveInventory(_id, BeerBottle);
                 llGiveInventory(_id, BeerBottle);
             }
-            //MORE COMING SOON.....
             else
                 llInstantMessage(_id, "/me Oh no what happened?... this aint gonna work at all...");
             state default;
