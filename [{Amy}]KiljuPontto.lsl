@@ -377,36 +377,9 @@ state KiljuReady
         if(_message == "Check"){
             lidOff();
             if((WATERcount == 4) && (YEASTcount == 1) && (SUGARcount == 6)){ //perfect
-                llInstantMessage(_id, "/me This is VeryGood shit!");
+                llInstantMessage(_id, "/me This is VeryGood Kilju!");
                 llGiveInventory(_id, KiljuBottle);
                 llGiveInventory(_id, KiljuBottle);
-                llGiveInventory(_id, KiljuBottle);
-                llGiveInventory(_id, KiljuBottle);
-                llGiveInventory(_id, KiljuBottle);
-                llGiveInventory(_id, KiljuBottle);
-            }
-            //i might need more of these.. but really????
-            else if ((YEASTcount == 1) && (SUGARcount < 6))
-            {
-                llInstantMessage(_id, "/me You added too little sugar.");
-                llGiveInventory(_id, KiljuBottle);
-                llGiveInventory(_id, KiljuBottle);
-                llGiveInventory(_id, KiljuBottle);
-            }
-            else if ((YEASTcount > 1) && (SUGARcount == 6))
-            {
-                llInstantMessage(_id, "/me You added too much yeast.");
-                llGiveInventory(_id, KiljuBottle);
-            }
-            else if (WATERcount < 4)
-            {
-                llInstantMessage(_id, "/me You added too little water.");
-                llGiveInventory(_id, KiljuBottle);
-                llGiveInventory(_id, KiljuBottle);
-            }
-            else if (WATERcount > 4)
-            {
-                llInstantMessage(_id, "/me You added too much water.");
                 llGiveInventory(_id, KiljuBottle);
                 llGiveInventory(_id, KiljuBottle);
                 llGiveInventory(_id, KiljuBottle);
