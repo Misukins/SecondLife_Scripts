@@ -43,9 +43,9 @@ state Sniffing
 {
     state_entry()
     {
-        integer i = 1;
-        for ( ; i <= 65; ++i )
-            llListen( i, "", "", "" );
+        //integer i = 1;
+        //for ( ; i <= 65; ++i )
+            llListen( -3044044, "", "", "" );
         llSetTimerEvent(1);
     }
 
