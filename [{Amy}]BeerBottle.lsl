@@ -94,8 +94,8 @@ timerRanOut()
     llSetPrimitiveParams([PRIM_NAME, objectEmpty]);
     llSetObjectName(objectEmpty);
     llOwnerSay("This Bottle is empty!");
-    llDetachFromAvatar();
     llDie();
+    llDetachFromAvatar();
 }
 
 default
@@ -125,21 +125,21 @@ default
     run_time_permissions(integer perm)
     {
         if (perm & PERMISSION_ATTACH | PERMISSION_TRIGGER_ANIMATION | PERMISSION_TAKE_CONTROLS){
-            llAttachToAvatar(ATTACH_RHAND);
+            llAttachToAvatarTemp(ATTACH_RHAND);
             llStartAnimation(rest);
             if(isEmpty){
                 origName = llGetObjectName();
                 llSetObjectName(objectEmpty);
                 llSetPrimitiveParams([PRIM_NAME, objectEmpty]);
                 llOwnerSay("This Bottle is empty!");
-                llDetachFromAvatar();
                 llDie();
+                llDetachFromAvatar();
             }
         }
         else{
             llResetAnimationOverride("ALL");
-            llDetachFromAvatar();
             llDie();
+            llDetachFromAvatar();
         }
     }
 
@@ -149,8 +149,8 @@ default
             llSetObjectName(objectEmpty);
             llSetPrimitiveParams([PRIM_NAME, objectEmpty]);
             llOwnerSay("This Bottle is empty!");
-            llDetachFromAvatar();
             llDie();
+            llDetachFromAvatar();
         }
         else if ((_id != NULL_KEY) && (!isEmpty)){
             llRequestPermissions(llGetOwner(), PERMISSION_ATTACH | PERMISSION_TRIGGER_ANIMATION | PERMISSION_TAKE_CONTROLS);
