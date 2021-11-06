@@ -345,7 +345,6 @@ state KiljuReady
         llGetObjectDesc();
     }
 
-    
     dataserver(key requested, string data)
     {
         list savedList = llParseString2List(llGetObjectDesc(), [","], []);
