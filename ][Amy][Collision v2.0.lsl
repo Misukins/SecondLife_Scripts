@@ -289,11 +289,13 @@ default
             if (SoundsOn == TRUE){
                 if (random_chance()){
                     llPlaySound(sound_6, soundvolume);
+                    llSleep(1.0);
                     llSetTimerEvent(wait_till_next);
                     soundsOFF();
                 }
                 else{
                     llPlaySound(sound_7, soundvolume);
+                    llSleep(1.0);
                     llSetTimerEvent(wait_till_next);
                     soundsOFF();
                 }
