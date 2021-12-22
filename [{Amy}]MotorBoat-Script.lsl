@@ -2,7 +2,11 @@ key BoatStartSound  = "fdda899b-28fa-271f-ccb0-b3cc1c4d0ad6";
 key BoatIdleSound   = "42107f16-0281-7c31-0a26-8eff95202f51";
 key BoatRunSound    = "32ae0d2b-535e-e9e0-634d-a31514e12128";
 
+//1st Gear
 float forward_power = 15;
+//2nd Gear
+float VERTICAL_THRUST  = 10;
+
 float reverse_power = -5;
 float turning_ratio = 5.0;
 
@@ -57,7 +61,7 @@ default
                 if (agent != llGetOwner()){
                     llSay(0, not_owner_message);
                     llUnSit(agent);
-                    llPushObject(agent, <0,0,50>, ZERO_VECTOR, FALSE);
+                    llPushObject(agent, <0, 0, 50>, ZERO_VECTOR, FALSE);
                 }
                 else{
                     llTriggerSound(BoatStartSound, 1);
@@ -76,7 +80,7 @@ default
                 llMessageLinked(LINK_ALL_CHILDREN , 0, "stop", NULL_KEY);
                 llSleep(.4);
                 llReleaseControls();
-                llTargetOmega(<0,0,0>,PI,0);
+                llTargetOmega(<0, 0, 0>, PI, 0);
                 llResetScript();
             }
         }
@@ -93,17 +97,17 @@ default
 
     control(key id, integer level, integer edge)
     {
-        integer reverse=1;
+        integer reverse = 1;
         vector angular_motor;
         vector vel = llGetVel();
         float speed = llVecMag(vel);
         if(level & CONTROL_FWD){
             llLoopSound(BoatRunSound, 1);
-            llSetVehicleVectorParam(VEHICLE_LINEAR_MOTOR_DIRECTION, <-forward_power,0,0>);
-            reverse=1;
+            llSetVehicleVectorParam(VEHICLE_LINEAR_MOTOR_DIRECTION, <-forward_power, 0, 0>);
+            reverse = 1;
         }
         if(level & CONTROL_BACK){
-            llSetVehicleVectorParam(VEHICLE_LINEAR_MOTOR_DIRECTION, <-reverse_power,0,0>);
+            llSetVehicleVectorParam(VEHICLE_LINEAR_MOTOR_DIRECTION, <-reverse_power, 0, 0>);
             reverse = -1;
         }
         if(level & (CONTROL_RIGHT|CONTROL_ROT_RIGHT)){
@@ -113,6 +117,20 @@ default
         if(level & (CONTROL_LEFT|CONTROL_ROT_LEFT)){
             angular_motor.z += speed / turning_ratio * reverse;
             angular_motor.x -= 15;
+        }
+        if(level & CONTROL_UP) {
+            llSetVehicleVectorParam(VEHICLE_LINEAR_MOTOR_DIRECTION, <0, 0, VERTICAL_THRUST>);
+        }
+        else if(edge & CONTROL_UP) {
+            llSetVehicleVectorParam(VEHICLE_LINEAR_MOTOR_DIRECTION, <0, 0, 0>);
+        }
+        if(level & CONTROL_DOWN) {
+            llSetVehicleVectorParam(VEHICLE_LINEAR_MOTOR_DIRECTION, <0, 0, -VERTICAL_THRUST>);
+            llSay(0, "1st Gear.");
+        }
+        else if(edge & CONTROL_DOWN) {
+            llSetVehicleVectorParam(VEHICLE_LINEAR_MOTOR_DIRECTION, <0, 0, 0>);
+            llSay(0, "2nd Gear.");
         }
         llSetVehicleVectorParam(VEHICLE_ANGULAR_MOTOR_DIRECTION, angular_motor);
     }
