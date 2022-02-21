@@ -64,8 +64,14 @@ doMenu(key _id)
         main_admin_buttons =   [ "Open Lid", "Reset", "▼" ];
     }
     else{
+        main_buttons =         [ "Close Lid", "Help", "▼" ];
+        main_admin_buttons =   [ "Close Lid", "Help", "Reset", "▼" ];
+
+        //NOTE v1.0 thing
+        /*
         main_buttons =         [ "Close Lid", "Water", "Yeast", "Sugar", "Help", "▼" ];
         main_admin_buttons =   [ "Close Lid", "Water", "Yeast", "Sugar", "Help", "Reset", "▼" ];
+        */
     }
     list owner_name = llParseString2List(llGetDisplayName(llGetOwnerKey(llGetKey())), [""], []);
     list name = llParseString2List(llGetDisplayName(_id), [""], []);
@@ -172,11 +178,11 @@ addWater(key _id)
     }
     if(WATERcount < 6){
         WATERcount += 1;
-        llInstantMessage(_id, "You added some water. :: Total water: " + (string)WATERcount + ".");
+        llSay(0, "You added some water. :: Total water: " + (string)WATERcount + ".");
     }
     else
-        llInstantMessage(_id, "You tryed to add too much water, it would overfill.");
-        WATERcount = WATERcount++;
+        llSay(0, "You tryed to add too much water, it would overfill.");
+    WATERcount = WATERcount++;
 }
 
 addYeast(key _id)
@@ -184,10 +190,10 @@ addYeast(key _id)
     if(YEASTcount < 5){
         YEASTcount += 1;
         llSetLinkAlpha(_yeast, 1, ALL_SIDES);
-        llInstantMessage(_id, "You added some yeast. :: Total yeast: " + (string)YEASTcount + ".");
+        llSay(0, "You added some yeast. :: Total yeast: " + (string)YEASTcount + ".");
     }
     else
-        llInstantMessage(_id, "You tryed to add too much yeast.");
+        llSay(0, "You tryed to add too much yeast.");
     YEASTcount = YEASTcount++;
 }
 
@@ -196,10 +202,10 @@ addSugar(key _id)
     if(SUGARcount < 10){
         SUGARcount += 1;
         llSetLinkAlpha(_sugar, 1, ALL_SIDES);
-        llInstantMessage(_id, "You added some sugar. :: Total sugar: " + (string)SUGARcount + ".");
+        llSay(0, "You added some sugar. :: Total sugar: " + (string)SUGARcount + ".");
     }
     else
-        llInstantMessage(_id, "You tryed to add too much sugar.");
+        llSay(0, "You tryed to add too much sugar.");
     SUGARcount = SUGARcount++;
 }
 
@@ -252,7 +258,7 @@ default
 {
     state_entry()
     {
-        llListen(listenChannel, "", llGetOwner(), "");
+        llListen(listenChannel, "", "", "");
         llPreloadSound(lid_ON_Sound);
         llPreloadSound(lid_OFF_Sound);
         llPreloadSound(MakinngKilju_Sound);
@@ -272,25 +278,38 @@ default
 
     listen(integer _channel, string _name, key _id, string _message)
     {
-        if (_channel ==)
+        if (_channel == listenChannel){
+            if (_message == "Yeast"){
+                if (!LidON)
+                    addYeast(_id);
+                else{
+                    llSay(0, "Please open the lid first to add Yeast.");
+                    llSay(_chan, "REFILL_YEAST");
+                }
+            }
+            else if (_message == "Water"){
+                if (!LidON)
+                    addWater(_id);
+                else{
+                    llSay(0, "Please open the lid first to add Water.");
+                    llSay(_chan, "REFILL_WATER");
+                }
+            }
+            else if (_message == "Sugar"){
+                if (!LidON)
+                    addSugar(_id);
+                else{
+                    llSay(0, "Please open the lid first to add Sugar.");
+                    llSay(_chan, "REFILL_SUGAR");
+                }
+            }
+        }
         if (_message == "Open Lid"){
             lidOff();
             doMenu(_id);
         }
         else if (_message == "Close Lid"){
             lidOn();
-            doMenu(_id);
-        }
-        else if ((_message == "Water") && (!LidON)){
-            addWater(_id);
-            doMenu(_id);
-        }
-        else if ((_message == "Yeast") && (!LidON)){
-            addYeast(_id);
-            doMenu(_id);
-        }
-        else if ((_message == "Sugar") && (!LidON)){
-            addSugar(_id);
             doMenu(_id);
         }
         else if ((_message == "Finished") && (LidON) && (WATERadded == TRUE)){
