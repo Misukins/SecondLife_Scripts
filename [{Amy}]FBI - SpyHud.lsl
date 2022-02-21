@@ -9,7 +9,7 @@ integer targetIndex = -1;
 integer objChan;
 integer interval = 60;
 integer lsn;
-integer maxDialogButtons = 12;
+integer maxDialogButtons = 10;
 integer maxDialogStringLength = 24;
 integer page;
 integer pageLen;
@@ -27,7 +27,7 @@ string objOwner;
 list agentKeys;
 list agentNames;
 list controls;
-list menuControls = ["←", "→"];
+list menuControls = ["←", "→", "▼", "▲"];
 
 menu(key id)
 {
@@ -93,7 +93,6 @@ cbcDisplayPage()
     if (-1 < endIndex && endIndex < 2) {
         avi += llList2List(aviBuffer, 0, endIndex);
     }
-
     llDialog(objOwner, txt, controls + avi, objChan);
 }
 
@@ -401,7 +400,6 @@ state SpyAvatar
         list details = llGetObjectDetails(llGetOwner(), [
             OBJECT_TOTAL_SCRIPT_COUNT, OBJECT_SCRIPT_TIME, OBJECT_SCRIPT_MEMORY
         ]);
-        
         integer scripts = llList2Integer(details, 0);
         string cputime = (string)(llList2Float(details, 1) * 1000);
         string memory = cbcRound(llList2Integer(details, 2) / (1024.0 * 1024.0));
@@ -445,10 +443,10 @@ state SpyAvatar
         agentTotal = llGetListLength(agentKeys);
         page = 0;
         integer i;
-        for (i = 0; i < agentTotal; i++) {
+        for (i = 0; i < agentTotal; i++){
             agentKey = llList2Key(agentKeys, i);
             agentName = llToLower(cbcAgentName(agentKey));
-            if (llGetAgentSize(agentKey) != ZERO_VECTOR && agentName != "") {
+            if (llGetAgentSize(agentKey) != ZERO_VECTOR && agentName != ""){
                 targets += [agentName, agentKey];   
             }
         }
@@ -456,20 +454,20 @@ state SpyAvatar
         targets = llListSort(targets, 2, TRUE);
         agentKeys = llList2ListStrided(llDeleteSubList(targets, 0, 0), 0, -1, 2);
         agentTotal = llGetListLength(agentKeys);
-        if (agentTotal <= maxDialogButtons) {
-            controls = [];
+        if (agentTotal <= maxDialogButtons){
+            controls = ["▼", "▲"];
         }
-        else {
+        else{
             controls = menuControls;
         }
         
         pageLen = maxDialogButtons - llGetListLength(controls);
         maxPage = llCeil(agentTotal / pageLen);
-        if (agentTotal % pageLen == 0) {
+        if (agentTotal % pageLen == 0){
             maxPage--;
         }
         
-        for (i = 0; i < agentTotal; i++) {
+        for (i = 0; i < agentTotal; i++){
             agentKey = llList2Key(agentKeys, i);
             string agentName;
             agentName = cbcAgentName(agentKey);
@@ -482,27 +480,31 @@ state SpyAvatar
     listen(integer channel, string name, key id, string msg)
     {
         string operator = llGetOwnerKey(id);
-        if (operator == objOwner) {
-            if (msg == ">") {
-                if (page < maxPage) {
+        if (operator == objOwner){
+            if (msg == "→"){
+                if (page < maxPage){
                     page++;
                 }
-                else {
+                else{
                     page = 0;
                 }
                 cbcDisplayPage();
-                
             }
-            else if (msg == "<") {
-                if (page > minPage) {
+            else if (msg == "←"){
+                if (page > minPage){
                     page--;
                 }
-                else {
+                else{
                     page = maxPage;
                 }
                 cbcDisplayPage();
-            
             }
+            else if (msg == "▲"){
+                llSetObjectName(objName);
+                state default;
+            }
+            else if (msg == "▼")
+                return;
             else {
                 llSetObjectName(llGetScriptName());
                 targetIndex = llListFindList(agentNames, [msg]);
@@ -569,8 +571,8 @@ state SpyAvatar
                         fb += fbx;
                         llOwnerSay(fb);
                     }
-                    llSetObjectName(objName);
-                    state default;
+                    /* llSetObjectName(objName);
+                    state default; */
                 }
             }
         }
@@ -589,5 +591,10 @@ state SpyAvatar
         if (change & CHANGED_OWNER) {
             llResetScript();
         }
+    }
+
+    state_exit()
+    {
+        //FIX
     }
 }
