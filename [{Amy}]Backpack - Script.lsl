@@ -81,6 +81,8 @@ list listReplace(list _source, list _newEntry, integer _index){
     return llListInsertList(llDeleteSubList(_source,_index,_index), _newEntry, _index);
 }
 
+list textures_menu  = ["Red", "White", "Blue", "Pink", "Back", "▼"];
+
 string defaultNoteCard = "*Default Anims";
 string lastAnimState = "";
 string lastAnim = "";
@@ -89,6 +91,12 @@ string item;
 string itemnum;
 string message;
 string origName;
+
+//Textures
+string redTexture = "cc30d883-39bd-46c1-6617-1a0dc7c77a72";
+string whiteTexture = "be9b51a1-998a-bde0-20ad-c061c4d3f7ad";
+string blueTexture  = "84b1512c-43a6-9875-a75e-751191e46b43";
+string pinkTexture  = "13d9e138-edf5-e796-c3e6-a6ea28e1986a";
 
 addbutton(integer i, integer n)
 {
@@ -132,6 +140,13 @@ prepare_menu()
         addmessage(page * 3 * rows + k, n);
 }
 
+texturesmenu(key _id){
+    list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
+    channel = llFloor(llFrand(2000000));
+    listener = llListen(channel, "", _id, "");
+    llDialog(_id, "Hello " + (string)avatar_name + " Select a an option", textures_menu, channel);
+}
+
 drinksMenu(key _id)
 {
     prepare_menu();
@@ -145,9 +160,9 @@ drinksMenu(key _id)
 menu(key _id)
 {
     if(animOverrideOn)
-        main_buttons = [ "AO √", "Drinks", "▼" ];
+        main_buttons = [ "AO √", "Drinks", "Textures", "▼" ];
     else
-        main_buttons = [ "AO ×", "Drinks", "▼" ];
+        main_buttons = [ "AO ×", "Drinks", "Textures", "▼" ];
     list owner_name = llParseString2List(llGetDisplayName(llGetOwnerKey(llGetKey())), [""], []);
     list name = llParseString2List(llGetDisplayName(_id), [""], []);
     llListenRemove(listener);
@@ -349,6 +364,26 @@ default
             prepare_menu();
             llDialog(_id, message, buttons, channel);
         }
+        else if (msg == "Red"){
+            llSetLinkTexture(LINK_THIS, redTexture, ALL_SIDES);
+            texturesmenu(_id);
+        }
+        else if (msg == "White"){
+            llSetLinkTexture(LINK_THIS, whiteTexture, ALL_SIDES);
+            texturesmenu(_id);
+        }
+        else if (msg == "Blue"){
+            llSetLinkTexture(LINK_THIS, blueTexture, ALL_SIDES);
+            texturesmenu(_id);
+        }
+        else if (msg == "Pink"){
+            llSetLinkTexture(LINK_THIS, pinkTexture, ALL_SIDES);
+            texturesmenu(_id);
+        }
+        else if (msg == "Back")
+            menu(_id);
+        else if (msg == "Textures")
+            texturesmenu(_id);
         else if (msg == "♡ Stock ♡")
         {
             integer n = llGetInventoryNumber(INVENTORY_OBJECT);

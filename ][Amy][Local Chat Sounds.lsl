@@ -50,11 +50,11 @@ default
         }
     }
 
-    changed(integer change)
+    /*changed(integer change)
     {
         if(change & (CHANGED_OWNER | CHANGED_INVENTORY))
             llResetScript();
-    }
+    }*/
 
     timer()
     {

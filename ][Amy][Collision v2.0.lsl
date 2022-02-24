@@ -228,16 +228,16 @@ _WalkSoundOFF(){
 
 default
 {
-    on_rez(integer start_param)
+    /*on_rez(integer start_param)
     {
         llResetScript();
-    }
+    }*/
 
-    changed(integer change)
+    /*changed(integer change)
     {
         if(change & (CHANGED_OWNER | CHANGED_INVENTORY))
             llResetScript();
-    }
+    }*/
 
     state_entry()
     {

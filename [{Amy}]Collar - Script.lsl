@@ -27,6 +27,38 @@ integer ll_channel      = 665;
 integer adminChannel    = 1;
 integer adminChannel_Active = FALSE;
 
+key g_kWearer;
+integer g_iLastRank;
+integer g_bFollowMode;
+string g_sScript="leash_";
+integer POPUP_HELP          = 1001;
+integer LM_SETTING_SAVE             = 2000; // to have settings saved to httpdb
+integer LM_SETTING_REQUEST          = 2001; // send requests for settings on this channel
+integer LM_SETTING_RESPONSE         = 2002; // responses received on this channel
+integer LM_SETTING_DELETE           = 2003; // delete token from DB
+integer LM_SETTING_EMPTY            = 2004;
+vector g_vPos = ZERO_VECTOR;
+integer g_iTargetHandle;
+integer g_iLength = 3;
+string TOK_LENGTH   = "leashlength";
+string TOK_DEST     = "leashedto"; // format: uuid,rank
+list g_lOwners=[];
+integer RLV_CMD = 6000;
+integer g_iLeasherInRange=FALSE;
+integer g_iStrictModeOn=FALSE;
+integer COMMAND_EVERYONE    = 504;
+key g_kCmdGiver;
+integer COMMAND_OWNER       = 500;
+integer COMMAND_GROUP       = 502;
+integer COMMAND_WEARER      = 503;
+integer g_iRLVOn=FALSE;
+
+
+
+
+
+
+
 integer globalListenHandle  = -0;
 integer channel;
 integer listen_handle;
@@ -76,6 +108,8 @@ string targetName = "";
 string objectName = "(TEMP): Collar - Leash";
 string CTYPE = "collar";
 string g_sCheck;
+string g_sWearer;
+string g_sWearerFirstName;
 
 //TODO -START
 string g_sParticleTexture;
@@ -274,7 +308,6 @@ FindLinkedPrims()
 
 Particles(integer iLink, key id)
 {
-    /*
     if (id == NULLKEY){
         return;
     }
@@ -294,24 +327,20 @@ Particles(integer iLink, key id)
         PSYS_SRC_TEXTURE, g_sParticleTextureID
     ];
     llLinkParticleSystem(iLink, lTemp);
-    */
 }
 
 StartParticles(key id)
 {
-    /*
     for (g_iLoop = 0; g_iLoop < llGetListLength(g_lLeashPrims); g_iLoop = g_iLoop + 3){
         if ((integer)llList2String(g_lLeashPrims, g_iLoop + 2)){
             Particles((integer)llList2String(g_lLeashPrims, g_iLoop + 1), id);
         }
     }
     g_bLeashActive = TRUE;
-    */
 }
 
 StopParticles(integer iEnd)
 {
-    /*
     for (g_iLoop = 0; g_iLoop < llGetListLength(g_lLeashPrims); g_iLoop++){
         llLinkParticleSystem((integer)llList2String(g_lLeashPrims, g_iLoop + 1), []);
     }
@@ -322,11 +351,259 @@ StopParticles(integer iEnd)
         g_kParticleTarget = NULLKEY;
         llSensorRemove();
     }
-    */
+}
+
+Notify(key kID, string sMsg, integer iAlsoNotifyWearer){
+    if (kID == g_kWearer) {
+        llOwnerSay(sMsg);
+    } else {
+        llInstantMessage(kID, sMsg);
+        if (iAlsoNotifyWearer) {
+            llOwnerSay(sMsg);
+        }
+    }
+}
+
+integer CheckCommandAuth(key kCmdGiver, integer iAuth){
+    // Check for invalid auth
+    if (iAuth < COMMAND_OWNER && iAuth > COMMAND_WEARER) return FALSE;
+    
+    // If leashed, only move leash if Comm Giver outranks current leasher
+    if (g_kLeashedTo != NULL_KEY && iAuth > g_iLastRank){
+        Notify(kCmdGiver, "Sorry, someone who outranks you on " + g_sWearer +"'s " + CTYPE + " leashed " + g_sWearerFirstName + " already.", FALSE);
+        return FALSE;
+    }
+    return TRUE;
+}
+
+ApplyRestrictions(){
+    //Debug("Applying Restrictions");
+    if (g_iLeasherInRange){
+        if (g_iStrictModeOn){
+            if (g_iRLVOn){
+                if (g_kLeashedTo){
+                    //Debug("Setting restrictions");
+                    llMessageLinked(LINK_SET, RLV_CMD, "fartouch=n,sittp=n,tplm=n,tplure=n,tploc=n", NULL_KEY);     //set all restrictions
+                    return;
+                }
+            //} else {
+                //Debug("RLV is off");
+            }
+        //} else {
+            //Debug("Strict is off");
+        }
+    //} else {
+        //Debug("Leasher out of range");
+    }
+    //Debug("Releasing restrictions");
+    llMessageLinked(LINK_SET, RLV_CMD, "fartouch=y,sittp=y,tplm=y,tplure=y,tploc=y", NULL_KEY);     //release all restrictions
+}
+
+integer LeashTo(key kTarget, key kCmdGiver, integer iAuth, list lPoints, integer iFollowMode){
+    // can't leash wearer to self.
+    if (kTarget == g_kWearer) return FALSE;
+    
+    if (!CheckCommandAuth(kCmdGiver, g_iLastRank)){
+        return FALSE;
+    }
+    
+    if (g_kLeashedTo){
+        DoUnleash();
+    }
+    integer bCmdGiverIsAvi=llGetAgentSize(kCmdGiver) != ZERO_VECTOR;
+    integer bTargetIsAvi=llGetAgentSize(kTarget) != ZERO_VECTOR;
+
+    // Send notices to wearer, leasher, and target
+    // Only send notices if Leasher is an AV, as objects normally handle their own messages for such things
+    if (bCmdGiverIsAvi) {
+        string sTarget = llKey2Name(kTarget);
+        string sWearMess;
+        if (kCmdGiver == g_kWearer) {// Wearer is Leasher
+            if (iFollowMode){
+                sWearMess = "You begin following " + sTarget + ".";
+            } else {
+                //sCmdMess = ""; // Only one message will need to be sent
+                sWearMess = "You take your leash";
+                if (bTargetIsAvi) { // leashing self to someone else
+                    sWearMess += ", and hand it to " + sTarget + ".";
+                } else { // leashing self to an object
+                    sWearMess += ", and tie it to " + sTarget + ".";
+                }
+            }
+        } else {// Leasher is not Wearer
+            string sCmdMess;
+            if (iFollowMode){
+                if (kCmdGiver != kTarget) { // LeashTo someone else
+                    Notify(kTarget, llKey2Name(kCmdGiver) + " commands " + g_sWearer + " to follow you.", FALSE);
+                    sCmdMess= "You command " + g_sWearer + " to follow " + sTarget + ".";
+                    sWearMess = llKey2Name(kCmdGiver) + " commands you to follow " + sTarget + ".";
+                } else {
+                    sCmdMess= "You command " + g_sWearer + " to follow you.";
+                    sWearMess = llKey2Name(kCmdGiver) + " commands you to follow them.";
+                }
+            } else {
+                string sPsv = "'s"; // Possessive, will vary if name ends in "s"
+                if (llGetSubString(g_sWearer, -1,-1)=="s") sPsv = "'";
+                sCmdMess= "You grab " + g_sWearer + sPsv + " leash";
+                sWearMess = llKey2Name(kCmdGiver) + " grabs your leash";
+                if (kCmdGiver != kTarget) { // Leasher is not LeashTo
+                    if (bTargetIsAvi) { // LeashTo someone else
+                        sCmdMess += ", and hand it to " + sTarget + ".";
+                        sWearMess += ", and hands it to " + sTarget + ".";
+                        Notify(kTarget, llKey2Name(kCmdGiver) + " hands you " + g_sWearer + sPsv + " leash.", FALSE);
+                    } else {// LeashTo object
+                        sCmdMess += ", and tie it to " + sTarget + ".";
+                        sWearMess += ", and ties it to " + sTarget + ".";
+                    }
+                }
+            }
+            Notify(kCmdGiver, sCmdMess, FALSE);
+        }
+        Notify(g_kWearer, sWearMess, FALSE);
+    }
+
+    g_bFollowMode = iFollowMode; // leashing, or following
+    if (bTargetIsAvi) g_bLeashedToAvi = TRUE;
+    DoLeash(kTarget, iAuth, lPoints);
+    
+    // Notify Target how to unleash, only if:
+    // Avatar
+    // Didn't send the command
+    // Don't own the object that sent the command
+    if (g_bLeashedToAvi && kCmdGiver != kTarget && llGetOwnerKey(kCmdGiver) != kTarget) {
+        if (iFollowMode){
+            llMessageLinked(LINK_SET, POPUP_HELP, g_sWearer + " has been commanded to follow you.  Say \"_PREFIX_unfollow\" to relase them.", g_kLeashedTo);
+        } else {
+            llMessageLinked(LINK_SET, POPUP_HELP, g_sWearer + " has been leashed to you.  Say \"_PREFIX_unleash\" to unleash them.  Say \"_PREFIX_giveholder\" to get a leash holder.", g_kLeashedTo);
+        }
+    }
+    return TRUE;
+}
+
+DoLeash(key kTarget, integer iAuth, list lPoints){
+    g_iLastRank = iAuth;
+    g_kLeashedTo = kTarget;
+
+    if (g_bFollowMode) {
+        llMessageLinked(LINK_THIS, Use_Particles, "unleash", g_kLeashedTo);
+    } else {
+        integer iPointCount = llGetListLength(lPoints);
+        g_sCheck = "";  
+        if (iPointCount) {//if more than one leashpoint, listen for all strings, else listen just for that point
+            if (iPointCount == 1) g_sCheck = (string)llGetOwnerKey(kTarget) + llList2String(lPoints, 0) + " ok";
+        }
+        //Send link message to the particle script
+        //Debug("leashing with "+g_sCheck);
+        llMessageLinked(LINK_THIS, Use_Particles, "leash" + g_sCheck + "|" + (string)g_bLeashedToAvi, g_kLeashedTo);
+        llSetTimerEvent(3.0);   //check for leasher out of range
+    }
+
+    // change to llTarget events by Lulu Pink 
+    g_vPos = llList2Vector(llGetObjectDetails(g_kLeashedTo, [OBJECT_POS]), 0);
+    //to prevent multiple target events and llMoveToTargets
+    llTargetRemove(g_iTargetHandle);
+    llStopMoveToTarget();
+    g_iTargetHandle = llTarget(g_vPos, (float)g_iLength);
+    if (g_vPos != ZERO_VECTOR) {
+        llMoveToTarget(g_vPos, 0.7);
+    }
+    llMessageLinked(LINK_SET, LM_SETTING_SAVE, g_sScript + TOK_DEST + "=" + (string)kTarget + "," + (string)iAuth + "," + (string)g_bLeashedToAvi + "," + (string)g_bFollowMode, "");
+    if (! ~llListFindList(g_lOwners,[g_kLeashedTo])) {
+        llMessageLinked(LINK_SET, RLV_CMD, "tplure:" + (string) g_kLeashedTo + "=add", NULL_KEY);
+    }
+    g_iLeasherInRange=TRUE;
+    ApplyRestrictions();
+}
+
+// Wrapper for DoUnleash()
+Unleash(key kCmdGiver)
+{
+    string sTarget = llKey2Name(g_kLeashedTo);
+    if ( (key)g_kLeashedTo ){
+        string sCmdGiver = llKey2Name(kCmdGiver);
+        string sWearMess;
+        string sCmdMess;
+        string sTargetMess;
+        
+        integer bCmdGiverIsAvi=llGetAgentSize(kCmdGiver) != ZERO_VECTOR;
+    
+        if (bCmdGiverIsAvi) {
+            if (kCmdGiver == g_kWearer) // Wearer is Leasher
+            {
+                if (g_bFollowMode) {
+                    sWearMess = "You stop following " + sTarget + ".";
+                    sTargetMess = g_sWearerFirstName + " stops following you.";
+                } else {
+                    sWearMess = "You unleash yourself from " + sTarget + "."; // sTarget might be an object
+                    sTargetMess = g_sWearerFirstName + " unleashes from you.";
+                }
+                if (g_bLeashedToAvi) Notify(g_kLeashedTo, sTargetMess, FALSE);
+            } else { // Unleasher is not Wearer
+                if (kCmdGiver == g_kLeashedTo) {
+                    if (g_bFollowMode) {
+                        sCmdMess= "You release " + g_sWearerFirstName + " from following you.";
+                        sWearMess = sCmdGiver + " releases you from following.";
+                    } else {
+                        sCmdMess= "You unleash  " + g_sWearer + ".";
+                        sWearMess = sCmdGiver + " unleashes you.";
+                    }
+                } else {
+                    if (g_bFollowMode) {
+                        sCmdMess= "You release " + g_sWearerFirstName + " from following " + sTarget + ".";
+                        sWearMess = sCmdGiver + " releases you from following " + sTarget + ".";
+                        sTargetMess = g_sWearer + " stops following you.";
+                    } else {
+                        sCmdMess= "You unleash  " + g_sWearerFirstName + " from " + sTarget + ".";
+                        sWearMess = sCmdGiver + " unleashes you from " + sTarget + ".";
+                        sTargetMess = sCmdGiver + " unleashes " + g_sWearerFirstName + " from you.";
+                    }
+                    if (g_bLeashedToAvi) Notify(g_kLeashedTo, sTargetMess, FALSE);
+                }
+                Notify(kCmdGiver, sCmdMess, FALSE);
+            }
+            Notify(g_kWearer, sWearMess, FALSE);
+        }
+        DoUnleash();
+    } else {
+        Notify(kCmdGiver, g_sWearerFirstName+" is not leashed", FALSE);
+    }
+}
+
+DoUnleash(){
+    llTargetRemove(g_iTargetHandle);
+    llStopMoveToTarget();
+    llMessageLinked(LINK_SET, Use_Particles, "unleash", g_kLeashedTo);
+    if (g_iStrictModeOn){
+        //Debug("Unleashing a Real leash");
+        if (! ~llListFindList(g_lOwners,[g_kLeashedTo]) ){ //if not in owner list
+            //Debug("leash holder ("+(string)g_kLeashedTo+")is not an owner");
+            llMessageLinked(LINK_SET, RLV_CMD, "tplure:" + (string) g_kLeashedTo + "=rem", NULL_KEY);
+        } else {
+            //Debug("leash holder is an owner");
+        }
+    }
+    g_kLeashedTo = NULL_KEY;
+    g_iLastRank = COMMAND_EVERYONE;
+    llMessageLinked(LINK_SET, LM_SETTING_DELETE, g_sScript + TOK_DEST, "");
+    llSetTimerEvent(0.0);   //stop checking for leasher out of range
+    g_iLeasherInRange=FALSE;
+
+    ApplyRestrictions();
+}
+
+YankTo(key kIn){
+    llMoveToTarget(llList2Vector(llGetObjectDetails(kIn, [OBJECT_POS]), 0), 0.5);
+    llSleep(2.0);
+    llStopMoveToTarget();    
 }
 
 default
 {
+    /*on_rez(integer s)
+    {
+        llResetScript();
+    }*/
+
     state_entry()
     {
         init();
@@ -425,15 +702,16 @@ default
             else if ((message == "Leash") || (message == "Unleash")){
                 if(leshedON){
                     llInstantMessage(id, (string)owner + " is no longer following you.");
-                    llMessageLinked(LINK_ALL_OTHERS, Use_Particles, "leash|" + (string)g_kParticleTarget, g_kLeashedTo);
+                    //llMessageLinked(LINK_ALL_OTHERS, Use_Particles, "leash|" + (string)g_kParticleTarget, g_kLeashedTo);
+                    LeashTo(targetKey, id, iAuth, ["handle"], FALSE);
 
-                    //llMessageLinked(LINK_THIS, Use_Particles, "leash" + g_sCheck + "|" + (string)g_bLeashedToAvi, g_kLeashedTo);
+                    llMessageLinked(LINK_THIS, Use_Particles, "leash" + g_sCheck + "|" + (string)g_bLeashedToAvi, g_kLeashedTo);
                     stopFollowing();
                     StopParticles(TRUE);
                 }
                 else{
                     llInstantMessage(id, (string)owner + " is now following you.");
-                    llMessageLinked(LINK_ALL_OTHERS, Use_Particles, "unleash", g_kLeashedTo);
+                    llMessageLinked(LINK_THIS, Use_Particles, "unleash", g_kLeashedTo);
                     startFollowingKey(id);
                     StartParticles(g_kParticleTarget);
                 }
@@ -531,18 +809,13 @@ default
     {
         if (_id != NULL_KEY){
             llRequestPermissions(llGetOwner(), PERMISSION_ATTACH | PERMISSION_TAKE_CONTROLS);
-            dumpAccessList();
         }
     }
 
     changed(integer change)
     {
-        if (change & CHANGED_OWNER)
-            llResetScript();
-
         if (change & CHANGED_TELEPORT){
             //TODO ---
-            llOwnerSay("[INFO]: This is temp.. after TP :P");
         }
         if(llGetInventoryNumber(INVENTORY_SOUND) > 0)
             asLoadSounds();
