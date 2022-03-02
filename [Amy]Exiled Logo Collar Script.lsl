@@ -26,12 +26,13 @@ default
         llSetTimerEvent(2.0);
     }
 
-    attach(key kAttached)
+    /* attach(key kAttached)
     {
         if (kAttached == NULL_KEY)
             llSay(g_iMychannel, (string)llGetOwner() + "handle detached");
-    }
+    } */
 
+    /*
     changed(integer change)
     {
         if (change & CHANGED_TELEPORT){
@@ -39,6 +40,7 @@ default
             llSetTimerEvent(2.0);
         }
     }
+    */
     
     timer()
     {

@@ -24,7 +24,6 @@ integer leshedON        = FALSE;
 integer announced       = FALSE;
 integer g_bLeashedToAvi;
 integer ll_channel      = 665;
-integer COLLAR_FACE     = 1;
 
 integer globalListenHandle  = -0;
 integer channel;
@@ -66,9 +65,8 @@ string sound_7 = "5c6dd6bc-1675-c57e-0847-5144e5611ef9";
 string sound_8 = "1dc1e689-3fd8-13c5-b57f-3fedd06b827a";
 */
 
-//TODO ~ more textures
-string blackTexture = "9af0ef91-122c-d867-d066-81c7929cdb40";
-string whiteTexture = "6b2ffa5f-dc71-c551-c9eb-9ce636c7ef84";
+string blackTexture = "790203ff-6b4f-c15c-70fc-1e95142e7225";
+string whiteTexture = "9c6e07c4-52cb-be8f-9ba3-ccfef92ebe7f";
 
 string API_Start_Sound;
 string API_Stop_Sound;
@@ -181,8 +179,7 @@ LMSay(){
 init(){
     FindLinkedPrims();
     StopParticles(TRUE);
-    //llListen(COMMAND_PARTICLE,"","","");
-    llListen(LOCKMEISTER,"","","");
+    llListen(COMMAND_PARTICLE,"","","");
     llParticleSystem([]);
 }
 
@@ -391,15 +388,15 @@ default
         else if ((message == "Leash") || (message == "Unleash")){
             if(leshedON){
                 llInstantMessage(id, (string)owner + " is no longer following you.");
-                //llShout(LOCKMEISTER, "leash");
+                llMessageLinked(LINK_ALL_OTHERS, COMMAND_PARTICLE, "leash|" + (string)g_kParticleTarget, g_kLeashedTo);
                 stopFollowing(id);
-                //StopParticles(TRUE);
+                StopParticles(TRUE);
             }
             else{
                 llInstantMessage(id, (string)owner + " is now following you.");
-                //llShout(LOCKMEISTER, "unleash");
+                llMessageLinked(LINK_ALL_OTHERS, COMMAND_PARTICLE, "unleash", g_kLeashedTo);
                 startFollowingKey(id);
-                //StartParticles(g_kParticleTarget);
+                StartParticles(g_kParticleTarget);
             }
             leshedON = !leshedON;
         }
@@ -421,11 +418,11 @@ default
         else if (message == "Back")
             ownermenu(id);
         else if (message == "Black"){
-            llSetLinkTexture(LINK_THIS, blackTexture, COLLAR_FACE);
+            llSetLinkTexture(LINK_THIS, blackTexture, ALL_SIDES);
             texturesmenu(id);
         }
         else if (message == "White"){
-            llSetLinkTexture(LINK_THIS, whiteTexture, COLLAR_FACE);
+            llSetLinkTexture(LINK_THIS, whiteTexture, ALL_SIDES);
             texturesmenu(id);
         }
         else if (message == "Users")
@@ -486,7 +483,6 @@ default
     {
         if (_id != NULL_KEY){
             llRequestPermissions(llGetOwner(), PERMISSION_ATTACH | PERMISSION_TAKE_CONTROLS);
-            llAttachToAvatar(ATTACH_NECK);
             dumpAccessList();
         }
     }

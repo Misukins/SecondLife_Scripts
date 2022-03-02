@@ -80,14 +80,16 @@ init()
   lh = llListen(CHANNEL,"",llGetOwner(),"");
 }
 
-stopFollowing()
+stopFollowing(string name)
 {
   string origName = llGetObjectName();
+  targetName = name;
   llTargetRemove(tid);
   llStopMoveToTarget();
   llSetTimerEvent(0.0);
   llSetObjectName(objectName);
   llOwnerSay("No longer following.");
+  llInstantMessage(targetKey, "secondlife:///app/agent/" + (string)name + "/about is no longer following you.");
   llSetObjectName(origName);
 }
 
@@ -173,7 +175,7 @@ default
   listen(integer c,string n,key id,string msg)
   {
     if (msg == "off")
-      stopFollowing();
+      stopFollowing(id);
     else if (msg == "follow"){
       if (id == llGetOwner())
         state Scan;
@@ -273,7 +275,7 @@ state Dialog
     key id = llDetectedKey(0);
     if (id == llGetOwner()){
       if (followOn == TRUE)
-        stopFollowing();
+        stopFollowing(id);
         reset();
         state default;
     }
@@ -293,8 +295,6 @@ state Dialog
         llSetLinkColor(LINK_THIS, _greenState, ALL_SIDES);
         if(followOn)
           llInstantMessage(targetKey, "secondlife:///app/agent/" + (string)id + "/about is now following you.");
-        else
-          llInstantMessage(targetKey, "secondlife:///app/agent/" + (string)id + "/about is no longer following you.");
       }
       else if(message == "▼"){
         reset();
@@ -303,7 +303,7 @@ state Dialog
     }
 
     if (message == "off"){
-      stopFollowing();
+      stopFollowing(id);
       reset();
       state default;
     }

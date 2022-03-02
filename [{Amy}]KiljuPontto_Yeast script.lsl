@@ -1,22 +1,13 @@
-/*
-TODO 
-Amy: countdown from 5 uses then its empty?
-
-Kenzi: Now it's one time use.. its way too fast lol so FIX it bitch ASAP!
-Kenzi: Add safety net when rezzed.. just delete it or do NO-COPY
-
-Amy: ok so NO-MOD NO-COPY ok
-*/
-
 key _id;
 key toucher;
 
-integer _chan           = -64849782;
-integer chan;
-integer hand;
+integer listenChannel   = -64849782;
 integer DEBUG           = FALSE;
 integer isEmpty         = FALSE;
-integer YEAST_count     = 5;
+integer LidON           = TRUE;
+integer YEAST_count     = 1;
+integer chan;
+integer hand;
 
 string objectname;
 string EmptyName        = "Yeast Box (empty)";
@@ -40,43 +31,36 @@ GiveMenu(key _id)
 
 Init(key _id)
 {
-    llListen(_chan, "", "", "");
+    llListen(listenChannel, "", "", "");
     GiveMenu(_id);   
 }
 
 default
 {
-    state_entry()
-    {
-        //NADA
-    }
-
     attach(key _id)
     {
-        if((_id != NULL_KEY) && (isEmpty)){
+        if((_id == NULL_KEY) && (!isEmpty))
+            llSay(listenChannel, "isNotOpen");
+        else if((_id == NULL_KEY) && (isEmpty)){
+            llSay(listenChannel, "isNotOpen");
             llSetObjectName(EmptyName);
             llSetPrimitiveParams([PRIM_NAME, EmptyName]);
             llOwnerSay("Yeast Box is empty!");
+        }
+        else if((_id != NULL_KEY) && (isEmpty)){
+            llSetObjectName(EmptyName);
+            llSetPrimitiveParams([PRIM_NAME, EmptyName]);
+            llOwnerSay("Yeast Box is empty!");
+            llSay(listenChannel, "isNotOpen");
             llDetachFromAvatar();
-            llDie();
         }
         else if ((_id != NULL_KEY) && (!isEmpty)){
             llRequestPermissions(llGetOwner(), PERMISSION_ATTACH);
             Init(_id);
+            llSay(listenChannel, "isOpen");
             if (DEBUG)
                 llOwnerSay("DEBUG :: Channel -64849782: Attached!");
         }
-    }
-
-    /* FAIL SAFE FOR THE LAG*/
-    touch_start(integer total_number)
-    {
-        _id = llGetOwner();
-        toucher = llDetectedKey(0);
-        if(_id == toucher)
-            GiveMenu(_id);
-        else
-            return;
     }
 
     run_time_permissions(integer perm)
@@ -88,20 +72,17 @@ default
                 llSetPrimitiveParams([PRIM_NAME, EmptyName]);
                 llOwnerSay("Yeast Box is empty!");
                 llDetachFromAvatar();
-                llDie();
             }
         }
-        else{
+        else
             llDetachFromAvatar();
-            llDie();
-        }
     }
 
     listen(integer _channel, string _name, key _id, string _message)
     {
-        if (_channel == _chan){
+        if (_channel == listenChannel){
             if (_message == "REFILL_YEAST"){
-                if(YEAST_count < 5)
+                if(YEAST_count < 1)
                     YEAST_count += 1;
                 else
                     return;
@@ -109,19 +90,19 @@ default
             }
         }
         if (_message == "Add Yeast"){
-            if(YEAST_count == 0){
+            if(YEAST_count < 1){
                 objectname = llGetObjectName();
                 llOwnerSay("Yeast Box is empty!");
                 isEmpty = TRUE;
                 llSetObjectName(EmptyName);
                 llSetPrimitiveParams([PRIM_NAME, EmptyName]);
+                llRemoveInventory(llGetScriptName());
                 llDetachFromAvatar();
-                llDie();
             }
             else{
                 YEAST_count -= 1;
                 llSay(0, "You added some yeast. :: Total yeast: " + (string)YEAST_count + ".");
-                llSay(_chan, "Yeast");
+                llSay(listenChannel, "Yeast");
                 GiveMenu(_id);
             }
             if (DEBUG)

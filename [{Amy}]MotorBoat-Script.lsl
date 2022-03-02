@@ -106,7 +106,10 @@ default
             llSetVehicleVectorParam(VEHICLE_LINEAR_MOTOR_DIRECTION, <-forward_power, 0, 0>);
             reverse = 1;
         }
+        else
+            llLoopSound(BoatIdleSound, 1);
         if(level & CONTROL_BACK){
+            llLoopSound(BoatIdleSound, 1);
             llSetVehicleVectorParam(VEHICLE_LINEAR_MOTOR_DIRECTION, <-reverse_power, 0, 0>);
             reverse = -1;
         }

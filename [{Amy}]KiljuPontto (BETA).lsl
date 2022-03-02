@@ -284,7 +284,7 @@ default
                     addYeast(_id);
                 else{
                     llSay(0, "Please open the lid first to add Yeast.");
-                    llSay(_chan, "REFILL_YEAST");
+                    llSay(listenChannel, "REFILL_YEAST");
                 }
             }
             else if (_message == "Water"){
@@ -292,7 +292,7 @@ default
                     addWater(_id);
                 else{
                     llSay(0, "Please open the lid first to add Water.");
-                    llSay(_chan, "REFILL_WATER");
+                    llSay(listenChannel, "REFILL_WATER");
                 }
             }
             else if (_message == "Sugar"){
@@ -300,9 +300,13 @@ default
                     addSugar(_id);
                 else{
                     llSay(0, "Please open the lid first to add Sugar.");
-                    llSay(_chan, "REFILL_SUGAR");
+                    llSay(listenChannel, "REFILL_SUGAR");
                 }
             }
+            else if (_message == "isOpen")
+                lidOff();
+            else if (_message == "isNotOpen")
+                lidOn();
         }
         if (_message == "Open Lid"){
             lidOff();
