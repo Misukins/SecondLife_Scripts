@@ -31,8 +31,9 @@ integer announced       = FALSE;
 integer g_bLeashedToAvi;
 integer ll_channel      = 665;
 integer COLLAR_FACE     = 1;
-integer dlgHandle = -1;
+integer dlgHandle       = -1;
 integer dlgChannel;
+integer ParticlesON     = TRUE;
 
 integer globalListenHandle  = -0;
 integer channel;
@@ -52,12 +53,13 @@ integer listenChannel = 1;
 
 list g_lLeashPrims;
 list main_menu;
-//list sounds_menu    = [ "Bell 1", "←", "▼"];
-list textures_menu  = ["Black", "White", "←", "▼"];
-list users_menu     = ["Add", "Remove", "List", "←", "▼"];
-list accessList     = [];
-list avatarList     = [];
-list avatarUUIDs    = [];
+//list sounds_menu      = [ "Bell 1", "←", "▼"];
+list textures_menu      = ["Black", "White", "Brown", "Red", "←", "▼"];
+list users_menu         = ["Add", "Remove", "List", "←", "▼"];
+list particle_menu      = [];
+list accessList         = [];
+list avatarList         = [];
+list avatarUUIDs        = [];
 /* //NOTE Coming soon.. (walk sounds) with on/off option
 string Default_Start_Walking_Sound = "";
 string Default_Walking_Sound = "";
@@ -77,8 +79,10 @@ string sound_8 = "1dc1e689-3fd8-13c5-b57f-3fedd06b827a";
 */
 
 //TODO ~ more textures
-string blackTexture = "9af0ef91-122c-d867-d066-81c7929cdb40";
-string whiteTexture = "6b2ffa5f-dc71-c551-c9eb-9ce636c7ef84";
+string blackTexture = "9af0ef91-122c-d867-d066-81c7929cdb40"; //Black
+string whiteTexture = "6b2ffa5f-dc71-c551-c9eb-9ce636c7ef84"; //White
+string brownTexture = "1d32a1d4-538c-a1fe-1d9f-33a95867e060"; // Brown
+string redTexture = "ed55e038-2e2d-4372-d0c8-a1ce50e74b81"; // Red
 
 string API_Start_Sound;
 string API_Stop_Sound;
@@ -87,17 +91,8 @@ string objectName = "(TEMP): Collar - Leash";
 string CTYPE = "collar";
 string g_sCheck;
 string desc_    = "(c)Amy (meljonna Resident) -";
-
-//TODO -START
 string g_sParticleTexture;
 string g_sParticleTextureID = "9a342cda-d62a-ae1f-fc32-a77a24a85d73";
-
-/*
-9a342cda-d62a-ae1f-fc32-a77a24a85d73 //Rope UUID
-4cde01ac-4279-2742-71e1-47ff81cc3529 //Chain UUID
-bd7d7770-39c2-d4c8-e371-0342ecf20921 //Transparent UUID
-*/
-//TODO -END
 
 vector g_vLeashColor    = <1,1,1>;
 vector g_vLeashSize     = <0.07, 0.07, 1.0>;
@@ -139,9 +134,9 @@ menu(key _id){
 
 ownermenu(key _id){
     if(!WalkingSound)
-        main_menu = ["On", "Textures", "Users", "Reset", "▼"];
+        main_menu = ["On", "Textures", "Particle", "Users", "Reset", "▼"];
     else
-        main_menu = ["Off", "Textures", "Users", "Reset", "▼"];
+        main_menu = ["Off", "Textures", "Particle", "Users", "Reset", "▼"];
     list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", _id, "");
@@ -160,6 +155,17 @@ usersmenu(key _id){
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", _id, "");
     llDialog(_id, "Hello " + (string)avatar_name + " Select a an option", users_menu, channel);
+}
+
+particlesmenu(key _id){
+    if (!ParticlesON)
+        particle_menu = ["▫Particles", "▼"];
+    else
+        particle_menu = ["▪Particles", "▼"];
+    list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
+    channel = llFloor(llFrand(2000000));
+    listen_handle = llListen(channel, "", _id, "");
+    llDialog(_id, "Hello " + (string)avatar_name + " Select a an option", particle_menu, channel);
 }
 
 dumpAccessList(){
@@ -377,7 +383,7 @@ default
         else if ((message == "Leash") || (message == "Unleash")){
             if(leshedON){
                 llInstantMessage(id, (string)owner + " is no longer following you.");
-                //llShout(LOCKMEISTER, "leash");
+                llShout(LOCKMEISTER, "leash");
                 llMessageLinked(LINK_ROOT, COMMAND_PARTICLE, "unleash", g_kLeashedTo);
                 stopFollowing(id);
                 StopParticles(TRUE);
@@ -385,10 +391,11 @@ default
             }
             else{
                 llInstantMessage(id, (string)owner + " is now following you.");
-                //llShout(LOCKMEISTER, "unleash");
+                llShout(LOCKMEISTER, "unleash");
                 llMessageLinked(LINK_ROOT, COMMAND_PARTICLE, "leash" + g_sCheck + "|" + (string)g_bLeashedToAvi, g_kLeashedTo);
                 startFollowingKey(id);
-                StartParticles(g_kParticleTarget);
+                if(ParticlesON)
+                    StartParticles(g_kParticleTarget);
                 llSetObjectDesc("Following - " + (string)id + llKey2Name(id) + ".");
             }
             leshedON = !leshedON;
@@ -418,8 +425,19 @@ default
             llSetLinkTexture(LINK_THIS, whiteTexture, COLLAR_FACE);
             texturesmenu(id);
         }
+        else if (message == "Brown"){
+            llSetLinkTexture(LINK_THIS, brownTexture, COLLAR_FACE);
+            texturesmenu(id);
+        }
+        else if (message == "Red"){
+            llSetLinkTexture(LINK_THIS, redTexture, COLLAR_FACE);
+            texturesmenu(id);
+        }
         else if (message == "Users"){
             usersmenu(id);
+        }
+        else if (message == "Particle"){
+            particlesmenu(id);
         }
         else if (message == "List"){
             dumpAccessList();
@@ -434,6 +452,22 @@ default
             ownermenu(id);
         else if (message == "Reset")
             llResetScript();
+        else if((message == "▫Particles") || (message == "▪Particles")){
+            if(!ParticlesON){
+                llOwnerSay("Leash particles are now on..");
+                ParticlesON = TRUE;
+                StartParticles(g_kParticleTarget);
+                ownermenu(id);
+            }
+            else{
+                llOwnerSay("Leash particles are now Off..");
+                ParticlesON = FALSE;
+                StopParticles(TRUE);
+                llParticleSystem([]);
+                ownermenu(id);
+            }
+            !ParticlesON = ParticlesON;
+        }
     }
 
     link_message(integer iSenderPrim, integer iNum, string sMessage, key kMessageID)
@@ -453,7 +487,8 @@ default
                 if (!g_bInvisibleLeash){
                     integer bLeasherIsAv = (integer)llList2String(llParseString2List(sMessage, ["|"], [""]), 1);
                     g_kParticleTarget = g_kLeashedTo;
-                    StartParticles(g_kLeashedTo);
+                    if(ParticlesON)
+                        StartParticles(g_kLeashedTo);
                     if (bLeasherIsAv){
                         llListenRemove(g_iLMListener);
                         llListenRemove(g_iLMListernerDetach);
