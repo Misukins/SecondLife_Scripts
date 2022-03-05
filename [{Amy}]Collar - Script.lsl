@@ -1,3 +1,9 @@
+/* 
+
+so far so good.. still alot work
+
+*/
+
 key targetKey           = NULL_KEY;
 key NULLKEY             = "";
 key g_kLeashedTo        = ""; //NULLKEY;
@@ -25,6 +31,8 @@ integer announced       = FALSE;
 integer g_bLeashedToAvi;
 integer ll_channel      = 665;
 integer COLLAR_FACE     = 1;
+integer dlgHandle = -1;
+integer dlgChannel;
 
 integer globalListenHandle  = -0;
 integer channel;
@@ -40,14 +48,16 @@ integer g_bParticleGlow = TRUE;
 integer g_bInvisibleLeash = FALSE;
 integer COMMAND_PARTICLE = 20000;
 integer LOCKMEISTER = -8888;
+integer listenChannel = 1;
 
 list g_lLeashPrims;
 list main_menu;
-//list sounds_menu    = [ "Bell 1", "Back", "▼"];
-list textures_menu  = ["Black", "White", "Back", "▼"];
-//list users_menu     = ["Add", "Remove", "List", "Clear", "Back", "▼"];
+//list sounds_menu    = [ "Bell 1", "←", "▼"];
+list textures_menu  = ["Black", "White", "←", "▼"];
+list users_menu     = ["Add", "Remove", "List", "←", "▼"];
 list accessList     = [];
-
+list avatarList     = [];
+list avatarUUIDs    = [];
 /* //NOTE Coming soon.. (walk sounds) with on/off option
 string Default_Start_Walking_Sound = "";
 string Default_Walking_Sound = "";
@@ -76,6 +86,7 @@ string targetName = "";
 string objectName = "(TEMP): Collar - Leash";
 string CTYPE = "collar";
 string g_sCheck;
+string desc_    = "(c)Amy (meljonna Resident) -";
 
 //TODO -START
 string g_sParticleTexture;
@@ -110,6 +121,11 @@ CheckMemory(){
     llOwnerSay((string)free_memory + " bytes of free memory available for allocation.");
 }
 
+Cleanup(){
+    llListenRemove(dlgHandle);
+    dlgHandle = -1;
+}
+
 menu(key _id){
     if (!leshedON)
         main_menu = ["Leash", "▼"];
@@ -123,9 +139,9 @@ menu(key _id){
 
 ownermenu(key _id){
     if(!WalkingSound)
-        main_menu = ["On", "Textures", "Users", "List", "Reset", "▼"];
+        main_menu = ["On", "Textures", "Users", "Reset", "▼"];
     else
-        main_menu = ["Off", "Textures", "Users", "List", "Reset", "▼"];
+        main_menu = ["Off", "Textures", "Users", "Reset", "▼"];
     list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", _id, "");
@@ -143,11 +159,11 @@ usersmenu(key _id){
     list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", _id, "");
-    llDialog(_id, "Hello " + (string)avatar_name + " Select a an option", textures_menu, channel);
+    llDialog(_id, "Hello " + (string)avatar_name + " Select a an option", users_menu, channel);
 }
 
 dumpAccessList(){
-    llOwnerSay("current access list:\n" + llDumpList2String(accessList, ",\n"));
+    llOwnerSay("current access list:" + llDumpList2String(accessList, ", "));
 }
 
 asLoadSounds(){
@@ -179,9 +195,7 @@ LMSay(){
 }
 
 init(){
-    FindLinkedPrims();
     StopParticles(TRUE);
-    //llListen(COMMAND_PARTICLE,"","","");
     llListen(LOCKMEISTER,"","","");
     llParticleSystem([]);
 }
@@ -245,36 +259,6 @@ debug(string sText){
     llOwnerSay(llGetScriptName() + " DEBUG: " + sText);
 }
 
-FindLinkedPrims()
-{
-    integer linkcount = llGetNumberOfPrims();
-    for (g_iLoop = 2; g_iLoop <= linkcount; g_iLoop++)
-    {
-        string sPrimDesc = (string)llGetObjectDetails(llGetLinkKey(g_iLoop), [OBJECT_DESC]);
-        list lTemp = llParseString2List(sPrimDesc, ["~"], []);
-        integer iLoop;
-        for (iLoop = 0; iLoop < llGetListLength(lTemp); iLoop++){
-            string sTest = llList2String(lTemp, iLoop);
-            if(DEBUG)
-                debug(sTest);
-            if (llGetSubString(sTest, 0, 9) == "leashpoint"){
-                if (llGetSubString(sTest, 11, -1) == ""){
-                    g_lLeashPrims += [sTest, (string)g_iLoop, "1"];
-                }
-                else{
-                    g_lLeashPrims += [llGetSubString(sTest, 11, -1), (string)g_iLoop, "1"];
-                }
-            }
-        }
-    }
-    if (!llGetListLength(g_lLeashPrims))
-    {
-        g_lLeashPrims = ["collar", LINK_THIS, "1"];
-        if(DEBUG)
-            llOwnerSay("DEBUG: collar !llGetListLength (if we did not find any leashpoint... we unset the root as one)");
-    }
-}
-
 Particles(integer iLink, key id)
 {
     if (id == NULLKEY){
@@ -326,10 +310,12 @@ default
 {
     state_entry()
     {
+        llSetObjectDesc(desc_);
         init();
         dumpAccessList();
         CheckMemory();
         globalListenHandle = llListen(ll_channel, "", llGetOwner(), "");
+        llListen(COMMAND_PARTICLE,"","","");
         llSetObjectName(llKey2Name(llGetOwner()) + "'s Collar");
         llOwnerSay("Type /" +  (string)ll_channel + "menu for Menu");
         if(llGetAttached() != 0){
@@ -392,14 +378,18 @@ default
             if(leshedON){
                 llInstantMessage(id, (string)owner + " is no longer following you.");
                 //llShout(LOCKMEISTER, "leash");
+                llMessageLinked(LINK_ROOT, COMMAND_PARTICLE, "unleash", g_kLeashedTo);
                 stopFollowing(id);
-                //StopParticles(TRUE);
+                StopParticles(TRUE);
+                llSetObjectDesc(desc_);
             }
             else{
                 llInstantMessage(id, (string)owner + " is now following you.");
                 //llShout(LOCKMEISTER, "unleash");
+                llMessageLinked(LINK_ROOT, COMMAND_PARTICLE, "leash" + g_sCheck + "|" + (string)g_bLeashedToAvi, g_kLeashedTo);
                 startFollowingKey(id);
-                //StartParticles(g_kParticleTarget);
+                StartParticles(g_kParticleTarget);
+                llSetObjectDesc("Following - " + (string)id + llKey2Name(id) + ".");
             }
             leshedON = !leshedON;
         }
@@ -418,7 +408,7 @@ default
         }
         else if (message == "Textures")
             texturesmenu(id);
-        else if (message == "Back")
+        else if (message == "←")
             ownermenu(id);
         else if (message == "Black"){
             llSetLinkTexture(LINK_THIS, blackTexture, COLLAR_FACE);
@@ -428,19 +418,17 @@ default
             llSetLinkTexture(LINK_THIS, whiteTexture, COLLAR_FACE);
             texturesmenu(id);
         }
-        else if (message == "Users")
-        {
-            if(id == llGetOwner())
-                state Owner;
-            else
-                return;
+        else if (message == "Users"){
+            usersmenu(id);
         }
-        else if (message == "List")
-        {
-            if(id == llGetOwner())
-                dumpAccessList();
-            else
-                return;
+        else if (message == "List"){
+            dumpAccessList();
+        }
+        else if (message == "Add"){
+            state Owner;
+        }
+        else if (message == "Remove"){
+            state Remove;
         }
         else if (message == "menu")
             ownermenu(id);
@@ -458,13 +446,14 @@ default
                 llListenRemove(g_iLMListener);
                 llListenRemove(g_iLMListernerDetach);
             }
+            /* else if (sMessage == "leash"){
+                
+            } */
             else{
-                if(DEBUG)
-                    debug("leash active");
-                if (! g_bInvisibleLeash){
+                if (!g_bInvisibleLeash){
                     integer bLeasherIsAv = (integer)llList2String(llParseString2List(sMessage, ["|"], [""]), 1);
                     g_kParticleTarget = g_kLeashedTo;
-                    StartParticles(g_kParticleTarget);
+                    StartParticles(g_kLeashedTo);
                     if (bLeasherIsAv){
                         llListenRemove(g_iLMListener);
                         llListenRemove(g_iLMListernerDetach);
@@ -526,15 +515,21 @@ default
         if(leshedON)
             keepFollowing();
     }
+
+    state_exit()
+    {
+        llSetTimerEvent(0);
+    }
 }
 
-state Owner
+state Remove
 {
     state_entry()
     {
-        llListen(1, "", llGetOwner(), "");
-        llOwnerSay("type /1add (username) or if you wish to remove users then type /1del (username), you have 1min (60seconds)!");
+        llListen(listenChannel, "", llGetOwner(), "");
+        llOwnerSay("type /" + (string)listenChannel + "del (username), you have 1min (60seconds)!");
         llSetTimerEvent(60);
+        dumpAccessList();
     }
 
     listen(integer channel, string name, key id, string message)
@@ -542,26 +537,16 @@ state Owner
         key targetKey;
         if (id == llGetOwner()){
             integer space = llSubStringIndex(message, " ");
-            if (space > 0) {
+            if (space > 0){
                 string command = llGetSubString(message, 0, space - 1);
                 string avatar = llGetSubString(message, space + 1, -1);
                 targetKey = llName2Key(avatar);
-                if (command == "add"){
-                    if (llListFindList(accessList, [avatar]) == -1) {
-                        accessList = llListInsertList(accessList, [avatar], 0);
-                        llOwnerSay("Added: " + avatar + " to access list");
-                        llInstantMessage(targetKey, "secondlife:///app/agent/" + (string)id + "/about added you to her Collar");
-                        state default;
-                    }
-                }
-                else if (command == "del"){
-                    integer pos = llListFindList(accessList, [avatar]);
-                    if (pos >= 0) {
-                        accessList = llDeleteSubList(accessList, pos, pos);
-                        llOwnerSay("Added: " + avatar + " to access list");
-                        llInstantMessage(targetKey, "secondlife:///app/agent/" + (string)id + "/about removed you from her Collar");
-                        state default;
-                    }
+                integer pos = llListFindList(accessList, [avatar]);
+                if (pos >= 0){
+                    accessList = llDeleteSubList(accessList, pos, pos);
+                    llOwnerSay("Added: " + avatar + " to access list");
+                    llInstantMessage(targetKey, "secondlife:///app/agent/" + (string)id + "/about removed you from her Collar");
+                    state default;
                 }
             }
         }
@@ -569,7 +554,71 @@ state Owner
 
     timer()
     {
-        llOwnerSay("Users add/delete time expired!");
+        llOwnerSay("Users delete time expired!");
         state default;
     }
-} 
+}
+
+state Owner
+{
+    state_entry()
+    {
+        llListen(listenChannel, "", llGetOwner(), "");
+        avatarList = [];
+        avatarUUIDs = [];
+        llSensor("", NULL_KEY, AGENT, 15.0, PI);
+    }
+
+    sensor(integer num_detected)
+    {
+        integer i;
+        while((i < num_detected) && (i < 9)){
+            if (llDetectedKey(i) != llGetOwner()){
+                avatarList += [llDetectedName(i)];
+                avatarUUIDs += [llDetectedKey(i)];
+            }
+            ++i;
+        }
+        if (llGetListLength(avatarList) > 0)
+            state OwnerDialog;
+    }
+}
+
+state OwnerDialog
+{
+    state_entry()
+    {
+        //llListen(listenChannel, "", llGetOwner(), "");
+        dlgHandle = llListen(listenChannel, "", "", "");
+        llSetTimerEvent(30.0);
+        avatarList += ["※Cancel"];
+        llDialog(llGetOwner(), "Please select an avatar you want", avatarList, listenChannel);
+        llOwnerSay("You have 30seconds to send this.. or else you have to start over!");
+    }
+
+    listen(integer channel, string name, key id, string message)
+    {
+        key targetKey;
+        string avatar = llGetSubString(message, 0, -1);
+        targetKey = llName2Key(avatar);
+        if (llListFindList(accessList, [avatar]) == -1){
+            accessList = llListInsertList(accessList, [avatar], 0);
+            llOwnerSay("Added: " + avatar + " to access list");
+            llInstantMessage(targetKey, "secondlife:///app/agent/" + (string)id + "/about added you to her Collar");
+            Cleanup();
+            state default;
+        }
+
+        if (message == "※Cancel"){
+            Cleanup();
+            state default;
+        }
+    }
+
+    timer()
+    {
+        llOwnerSay("Users add time expired!");
+        Cleanup();
+        state default;
+    }
+}

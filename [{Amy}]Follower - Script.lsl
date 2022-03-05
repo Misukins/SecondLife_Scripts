@@ -13,19 +13,47 @@ integer followOn = FALSE;
 integer dlgHandle = -1;
 integer dlgChannel;
 integer gMenuPosition;
+integer channel;
+integer listen_handle;
+
+integer defdist       = TRUE;
+integer fivemDist     = FALSE;
+integer tenmDist      = FALSE;
+integer fifteenmDist  = FALSE;
+integer twentyMDist   = FALSE;
 
 string targetName = "";
 string objectName = "[{Amy}]Camera Mod v3 - Follower";
 
 list avatarList = [];
 list avatarUUIDs = [];
+list main_menu = [];
+list settings_menu = [];
 
 vector _greenState = <0.000, 0.502, 0.000>;
 vector _whiteState = <1.000, 1.000, 1.000>;
 
-integer DEBUG = TRUE;
+integer DEBUG = FALSE;
 
 // ► ◄ ▲ ▼ \\
+mainMenu(key id){
+  main_menu = ["Follow", "Distance", "▼"];
+  //key id == llDetectedKey(0);
+  list avatar_name = llParseString2List(llGetDisplayName(id), [""], []);
+  channel = llFloor(llFrand(2000000));
+  listen_handle = llListen(channel, "", id, "");
+  llDialog(id, "Hello " + (string)avatar_name + " Select a an option", main_menu, channel);
+}
+
+settingsMenu(key id){
+  settings_menu = ["Default", "5 Meters", "10 Meters", "15 Meters", "20 Meters", "◄", "▼"];
+  //key id == llDetectedKey(0);
+  list avatar_name = llParseString2List(llGetDisplayName(id), [""], []);
+  channel = llFloor(llFrand(2000000));
+  listen_handle = llListen(channel, "", id, "");
+  llDialog(id, "Hello " + (string)avatar_name + " Select a an option\nCurrent Distance :: "+ (string)RANGE +"", settings_menu, channel);
+}
+
 Menu()
 {
     integer Last;
@@ -116,7 +144,7 @@ keepFollowing()
   llStopMoveToTarget();
   list answer = llGetObjectDetails(targetKey,[OBJECT_POS]);
   string origName = llGetObjectName();
-  if (llGetListLength(answer)==0) {
+  if (llGetListLength(answer)==0){
     if (!announced){
       llSetObjectName(objectName);
       llOwnerSay(targetName + " seems to be out of range.  Waiting for return...");
@@ -128,21 +156,36 @@ keepFollowing()
     announced = FALSE;
     vector targetPos = llList2Vector(answer,0);
     float dist = llVecDist(targetPos,llGetPos());
-    if (dist>RANGE) {
+    if (dist>RANGE){
       tid = llTarget(targetPos,RANGE);
-      if (dist>LIMIT)
-        targetPos = llGetPos() + LIMIT * llVecNorm( targetPos - llGetPos() );
       llMoveToTarget(targetPos,TAU);
     }
   }
+}
+
+info(string message)
+{
+    llOwnerSay("[INFO] " + message);
 }
 
 default
 {
   state_entry()
   {
+    if(DEBUG)
+      llOwnerSay("state DEF");
     llSetObjectName(objectName);
     dlgChannel = -1 - (integer)("0x" + llGetSubString( (string)llGetKey(), -7, -1) );
+    if(RANGE == 1.5)
+      info("Follow Distance has been set to DEFAULT");
+    else if(RANGE == 5.0)
+      info("Follow Distance has been set to 5 Meters");
+    else if(RANGE == 10.0)
+      info("Follow Distance has been set to 10 Meters");
+    else if(RANGE == 15.0)
+      info("Follow Distance has been set to 15 Meters");
+    else
+      info("Follow Distance has been set to 20 Meters");
     init();
   }
 
@@ -154,13 +197,18 @@ default
 
   attach(key attached)
   {
-    if(attached != NULL_KEY)
-      llResetScript();
-  }
-
-  on_rez(integer x)
-  {
-    llResetScript();
+    if(attached != NULL_KEY){
+      if(RANGE == 1.5)
+        info("Follow Distance has been set to DEFAULT");
+      else if(RANGE == 5.0)
+        info("Follow Distance has been set to 5 Meters");
+      else if(RANGE == 10.0)
+        info("Follow Distance has been set to 10 Meters");
+      else if(RANGE == 15.0)
+        info("Follow Distance has been set to 15 Meters");
+      else
+        info("Follow Distance has been set to 20 Meters");
+    }
   }
 
   touch_start(integer total_number)
@@ -168,23 +216,86 @@ default
     key id = llDetectedKey(0);
     if (id == llGetOwner()){
       if (followOn != TRUE)
-        state Scan;
+        mainMenu(id);
     }
   }
 
-  listen(integer c,string n,key id,string msg)
+  listen(integer c, string n, key id, string msg)
   {
-    if (msg == "off")
-      stopFollowing(id);
-    else if (msg == "follow"){
-      if (id == llGetOwner())
+    if (msg == "Distance")
+      settingsMenu(id);
+    else if (msg == "Follow"){
+      if (followOn != TRUE)
         state Scan;
     }
-    else
-      startFollowingName(msg);
+    else if (msg == "◄")
+      mainMenu(id);
+    else if (msg == "▼")
+      return;
+    else if (msg == "Default"){
+      defdist       = TRUE;
+      fivemDist     = FALSE;
+      tenmDist      = FALSE;
+      fifteenmDist  = FALSE;
+      twentyMDist   = FALSE;
+      RANGE         = 1.5;
+      llOwnerSay("Follow Distance has been changed to " + (string)RANGE + ". (DEFAULT)");
+      mainMenu(id);
+    }
+    else if (msg == "5 Meters"){
+      defdist       = FALSE;
+      fivemDist     = TRUE;
+      tenmDist      = FALSE;
+      fifteenmDist  = FALSE;
+      twentyMDist   = FALSE;
+      RANGE         += 3.5;
+      llOwnerSay("Follow Distance has been changed to " + (string)RANGE + ". (5Meters)");
+      mainMenu(id);
+    }
+    else if (msg == "10 Meters"){
+      defdist       = FALSE;
+      fivemDist     = FALSE;
+      tenmDist      = TRUE;
+      fifteenmDist  = FALSE;
+      twentyMDist   = FALSE;
+      RANGE         += 8.5;
+      llOwnerSay("Follow Distance has been changed to " + (string)RANGE + ". (10Meters)");
+      mainMenu(id);
+    }
+    else if (msg == "15 Meters"){
+      defdist       = FALSE;
+      fivemDist     = FALSE;
+      tenmDist      = FALSE;
+      fifteenmDist  = TRUE;
+      twentyMDist   = FALSE;
+      RANGE         += 13.5;
+      llOwnerSay("Follow Distance has been changed to " + (string)RANGE + ". (15Meters)");
+      mainMenu(id);
+    }
+    else if (msg == "20 Meters"){
+      defdist       = FALSE;
+      fivemDist     = FALSE;
+      tenmDist      = FALSE;
+      fifteenmDist  = FALSE;
+      twentyMDist   = TRUE;
+      RANGE         += 18.5;
+      llOwnerSay("Follow Distance has been changed to " + (string)RANGE + ". (20Meters)");
+      mainMenu(id);
+    }
+
+    if(c == CHANNEL){
+      if (id == llGetOwner()){
+        if (msg == "follow"){
+          if (id == llGetOwner())
+            state Scan;
+        }
+      }
+    }
+    /* else
+        startFollowingName(msg); */
   }
 
-  link_message(integer from,integer to,string msg,key id)
+  link_message(integer from, integer to, string msg, key id)
   {
     if (msg == "RESET"){
       llOwnerSay("Resetting - Follower Script!");
@@ -210,7 +321,7 @@ default
     keepFollowing();
   }
 
-  at_target(integer tnum,vector tpos,vector ourpos)
+  at_target(integer tnum, vector tpos, vector ourpos)
   {
     llTargetRemove(tnum);
     llStopMoveToTarget();
@@ -221,6 +332,8 @@ state Scan
 {
   state_entry()
   {
+    if(DEBUG)
+      llOwnerSay("state Scan");
     avatarList = [];
     avatarUUIDs = [];
     llSensor("", NULL_KEY, AGENT, 96.0, PI);
@@ -232,7 +345,7 @@ state Scan
           llResetScript();
   }
 
-  link_message(integer from,integer to,string msg,key id)
+  link_message(integer from, integer to, string msg, key id)
   {
     if (msg == "RESET"){
       llOwnerSay("Resetting - Follower Script!");
@@ -262,6 +375,9 @@ state Dialog
     llListenRemove(lh);
     gMenuPosition = 0;
     Menu();
+    init();
+    if(DEBUG)
+      llOwnerSay("state Dialog");
   }
 
   changed(integer change)
@@ -272,10 +388,10 @@ state Dialog
 
   touch_start(integer total_number)
   {
-    key id = llDetectedKey(0);
-    if (id == llGetOwner()){
+    key _id = llDetectedKey(0);
+    if (_id == llGetOwner()){
       if (followOn == TRUE)
-        stopFollowing(id);
+        stopFollowing(_id);
         reset();
         state default;
     }
@@ -301,12 +417,6 @@ state Dialog
         state default;
       }
     }
-
-    if (message == "off"){
-      stopFollowing(id);
-      reset();
-      state default;
-    }
     else if (~llSubStringIndex(message, "►")){
       gMenuPosition += 10;
       Menu();
@@ -315,9 +425,25 @@ state Dialog
       gMenuPosition -= 10;
       Menu();
     }
+
+    if(channel == CHANNEL){
+      if (id == llGetOwner()){
+        if (message == "follow"){
+          if (id == llGetOwner())
+            llOwnerSay("You are already following somebody!");
+        }
+        else if (message == "stop"){
+          if (id == llGetOwner()){
+            stopFollowing(id);
+            reset();
+            state default;
+          }
+        }
+      }
+    }
   }
 
-  link_message(integer from,integer to,string msg,key id)
+  link_message(integer from, integer to, string msg, key id)
   {
     if (msg == "RESET"){
       llOwnerSay("Resetting - Follower Script!");
