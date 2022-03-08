@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////
 // ------------------------------------------------------------------------------ //
 //                           OpenCollar - leashParticle                           //
-//                                 version 3.960                                  //
+//                                 version 3.988                                  //
 // ------------------------------------------------------------------------------ //
 // Licensed under the GPLv2 with additional requirements specific to Second Life® //
 // and other virtual metaverse environments.  ->  www.opencollar.at/license.html  //
@@ -53,7 +53,7 @@ integer COMMAND_LEASH_SENSOR = 20001;
 string UPMENU       = "BACK";
 //string MORE         = ">";
 string PARENTMENU   = "Leash";
-string SUBMENU      = "Customize";
+string SUBMENU      = "Particle";
 string L_TEXTURE    = "Texture";
 string L_DENSITY    = "Density";
 string L_COLOR      = "Color";
@@ -134,7 +134,6 @@ list g_lLeashPrims;
 //global integer used for loops
 integer g_iLoop;
 string g_sScript;
-string g_sDefaults;
 
 debug(string sText)
 {
@@ -261,17 +260,12 @@ StopParticles(integer iEnd)
 
 Notify(key kID, string sMsg, integer iAlsoNotifyWearer)
 {
-    if (kID == g_kWearer)
-    {
-        llOwnerSay(sMsg);
-    }
+    if (kID == g_kWearer) llOwnerSay(sMsg);
     else
     {
-        llInstantMessage(kID, sMsg);
-        if (iAlsoNotifyWearer)
-        {
-            llOwnerSay(sMsg);
-        }
+        if (llGetAgentSize(kID)) llRegionSayTo(kID,0,sMsg);
+        else llInstantMessage(kID, sMsg);
+        if (iAlsoNotifyWearer) llOwnerSay(sMsg);
     }
 }
 
@@ -364,6 +358,7 @@ GetSettings()
 // Added bSave as a boolean, to make this a more versatile wrapper
 SetTexture(string sIn, key kIn)
 {
+    g_sParticleTexture = sIn;
     if (sIn=="chain"){
         g_sParticleTextureID="4cde01ac-4279-2742-71e1-47ff81cc3529";
     } else if (sIn=="rope"){
@@ -371,7 +366,6 @@ SetTexture(string sIn, key kIn)
     } else if (sIn=="totallytransparent"){
         g_sParticleTextureID="bd7d7770-39c2-d4c8-e371-0342ecf20921";
     } else {
-        g_sParticleTexture = sIn;
         if (llToLower(g_sParticleTexture) == "noleash")
         {
             g_bInvisibleLeash = TRUE;
@@ -437,20 +431,20 @@ OptionsMenu(key kIn, integer iAuth)
 
 DensityMenu(key kIn, integer iAuth)
 {
-    list lButtons = ["+", "-", "Default"];
+    list lButtons = ["+", "−", "Default"];
     g_sCurrentMenu = L_DENSITY;
     string Default = GetDefaultSetting(L_DENSITY);
-    string sPrompt = "\nChoose '+' for more and '-' for less particles\n'Default' to revert to the default: "+Default;
+    string sPrompt = "\nChoose + for more and − for less particles\n'Default' to revert to the default: "+Default;
     sPrompt += "\n\nCurrent Density = "+Float2String(g_fBurstRate) ;// BurstRate is opposite the implied effect of density
     g_kDialogID = Dialog(kIn, sPrompt, lButtons, [UPMENU], 0, iAuth);
 }
 
 GravityMenu(key kIn, integer iAuth)
 {
-    list lButtons = ["+", "-", "Default", "noGravity"];
+    list lButtons = ["+", "−", "Default", "noGravity"];
     g_sCurrentMenu = L_GRAVITY;
     string Default = GetDefaultSetting(L_GRAVITY);
-    string sPrompt = "\nChoose '+' for more and '-' for less leash-gravity\n'Default' to revert to the default: "+Default; 
+    string sPrompt = "\nChoose + for more and − for less leash-gravity\n'Default' to revert to the default: "+Default; 
     sPrompt += "\n\nCurrent Gravity = "+Float2String(g_vLeashGravity.z) ;
     g_kDialogID = Dialog(kIn, sPrompt, lButtons, [UPMENU], 0, iAuth);
 }
@@ -538,7 +532,6 @@ default
     state_entry()
     {
         g_sScript = "leashParticle_";
-        g_sDefaults = "leashDefaults_";
         g_kWearer = llGetOwner();
         FindLinkedPrims();
         StopParticles(TRUE);
@@ -641,7 +634,7 @@ default
                         OptionsMenu(kAv, iAuth);
                     }
                 }
-                else if (g_sCurrentMenu == "Customize")
+                else if (g_sCurrentMenu == "Particle")
                 {
                     if (sButton == L_DEFAULTS)
                     {
@@ -757,7 +750,7 @@ default
                     {
                         g_fBurstRate -= 0.01;
                     }
-                    else if (sButton == "-")
+                    else if (sButton == "−")
                     {
                         g_fBurstRate += 0.01;
                     }
@@ -783,7 +776,7 @@ default
                             Notify(kAv, "You have already reached maximum gravity.", FALSE);
                         } 
                     }
-                    else if (sButton == "-")
+                    else if (sButton == "−")
                     {
                         g_vLeashGravity.z += 0.1;
                         if (g_vLeashGravity.z > 0.0)
@@ -914,13 +907,8 @@ default
             {
                 // load current settings
                 sToken = llGetSubString(sToken, i + 1, -1);                
-                SaveSettings(sToken, sValue, FALSE);             
-            }
-            else if (llGetSubString(sToken, 0, i) == g_sDefaults)
-            {
-                // load default settings
-                sToken = llGetSubString(sToken, i + 1, -1);
-                SaveDefaultSettings(sToken,sValue);
+                SaveSettings(sToken, sValue, FALSE);
+                SaveDefaultSettings(sToken, sValue);
             }
             else if (sToken == "Global_CType") CTYPE = sValue;
             // in case wearer is currently leashed
