@@ -30,16 +30,14 @@ default
 
     attach(key kAttached)
     {
-        if (kAttached == NULL_KEY)
-        {
+        if (kAttached == NULL_KEY){
             llSay(g_iMychannel, (string)llGetOwner() + "handle detached");
         }
     }
 
     changed(integer change)
     {
-        if (change & CHANGED_TELEPORT)
-        {
+        if (change & CHANGED_TELEPORT){
             AnnounceLeashHolder();
             llSetTimerEvent(2.0);
         }
@@ -48,5 +46,7 @@ default
     timer()
     {
         llSetColor(<llFrand(1.0), llFrand(1.0), llFrand(1.0)>, 0);
+        llSetTimerEvent(0.0);
+        AnnounceLeashHolder();
     }
 }

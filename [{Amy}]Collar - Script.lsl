@@ -7,7 +7,6 @@ so far so good.. still alot work
 key targetKey           = NULL_KEY;
 
 float DELAY = 0.5;
-float RANGE = 1.5;
 float TAU = 1.0;
 float LIMIT = 60.0;
 float Walking_Sound_Speed = 1.0;
@@ -15,6 +14,7 @@ float Volume_For_Sounds = 0.05;
 float Volume_For_Bell = 0.2;
 float seconds_to_check_when_avatar_walks = 0.01;
 
+integer RANGE = 2;
 integer WalkingSound;
 integer walking         = FALSE;
 integer leshedON        = FALSE;
@@ -86,31 +86,35 @@ what else? oh
 //FIX Sorry, someone who outranks you on
 */ //TODO list END
 
-CheckMemory(){
+CheckMemory()
+{
     integer free_memory = llGetFreeMemory();
     llOwnerSay((string)free_memory + " bytes of free memory available for allocation.");
 }
 
-Cleanup(){
+Cleanup()
+{
     llListenRemove(dlgHandle);
     dlgHandle = -1;
 }
 
-menu(key _id){
+menu(key _id)
+{
     list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", _id, "");
     if (!leshedON){
         main_menu = ["Leash", "▼"];
-        llDialog(_id, "Hello " + (string)avatar_name + " Select a an option\nCurrent Follow Distance :: " + (string)RANGE, main_menu, channel);
+        llDialog(_id, "Hello " + (string)avatar_name + " Select a an option\nCurrent Follow Distance :: " + (string)RANGE + " meter(s)", main_menu, channel);
     }
     else{
         main_menu = ["Unleash", "Distance", "▼"];
-        llDialog(_id, "Hello " + (string)avatar_name + " Select a an option\nCurrent Follow Distance :: " + (string)RANGE, main_menu, channel);
+        llDialog(_id, "Hello " + (string)avatar_name + " Select a an option\nCurrent Follow Distance :: " + (string)RANGE + " meter(s)", main_menu, channel);
     }
 }
 
-ownermenu(key _id){
+ownermenu(key _id)
+{
     if(!WalkingSound)
         main_menu = ["On", "Textures", "Users", "Reset", "▼"];
     else
@@ -121,21 +125,24 @@ ownermenu(key _id){
     llDialog(_id, "Hello " + (string)avatar_name + " Select a an option", main_menu, channel);
 }
 
-texturesmenu(key _id){
+texturesmenu(key _id)
+{
     list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", _id, "");
     llDialog(_id, "Hello " + (string)avatar_name + " Select a an option", textures_menu, channel);
 }
 
-usersmenu(key _id){
+usersmenu(key _id)
+{
     list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", _id, "");
     llDialog(_id, "Hello " + (string)avatar_name + " Select a an option", users_menu, channel);
 }
 
-distanceMenu(key id){
+distanceMenu(key id)
+{
     if ((defdist) && (!fivemDist) && (!tenmDist) && (!fifteenmDist) && (!twentyMDist))
         distance_menu = ["▪Default", "▫5Meters", "▫10Meters", "▫15Meters", "▫20Meters", "◄", "▼"];
     else if ((!defdist) && (fivemDist) && (!tenmDist) && (!fifteenmDist) && (!twentyMDist))
@@ -149,14 +156,16 @@ distanceMenu(key id){
     list avatar_name = llParseString2List(llGetDisplayName(id), [""], []);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", id, "");
-    llDialog(id, "Hello " + (string)avatar_name + " Select a an option\nCurrent Distance :: "+ (string)RANGE, distance_menu, channel);
+    llDialog(id, "Hello " + (string)avatar_name + " Select a an option\nCurrent Distance :: "+ (string)RANGE + " meter(s)", distance_menu, channel);
 }
 
-dumpAccessList(){
+dumpAccessList()
+{
     llOwnerSay("current access list:\n" + llDumpList2String(accessList, ", "));
 }
 
-asLoadSounds(){
+asLoadSounds()
+{
     API_Start_Sound = "";
     API_Stop_Sound = "";
     integer i = 0;
@@ -174,17 +183,20 @@ asLoadSounds(){
     while(i++<a);
 }
 
-key llGetObjectOwner(){
+key llGetObjectOwner()
+{
     list details = llGetObjectDetails(llGetKey(), [OBJECT_OWNER]);
     return (key)llList2CSV(details);
 }
 
-soundsOFF(){
+soundsOFF()
+{
     walking = FALSE;
     llSetTimerEvent(seconds_to_check_when_avatar_walks);
 }
 
-stopFollowing(key id){
+stopFollowing(key id)
+{
   string origName = llGetObjectName();
   list username = llParseString2List(llGetDisplayName(id), [""], []);
   list owner = llParseString2List(llGetDisplayName(llGetOwner()), [""], []);
@@ -196,12 +208,14 @@ stopFollowing(key id){
   llSetObjectName(origName);
 }
 
-startFollowingName(string name){
+startFollowingName(string name)
+{
     targetName = name;
     llSensor(targetName,NULL_KEY,AGENT,96.0,PI);
 }
 
-startFollowingKey(key id){
+startFollowingKey(key id)
+{
   string origName = llGetObjectName();
   list username = llParseString2List(llGetDisplayName(id), [""], []);
   list owner = llParseString2List(llGetDisplayName(llGetOwner()), [""], []);
@@ -214,7 +228,8 @@ startFollowingKey(key id){
   llSetTimerEvent(DELAY);
 }
 
-keepFollowing(){
+keepFollowing()
+{
   llTargetRemove(tid);
   llStopMoveToTarget();
   list answer = llGetObjectDetails(targetKey,[OBJECT_POS]);
@@ -299,14 +314,11 @@ default
                 llInstantMessage(id, (string)owner + " is no longer following you.");
                 stopFollowing(id);
                 llSetObjectDesc(desc_);
-                leshedON = FALSE;
             }
             else{
                 llInstantMessage(id, (string)owner + " is now following you.");
                 startFollowingKey(id);
                 llSetObjectDesc("Following - " + (string)id + llKey2Name(id) + ".");
-                leshedON = TRUE;
-                menu(id);
             }
             leshedON = !leshedON;
         }
@@ -367,51 +379,51 @@ default
             tenmDist      = FALSE;
             fifteenmDist  = FALSE;
             twentyMDist   = FALSE;
-            RANGE         = 1.5;
+            RANGE         = 2;
             llOwnerSay("Follow Distance has been changed to. (DEFAULT)");
             llInstantMessage(id, "Follow Distance set to DEFAULT.");
         }
         else if (message == "▫5Meters"){
-            RANGE         = 1.5;
+            RANGE         = 0;
             defdist       = FALSE;
             fivemDist     = TRUE;
             tenmDist      = FALSE;
             fifteenmDist  = FALSE;
             twentyMDist   = FALSE;
-            RANGE         += 3.5;
+            RANGE         += 5;
             llOwnerSay("Follow Distance has been changed to. (5Meters)");
             llInstantMessage(id, "Follow Distance set to 5Meters.");
         }
         else if (message == "▫10Meters"){
-            RANGE         = 1.5;
+            RANGE         = 0;
             defdist       = FALSE;
             fivemDist     = FALSE;
             tenmDist      = TRUE;
             fifteenmDist  = FALSE;
             twentyMDist   = FALSE;
-            RANGE         += 8.5;
+            RANGE         += 10;
             llOwnerSay("Follow Distance has been changed to. (10Meters)");
             llInstantMessage(id, "Follow Distance set to 10Meters.");
         }
         else if (message == "▫15Meters"){
-            RANGE         = 1.5;
+            RANGE         = 0;
             defdist       = FALSE;
             fivemDist     = FALSE;
             tenmDist      = FALSE;
             fifteenmDist  = TRUE;
             twentyMDist   = FALSE;
-            RANGE         += 13.5;
+            RANGE         += 15;
             llOwnerSay("Follow Distance has been changed to. (15Meters)");
             llInstantMessage(id, "Follow Distance set to 15Meters.");
         }
         else if (message == "▫20Meters"){
-            RANGE         = 1.5;
+            RANGE         = 0;
             defdist       = FALSE;
             fivemDist     = FALSE;
             tenmDist      = FALSE;
             fifteenmDist  = FALSE;
             twentyMDist   = TRUE;
-            RANGE         += 18.5;
+            RANGE         += 20;
             llOwnerSay("Follow Distance has been changed to. (20Meters)");
             llInstantMessage(id, "Follow Distance set to 20Meters.");
         }
@@ -421,7 +433,7 @@ default
             tenmDist      = FALSE;
             fifteenmDist  = FALSE;
             twentyMDist   = FALSE;
-            RANGE         = 1.5;
+            RANGE         = 2;
             llInstantMessage(id, "Follow Distance set to DEFAULT.");
         }
     }
@@ -445,6 +457,14 @@ default
 
         if(llGetInventoryNumber(INVENTORY_SOUND) > 0)
             asLoadSounds();
+    }
+
+    no_sensor()
+    {
+        string origName = llGetObjectName();
+        llSetObjectName(objectName);
+        llOwnerSay("Did not find anyone named "+ targetName);
+        llSetObjectName(origName);
     }
 
     sensor(integer n)
@@ -471,10 +491,10 @@ default
             keepFollowing();
     }
 
-    state_exit()
+    /* state_exit()
     {
         llSetTimerEvent(0);
-    }
+    } */
 }
 
 state Remove

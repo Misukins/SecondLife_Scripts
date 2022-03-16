@@ -34,42 +34,42 @@ info(string message)
 menu(key id)
 {
     if (cameraOn == FALSE){
-        list main_menu = [ "■ Off ■", "□ Cinema □", "□ Adult □", "□ Teen □", "□ Child □", "□ Petite □", "† Reset †", "† Exit †" ];
+        list main_menu = [ "■ Off ■", "□ Cinema □", "□ Adult □", "□ Teen □", "□ Child □", "□ Petite □", "† STOP †", "† Reset †", "† Exit †" ];
         llListenRemove(listener);
         channel = -1000000000 - (integer)(llFrand(1000000000));
         listener = llListen(channel, "", "", "");
         llDialog(id, "Choose an option...", main_menu, channel);
     }
     else if ((adultcamOn == TRUE) && (cameraOn == TRUE)){
-        list main_menu = [ "□ Off □", "□ Cinema □", "■ Adult ■", "□ Teen □", "□ Child □", "□ Petite □", "† Reset †", "† Exit †" ];
+        list main_menu = [ "□ Off □", "□ Cinema □", "■ Adult ■", "□ Teen □", "□ Child □", "□ Petite □", "† STOP †", "† Reset †", "† Exit †" ];
         llListenRemove(listener);
         channel = -1000000000 - (integer)(llFrand(1000000000));
         listener = llListen(channel, "", "", "");
         llDialog(id, "Choose an option...", main_menu, channel);
     }
     else if ((teencamOn == TRUE) && (cameraOn == TRUE)){
-        list main_menu = [ "□ Off □", "□ Cinema □", "□ Adult □", "■ Teen ■", "□ Child □", "□ Petite □", "† Reset †", "† Exit †" ];
+        list main_menu = [ "□ Off □", "□ Cinema □", "□ Adult □", "■ Teen ■", "□ Child □", "□ Petite □", "† STOP †", "† Reset †", "† Exit †" ];
         llListenRemove(listener);
         channel = -1000000000 - (integer)(llFrand(1000000000));
         listener = llListen(channel, "", "", "");
         llDialog(id, "Choose an option...", main_menu, channel);
     }
     else if ((childcamOn == TRUE) && (cameraOn == TRUE)){
-        list main_menu = [ "□ Off □", "□ Cinema □", "□ Adult □", "□ Teen □", "■ Child ■", "□ Petite □", "† Reset †", "† Exit †" ];
+        list main_menu = [ "□ Off □", "□ Cinema □", "□ Adult □", "□ Teen □", "■ Child ■", "□ Petite □", "† STOP †", "† Reset †", "† Exit †" ];
         llListenRemove(listener);
         channel = -1000000000 - (integer)(llFrand(1000000000));
         listener = llListen(channel, "", "", "");
         llDialog(id, "Choose an option...", main_menu, channel);
     }
     else if ((petitecamOn == TRUE) && (cameraOn == TRUE)){
-        list main_menu = [ "□ Off □", "□ Cinema □", "□ Adult □", "□ Teen □", "□ Child □", "■ Petite ■", "† Reset †", "† Exit †" ];
+        list main_menu = [ "□ Off □", "□ Cinema □", "□ Adult □", "□ Teen □", "□ Child □", "■ Petite ■", "† STOP †", "† Reset †", "† Exit †" ];
         llListenRemove(listener);
         channel = -1000000000 - (integer)(llFrand(1000000000));
         listener = llListen(channel, "", "", "");
         llDialog(id, "Choose an option...", main_menu, channel);
     }
     else if ((cinematiccamOn == TRUE) && (cameraOn == TRUE)){
-        list main_menu = [ "□ Off □", "■ Cinema ■", "□ Adult □", "□ Teen □", "□ Child □", "□ Petite □", "† Reset †", "† Exit †" ];
+        list main_menu = [ "□ Off □", "■ Cinema ■", "□ Adult □", "□ Teen □", "□ Child □", "□ Petite □", "† STOP †", "† Reset †", "† Exit †" ];
         llListenRemove(listener);
         channel = -1000000000 - (integer)(llFrand(1000000000));
         listener = llListen(channel, "", "", "");
@@ -276,7 +276,7 @@ default
     state_entry()
     {
         llSetObjectName(objName);
-        llSetLinkColor(LINK_THIS, _redState, ALL_SIDES);
+        //llSetLinkColor(LINK_THIS, _redState, ALL_SIDES);
         llSitTarget(<0.0, 0.0, 0.1>, ZERO_ROTATION);
         llPreloadSound(_sound_on);
         llPreloadSound(_sound_off);
@@ -327,6 +327,10 @@ default
                 llMessageLinked(LINK_SET, 0, "RESET", NULL_KEY);
                 llTriggerSound(_sound_on, 0.4);
                 reset_cam();
+            }
+            else if (message == "† STOP †"){
+                llTriggerSound(_sound_on, 0.4);
+                state stopAnims;
             }
             else{
                 llTriggerSound(_sound_on, 0.4);
@@ -407,4 +411,31 @@ default
             sitOverride = FALSE;
     }
     */
+}
+
+state stopAnims
+{
+    state_entry()
+    {
+        llRequestPermissions(llGetOwner(), PERMISSION_TRIGGER_ANIMATION);
+    }
+
+    run_time_permissions(integer perm)
+    {
+        if (perm & PERMISSION_TRIGGER_ANIMATION)
+        {
+            list anims = llGetAnimationList(llGetOwner());
+            integer n;
+            for(n = 0; n < llGetListLength(anims) ;n++){
+                llStopAnimation(llList2String(anims, n));
+                llSleep(0.2);
+            }
+            llOwnerSay((string)n + " Animations Stopped");
+            state default;
+        }
+        else{
+            llOwnerSay("Sorry, i need permission to be able to stop the animations");
+            state default;
+        }
+    }
 }

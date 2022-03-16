@@ -1,7 +1,6 @@
 key targetKey = NULL_KEY;
 
 float DELAY = 0.5;
-float RANGE = 1.5;
 float TAU = 1.0;
 float LIMIT = 60.0;
 
@@ -15,12 +14,12 @@ integer dlgChannel;
 integer gMenuPosition;
 integer channel;
 integer listen_handle;
-
 integer defdist       = TRUE;
 integer fivemDist     = FALSE;
 integer tenmDist      = FALSE;
 integer fifteenmDist  = FALSE;
 integer twentyMDist   = FALSE;
+integer RANGE = 1;
 
 string targetName = "";
 string objectName = "[{Amy}]Camera Mod v3 - Follower";
@@ -28,7 +27,7 @@ string objectName = "[{Amy}]Camera Mod v3 - Follower";
 list avatarList = [];
 list avatarUUIDs = [];
 list main_menu = [];
-list settings_menu = [];
+list distance_menu = [];
 
 vector _greenState = <0.000, 0.502, 0.000>;
 vector _whiteState = <1.000, 1.000, 1.000>;
@@ -38,20 +37,27 @@ integer DEBUG = FALSE;
 // ► ◄ ▲ ▼ \\
 mainMenu(key id){
   main_menu = ["Follow", "Distance", "▼"];
-  //key id == llDetectedKey(0);
   list avatar_name = llParseString2List(llGetDisplayName(id), [""], []);
   channel = llFloor(llFrand(2000000));
   listen_handle = llListen(channel, "", id, "");
   llDialog(id, "Hello " + (string)avatar_name + " Select a an option", main_menu, channel);
 }
 
-settingsMenu(key id){
-  settings_menu = ["Default", "5 Meters", "10 Meters", "15 Meters", "20 Meters", "◄", "▼"];
-  //key id == llDetectedKey(0);
+distanceMenu(key id){
+  if ((defdist) && (!fivemDist) && (!tenmDist) && (!fifteenmDist) && (!twentyMDist))
+      distance_menu = ["▪Default", "▫5Meters", "▫10Meters", "▫15Meters", "▫20Meters", "◄", "▼"];
+  else if ((!defdist) && (fivemDist) && (!tenmDist) && (!fifteenmDist) && (!twentyMDist))
+      distance_menu = ["▫Default", "▪5Meters", "▫10Meters", "▫15Meters", "▫20Meters", "◄", "▼"];
+  else if ((!defdist) && (!fivemDist) && (tenmDist) && (!fifteenmDist) && (!twentyMDist))
+      distance_menu = ["▫Default", "▫5Meters", "▪10Meters", "▫15Meters", "▫20Meters", "◄", "▼"];
+  else if ((!defdist) && (!fivemDist) && (!tenmDist) && (fifteenmDist) && (!twentyMDist))
+      distance_menu = ["▫Default", "▫5Meters", "▫10Meters", "▪15Meters", "▫20Meters", "◄", "▼"];
+  else if ((!defdist) && (!fivemDist) && (!tenmDist) && (!fifteenmDist) && (twentyMDist))
+      distance_menu = ["▫Default", "▫5Meters", "▫10Meters", "▫15Meters", "▪20Meters", "◄", "▼"];
   list avatar_name = llParseString2List(llGetDisplayName(id), [""], []);
   channel = llFloor(llFrand(2000000));
   listen_handle = llListen(channel, "", id, "");
-  llDialog(id, "Hello " + (string)avatar_name + " Select a an option\nCurrent Distance :: "+ (string)RANGE +"", settings_menu, channel);
+  llDialog(id, "Hello " + (string)avatar_name + " Select a an option\nCurrent Distance :: "+ (string)RANGE + " Meter(s)", distance_menu, channel);
 }
 
 Menu()
@@ -176,16 +182,16 @@ default
       llOwnerSay("state DEF");
     llSetObjectName(objectName);
     dlgChannel = -1 - (integer)("0x" + llGetSubString( (string)llGetKey(), -7, -1) );
-    if(RANGE == 1.5)
-      info("Follow Distance has been set to DEFAULT");
-    else if(RANGE == 5.0)
-      info("Follow Distance has been set to 5 Meters");
-    else if(RANGE == 10.0)
-      info("Follow Distance has been set to 10 Meters");
-    else if(RANGE == 15.0)
-      info("Follow Distance has been set to 15 Meters");
+    if(RANGE == 1)
+      info("Follow Distance has been set to DEFAULT.");
+    else if(RANGE == 5)
+      info("Follow Distance has been set to 5 Meters.");
+    else if(RANGE == 10)
+      info("Follow Distance has been set to 10 Meters.");
+    else if(RANGE == 15)
+      info("Follow Distance has been set to 15 Meters.");
     else
-      info("Follow Distance has been set to 20 Meters");
+      info("Follow Distance has been set to 20 Meters.");
     init();
   }
 
@@ -198,16 +204,16 @@ default
   attach(key attached)
   {
     if(attached != NULL_KEY){
-      if(RANGE == 1.5)
-        info("Follow Distance has been set to DEFAULT");
-      else if(RANGE == 5.0)
-        info("Follow Distance has been set to 5 Meters");
-      else if(RANGE == 10.0)
-        info("Follow Distance has been set to 10 Meters");
-      else if(RANGE == 15.0)
-        info("Follow Distance has been set to 15 Meters");
+      if(RANGE == 1)
+        info("Follow Distance has been set to DEFAULT.");
+      else if(RANGE == 5)
+        info("Follow Distance has been set to 5 Meters.");
+      else if(RANGE == 10)
+        info("Follow Distance has been set to 10 Meters.");
+      else if(RANGE == 15)
+        info("Follow Distance has been set to 15 Meters.");
       else
-        info("Follow Distance has been set to 20 Meters");
+        info("Follow Distance has been set to 20 Meters.");
     }
   }
 
@@ -223,7 +229,7 @@ default
   listen(integer c, string n, key id, string msg)
   {
     if (msg == "Distance")
-      settingsMenu(id);
+      distanceMenu(id);
     else if (msg == "Follow"){
       if (followOn != TRUE)
         state Scan;
@@ -232,56 +238,69 @@ default
       mainMenu(id);
     else if (msg == "▼")
       return;
-    else if (msg == "Default"){
+    else if (msg == "▪Default"){
+        defdist       = TRUE;
+        fivemDist     = FALSE;
+        tenmDist      = FALSE;
+        fifteenmDist  = FALSE;
+        twentyMDist   = FALSE;
+        RANGE         = 1;
+        info("Follow Distance has been set to DEFAULT.");
+        mainMenu(id);
+    }
+    else if (msg == "▫5Meters"){
+        RANGE         = 1;
+        defdist       = FALSE;
+        fivemDist     = TRUE;
+        tenmDist      = FALSE;
+        fifteenmDist  = FALSE;
+        twentyMDist   = FALSE;
+        RANGE         += 4;
+        info("Follow Distance has been set to 5 Meters.");
+        mainMenu(id);
+    }
+    else if (msg == "▫10Meters"){
+        RANGE         = 1;
+        defdist       = FALSE;
+        fivemDist     = FALSE;
+        tenmDist      = TRUE;
+        fifteenmDist  = FALSE;
+        twentyMDist   = FALSE;
+        RANGE         += 9;
+        info("Follow Distance has been set to 10 Meters.");
+        mainMenu(id);
+    }
+    else if (msg == "▫15Meters"){
+        RANGE         = 1;
+        defdist       = FALSE;
+        fivemDist     = FALSE;
+        tenmDist      = FALSE;
+        fifteenmDist  = TRUE;
+        twentyMDist   = FALSE;
+        RANGE         += 14;
+        info("Follow Distance has been set to 15 Meters.");
+        mainMenu(id);
+    }
+    else if (msg == "▫20Meters"){
+        RANGE         = 1;
+        defdist       = FALSE;
+        fivemDist     = FALSE;
+        tenmDist      = FALSE;
+        fifteenmDist  = FALSE;
+        twentyMDist   = TRUE;
+        RANGE         += 19;
+        info("Follow Distance has been set to 20 Meters.");
+        mainMenu(id);
+    }
+    else{
       defdist       = TRUE;
       fivemDist     = FALSE;
       tenmDist      = FALSE;
       fifteenmDist  = FALSE;
       twentyMDist   = FALSE;
-      RANGE         = 1.5;
-      llOwnerSay("Follow Distance has been changed to " + (string)RANGE + ". (DEFAULT)");
-      mainMenu(id);
-    }
-    else if (msg == "5 Meters"){
-      defdist       = FALSE;
-      fivemDist     = TRUE;
-      tenmDist      = FALSE;
-      fifteenmDist  = FALSE;
-      twentyMDist   = FALSE;
-      RANGE         += 3.5;
-      llOwnerSay("Follow Distance has been changed to " + (string)RANGE + ". (5Meters)");
-      mainMenu(id);
-    }
-    else if (msg == "10 Meters"){
-      defdist       = FALSE;
-      fivemDist     = FALSE;
-      tenmDist      = TRUE;
-      fifteenmDist  = FALSE;
-      twentyMDist   = FALSE;
-      RANGE         += 8.5;
-      llOwnerSay("Follow Distance has been changed to " + (string)RANGE + ". (10Meters)");
-      mainMenu(id);
-    }
-    else if (msg == "15 Meters"){
-      defdist       = FALSE;
-      fivemDist     = FALSE;
-      tenmDist      = FALSE;
-      fifteenmDist  = TRUE;
-      twentyMDist   = FALSE;
-      RANGE         += 13.5;
-      llOwnerSay("Follow Distance has been changed to " + (string)RANGE + ". (15Meters)");
-      mainMenu(id);
-    }
-    else if (msg == "20 Meters"){
-      defdist       = FALSE;
-      fivemDist     = FALSE;
-      tenmDist      = FALSE;
-      fifteenmDist  = FALSE;
-      twentyMDist   = TRUE;
-      RANGE         += 18.5;
-      llOwnerSay("Follow Distance has been changed to " + (string)RANGE + ". (20Meters)");
-      mainMenu(id);
-    }
+      RANGE         = 1;
+      info("Follow Distance has been set to DEFAULT.");
+  }
 
     if(c == CHANNEL){
       if (id == llGetOwner()){
