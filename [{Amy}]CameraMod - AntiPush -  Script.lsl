@@ -1,39 +1,49 @@
 key gOwner;
+key unlocked    = "521c27d6-3ade-04bd-646f-22e84ce85947";
+key locked      = "5571b284-297a-ce9a-f588-922cfdbbd129";
 
 integer gUseMoveLock;
 integer gRelockMoveLockAfterMovement;
 integer gRelockIsUserMoving;
 
-vector _greenState = <0.502, 0.000, 0.000>;
-vector _whiteState = <1.000, 1.000, 1.000>;
+vector _redState    = <0.502, 0.000, 0.000>;
+vector _whiteState  = <1.000, 1.000, 1.000>;
 
 movelockMe(integer lock)
 {
-    if(lock){
+    if (lock){
         llMoveToTarget(llGetPos() - <0, 0, 0.1>, 0.05);
         llSetVehicleType(VEHICLE_TYPE_SLED);
         llSetVehicleFloatParam(VEHICLE_LINEAR_FRICTION_TIMESCALE, 0.05);
         llSetVehicleFloatParam(VEHICLE_ANGULAR_FRICTION_TIMESCALE, 0.05);
         llOwnerSay("Movelock Activated!");
+        llSetLinkColor(LINK_THIS, _redState, ALL_SIDES);
+        llSetLinkTexture(LINK_THIS, locked, ALL_SIDES);
     }
     else{
         llStopMoveToTarget();
         llSetVehicleType(VEHICLE_TYPE_NONE);
         llOwnerSay("Movelock Deactivated!");
+        llSetLinkColor(LINK_THIS, _whiteState, ALL_SIDES);
+        llSetLinkTexture(LINK_THIS, unlocked, ALL_SIDES);
     }
 }
 
 default
 {
+    state_entry()
+    {
+        llSetLinkColor(LINK_THIS, _whiteState, ALL_SIDES);
+        llSetLinkTexture(LINK_THIS, unlocked, ALL_SIDES);
+    }
+    
     touch_start(integer total_number)
     {
         if(!gUseMoveLock){
-            llSetLinkColor(LINK_THIS, _greenState, ALL_SIDES);
             gUseMoveLock = TRUE;
             movelockMe(TRUE);
         }
         else{
-            llSetLinkColor(LINK_THIS, _whiteState, ALL_SIDES);
             gUseMoveLock = FALSE;
             movelockMe(FALSE);
         }

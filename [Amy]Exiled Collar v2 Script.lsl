@@ -1,54 +1,48 @@
+/* 
+
+so far so good.. still alot work
+
+*/
+
 key targetKey           = NULL_KEY;
-key NULLKEY             = "";
-key g_kLeashedTo        = ""; //NULLKEY;
-key g_kLeashToPoint     = ""; //NULLKEY;
-key g_kParticleTarget   = ""; //NULLKEY;
 
 float DELAY = 0.5;
-float RANGE = 2.0;
 float TAU = 1.0;
 float LIMIT = 60.0;
 float Walking_Sound_Speed = 1.0;
 float Volume_For_Sounds = 0.05;
 float Volume_For_Bell = 0.2;
 float seconds_to_check_when_avatar_walks = 0.01;
-float g_fLeashLength;
-float g_fParticleAge = 1.0;
-float g_fParticleAlpha = 1.0;
-float g_fBurstRate = 0.04;
 
-integer DEBUG           = FALSE;
+integer RANGE = 2;
 integer WalkingSound;
 integer walking         = FALSE;
 integer leshedON        = FALSE;
 integer announced       = FALSE;
-integer g_bLeashedToAvi;
 integer ll_channel      = 665;
-integer adminChannel    = 1;
-integer adminChannel_Active = FALSE;
+integer COLLAR_FACE     = 1;
+integer dlgHandle       = -1;
+integer defdist       = TRUE;
+integer fivemDist     = FALSE;
+integer tenmDist      = FALSE;
+integer fifteenmDist  = FALSE;
+integer twentyMDist   = FALSE;
 
 integer globalListenHandle  = -0;
 integer channel;
 integer listen_handle;
-integer g_iLMListener;
-integer g_iLMListernerDetach;
 integer tid = 0;
 
-integer g_iParticleCount = 1;
-integer g_bLeashActive;
-integer g_iLoop;
-integer g_bParticleGlow = TRUE;
-integer g_bInvisibleLeash = FALSE;
-integer Use_Particles = 20000;
-integer LockParticles = -8888;
+integer listenChannel = 1;
 
-list g_lLeashPrims;
 list main_menu;
-//list sounds_menu    = [ "Bell 1", "Back", "▼"];
-list textures_menu  = ["Black", "White", "Back", "▼"];
-//list users_menu     = ["Add", "Remove", "List", "Clear", "Back", "▼"];
-list accessList;
-
+//list sounds_menu      = [ "Bell 1", "←", "▼"];
+list textures_menu      = ["Black", "White", "Brown", "Red", "←", "▼"];
+list users_menu         = ["Add", "Remove", "List", "←", "▼"];
+list accessList         = [];
+list avatarList         = [];
+list avatarUUIDs        = [];
+list distance_menu       = [];
 /* //NOTE Coming soon.. (walk sounds) with on/off option
 string Default_Start_Walking_Sound = "";
 string Default_Walking_Sound = "";
@@ -67,30 +61,17 @@ string sound_7 = "5c6dd6bc-1675-c57e-0847-5144e5611ef9";
 string sound_8 = "1dc1e689-3fd8-13c5-b57f-3fedd06b827a";
 */
 
-string blackTexture = "790203ff-6b4f-c15c-70fc-1e95142e7225";
-string whiteTexture = "9c6e07c4-52cb-be8f-9ba3-ccfef92ebe7f";
+//TODO ~ more textures
+string blackTexture = "9af0ef91-122c-d867-d066-81c7929cdb40"; //Black
+string whiteTexture = "6b2ffa5f-dc71-c551-c9eb-9ce636c7ef84"; //White
+string brownTexture = "1d32a1d4-538c-a1fe-1d9f-33a95867e060"; // Brown
+string redTexture = "ed55e038-2e2d-4372-d0c8-a1ce50e74b81"; // Red
 
 string API_Start_Sound;
 string API_Stop_Sound;
 string targetName = "";
 string objectName = "(TEMP): Collar - Leash";
-string CTYPE = "collar";
-string g_sCheck;
-
-//TODO -START
-string g_sParticleTexture;
-string g_sParticleTextureID = "9a342cda-d62a-ae1f-fc32-a77a24a85d73";
-
-/*
-9a342cda-d62a-ae1f-fc32-a77a24a85d73 //Rope UUID
-4cde01ac-4279-2742-71e1-47ff81cc3529 //Chain UUID
-bd7d7770-39c2-d4c8-e371-0342ecf20921 //Transparent UUID
-*/
-//TODO -END
-
-vector g_vLeashColor    = <1,1,1>;
-vector g_vLeashSize     = <0.07, 0.07, 1.0>;
-vector g_vLeashGravity  = <0.0,0.0,-1.0>;
+string desc_    = "(c)Amy (meljonna Resident) -";
 
 // TODO list START
 /* //NOTE so far this works 100% but leash goesto Avi Center looks stupid!!
@@ -98,60 +79,93 @@ vector g_vLeashGravity  = <0.0,0.0,-1.0>;
 //FIX leash texture change
 //FIX leash color change
 //FIX link leash to collar LOGO
-
 what else? oh
 //FIX after teleport checks
 //FIX range checks
-
 //FIX CLEAN UP!!!
+//FIX Sorry, someone who outranks you on
 */ //TODO list END
 
-CheckMemory(){
+CheckMemory()
+{
     integer free_memory = llGetFreeMemory();
     llOwnerSay((string)free_memory + " bytes of free memory available for allocation.");
 }
 
-menu(key _id){
-    if (!leshedON)
+Cleanup()
+{
+    llListenRemove(dlgHandle);
+    dlgHandle = -1;
+}
+
+menu(key _id)
+{
+    list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
+    channel = llFloor(llFrand(2000000));
+    listen_handle = llListen(channel, "", _id, "");
+    if (!leshedON){
         main_menu = ["Leash", "▼"];
-    else
-        main_menu = ["Unleash", "▼"];
-    list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
-    channel = llFloor(llFrand(2000000));
-    listen_handle = llListen(channel, "", _id, "");
-    llDialog(_id, "Hello " + (string)avatar_name + " Select a an option", main_menu, channel);
+        llDialog(_id, "Hello " + (string)avatar_name + " Select a an option\nCurrent Follow Distance :: " + (string)RANGE + " meter(s)", main_menu, channel);
+    }
+    else{
+        main_menu = ["Unleash", "Distance", "▼"];
+        llDialog(_id, "Hello " + (string)avatar_name + " Select a an option\nCurrent Follow Distance :: " + (string)RANGE + " meter(s)", main_menu, channel);
+    }
 }
 
-ownermenu(key _id){
+ownermenu(key _id)
+{
     if(!WalkingSound)
-        main_menu = ["On", "Textures", "Users", "List", "Reset", "▼"];
+        main_menu = ["On", "Textures", "Users", "Reset", "▼"];
     else
-        main_menu = ["Off", "Textures", "Users", "List", "Reset", "▼"];
+        main_menu = ["Off", "Textures", "Users", "Reset", "▼"];
     list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", _id, "");
     llDialog(_id, "Hello " + (string)avatar_name + " Select a an option", main_menu, channel);
 }
 
-texturesmenu(key _id){
+texturesmenu(key _id)
+{
     list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", _id, "");
     llDialog(_id, "Hello " + (string)avatar_name + " Select a an option", textures_menu, channel);
 }
 
-usersmenu(key _id){
+usersmenu(key _id)
+{
     list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", _id, "");
-    llDialog(_id, "Hello " + (string)avatar_name + " Select a an option", textures_menu, channel);
+    llDialog(_id, "Hello " + (string)avatar_name + " Select a an option", users_menu, channel);
 }
 
-dumpAccessList(){
-    llOwnerSay("current access list: " + llDumpList2String(accessList, ".\n "));
+distanceMenu(key id)
+{
+    if ((defdist) && (!fivemDist) && (!tenmDist) && (!fifteenmDist) && (!twentyMDist))
+        distance_menu = ["▪Default", "▫5Meters", "▫10Meters", "▫15Meters", "▫20Meters", "◄", "▼"];
+    else if ((!defdist) && (fivemDist) && (!tenmDist) && (!fifteenmDist) && (!twentyMDist))
+        distance_menu = ["▫Default", "▪5Meters", "▫10Meters", "▫15Meters", "▫20Meters", "◄", "▼"];
+    else if ((!defdist) && (!fivemDist) && (tenmDist) && (!fifteenmDist) && (!twentyMDist))
+        distance_menu = ["▫Default", "▫5Meters", "▪10Meters", "▫15Meters", "▫20Meters", "◄", "▼"];
+    else if ((!defdist) && (!fivemDist) && (!tenmDist) && (fifteenmDist) && (!twentyMDist))
+        distance_menu = ["▫Default", "▫5Meters", "▫10Meters", "▪15Meters", "▫20Meters", "◄", "▼"];
+    else if ((!defdist) && (!fivemDist) && (!tenmDist) && (!fifteenmDist) && (twentyMDist))
+        distance_menu = ["▫Default", "▫5Meters", "▫10Meters", "▫15Meters", "▪20Meters", "◄", "▼"];
+    list avatar_name = llParseString2List(llGetDisplayName(id), [""], []);
+    channel = llFloor(llFrand(2000000));
+    listen_handle = llListen(channel, "", id, "");
+    llDialog(id, "Hello " + (string)avatar_name + " Select a an option\nCurrent Distance :: "+ (string)RANGE + " meter(s)", distance_menu, channel);
 }
 
-asLoadSounds(){
+dumpAccessList()
+{
+    llOwnerSay("current access list:\n" + llDumpList2String(accessList, ", "));
+}
+
+asLoadSounds()
+{
     API_Start_Sound = "";
     API_Stop_Sound = "";
     integer i = 0;
@@ -169,68 +183,65 @@ asLoadSounds(){
     while(i++<a);
 }
 
-key llGetObjectOwner(){
+key llGetObjectOwner()
+{
     list details = llGetObjectDetails(llGetKey(), [OBJECT_OWNER]);
     return (key)llList2CSV(details);
 }
 
-LMSay(){
-    llShout(LockParticles, (string)llGetOwnerKey(g_kLeashedTo) + "collar");
-    llShout(LockParticles, (string)llGetOwnerKey(g_kLeashedTo) + "handle");
-}
-
-init(){
-    FindLinkedPrims();
-    StopParticles(TRUE);
-    llListen(Use_Particles, "", "", "");
-    llListen(1, "", llGetOwner(), "");
-    llParticleSystem([]);
-}
-
-soundsOFF(){
+soundsOFF()
+{
     walking = FALSE;
     llSetTimerEvent(seconds_to_check_when_avatar_walks);
 }
 
-stopFollowing(){
+stopFollowing(key id)
+{
   string origName = llGetObjectName();
+  list username = llParseString2List(llGetDisplayName(id), [""], []);
+  list owner = llParseString2List(llGetDisplayName(llGetOwner()), [""], []);
   llTargetRemove(tid);
   llStopMoveToTarget();
   llSetObjectName(llKey2Name(llGetOwner())+ "'s Collar");
-  llOwnerSay("No longer following.");
+  llOwnerSay("No longer following " + (string)username + ".");
+  llSay(0, (string)username + " lets go " + (string)owner + "'s leash.");
   llSetObjectName(origName);
 }
 
-startFollowingName(string name){
-  targetName = name;
-  llSensor(targetName,NULL_KEY,AGENT,96.0,PI);
+startFollowingName(string name)
+{
+    targetName = name;
+    llSensor(targetName,NULL_KEY,AGENT,96.0,PI);
 }
 
-startFollowingKey(key id){
+startFollowingKey(key id)
+{
   string origName = llGetObjectName();
   list username = llParseString2List(llGetDisplayName(id), [""], []);
   list owner = llParseString2List(llGetDisplayName(llGetOwner()), [""], []);
   targetKey = id;
   llSetObjectName(llKey2Name(llGetOwner())+ "'s Collar");
   llOwnerSay("You are now following " + (string)username + ".");
+  llSay(0, (string)username + " grabs " + (string)owner + "'s leash.");
   llSetObjectName(origName);
   keepFollowing();
   llSetTimerEvent(DELAY);
 }
 
-keepFollowing(){
+keepFollowing()
+{
   llTargetRemove(tid);
   llStopMoveToTarget();
   list answer = llGetObjectDetails(targetKey,[OBJECT_POS]);
   string origName = llGetObjectName();
-  if (llGetListLength(answer)==0)
+  if (llGetListLength(answer) == 0)
     announced = TRUE;
   else{
     announced = FALSE;
     vector targetPos = llList2Vector(answer,0);
-    float dist = llVecDist(targetPos,llGetPos());
-    if (dist>RANGE) {
-      tid = llTarget(targetPos,RANGE);
+    float dist = llVecDist(targetPos, llGetPos());
+    if (dist > RANGE) {
+      tid = llTarget(targetPos, RANGE);
       if (dist>LIMIT)
         targetPos = llGetPos() + LIMIT * llVecNorm( targetPos - llGetPos() );
       llMoveToTarget(targetPos,TAU);
@@ -238,98 +249,10 @@ keepFollowing(){
   }
 }
 
-debug(string sText){
-    llOwnerSay(llGetScriptName() + " DEBUG: " + sText);
-}
-
-FindLinkedPrims()
-{
-    integer linkcount = llGetNumberOfPrims();
-    for (g_iLoop = 2; g_iLoop <= linkcount; g_iLoop++)
-    {
-        string sPrimDesc = (string)llGetObjectDetails(llGetLinkKey(g_iLoop), [OBJECT_DESC]);
-        list lTemp = llParseString2List(sPrimDesc, ["~"], []);
-        integer iLoop;
-        for (iLoop = 0; iLoop < llGetListLength(lTemp); iLoop++){
-            string sTest = llList2String(lTemp, iLoop);
-            if(DEBUG)
-                debug(sTest);
-            if (llGetSubString(sTest, 0, 9) == "leashpoint"){
-                if (llGetSubString(sTest, 11, -1) == ""){
-                    g_lLeashPrims += [sTest, (string)g_iLoop, "1"];
-                }
-                else{
-                    g_lLeashPrims += [llGetSubString(sTest, 11, -1), (string)g_iLoop, "1"];
-                }
-            }
-        }
-    }
-    if (!llGetListLength(g_lLeashPrims))
-    {
-        g_lLeashPrims = ["leashpoint", LINK_THIS, "1"];
-        if(DEBUG)
-            llOwnerSay("DEBUG: collar !llGetListLength");
-    }
-}
-
-Particles(integer iLink, key id)
-{
-    /*
-    if (id == NULLKEY){
-        return;
-    }
-    integer iFlags = PSYS_PART_FOLLOW_VELOCITY_MASK | PSYS_PART_TARGET_POS_MASK|PSYS_PART_FOLLOW_SRC_MASK;
-    if (g_bParticleGlow) iFlags = iFlags | PSYS_PART_EMISSIVE_MASK;
-    list lTemp = [
-        PSYS_PART_MAX_AGE,g_fParticleAge,
-        PSYS_PART_FLAGS,iFlags,
-        PSYS_PART_START_COLOR, g_vLeashColor,
-        PSYS_PART_START_SCALE,g_vLeashSize,
-        PSYS_SRC_PATTERN, PSYS_SRC_PATTERN_DROP,
-        PSYS_SRC_BURST_RATE,g_fBurstRate,
-        PSYS_SRC_ACCEL, g_vLeashGravity,
-        PSYS_SRC_BURST_PART_COUNT,g_iParticleCount,
-        PSYS_SRC_TARGET_KEY,id,
-        PSYS_SRC_MAX_AGE, 0,
-        PSYS_SRC_TEXTURE, g_sParticleTextureID
-    ];
-    llLinkParticleSystem(iLink, lTemp);
-    */
-}
-
-StartParticles(key id)
-{
-    /*
-    for (g_iLoop = 0; g_iLoop < llGetListLength(g_lLeashPrims); g_iLoop = g_iLoop + 3){
-        if ((integer)llList2String(g_lLeashPrims, g_iLoop + 2)){
-            Particles((integer)llList2String(g_lLeashPrims, g_iLoop + 1), id);
-        }
-    }
-    g_bLeashActive = TRUE;
-    */
-}
-
-StopParticles(integer iEnd)
-{
-    /*
-    for (g_iLoop = 0; g_iLoop < llGetListLength(g_lLeashPrims); g_iLoop++){
-        llLinkParticleSystem((integer)llList2String(g_lLeashPrims, g_iLoop + 1), []);
-    }
-    if (iEnd){
-        g_bLeashActive = FALSE;
-        g_kLeashedTo = NULLKEY;
-        g_kLeashToPoint = NULLKEY;
-        g_kParticleTarget = NULLKEY;
-        llSensorRemove();
-    }
-    */
-}
-
 default
 {
     state_entry()
     {
-        init();
         dumpAccessList();
         CheckMemory();
         globalListenHandle = llListen(ll_channel, "", llGetOwner(), "");
@@ -363,21 +286,17 @@ default
                 string avatar = llKey2Name(toucher_key);
                 string origName = llGetObjectName();
                 if (llListFindList(accessList, [avatar]) < 0 && toucher_key != ownerKey){
-                    if(!DEBUG){
-                        llSetObjectName("");
-                        llOwnerSay((string)username + " touched your collar. (secondlife:///app/agent/" + (string)toucher_key + "/about)" );
-                        llSetObjectName(origName);
-                        llInstantMessage(toucher_key, "Hello " + (string)username + ", you are not on the access list, ask secondlife:///app/agent/" + (string)ownerKey + "/about");
-                    }
-                    return;
+                    llSetObjectName("");
+                    llOwnerSay((string)username + " touched your collar. (secondlife:///app/agent/" + (string)toucher_key + "/about)" );
+                    llSetObjectName(origName);
+                    llInstantMessage(toucher_key, "Hello " + (string)username + ", you are not on the access list, ask secondlife:///app/agent/" + (string)ownerKey + "/about");
                 }
                 else{
-                    if(!DEBUG){
-                        llPlaySound(sound_9, Volume_For_Bell);
-                        llSetObjectName("");
-                        llWhisper(0, (string)username + " plays with the trinket on " + (string)owner + "'s collar.");
-                        llSetObjectName(origName);
-                    }
+                    llPlaySound(sound_9, Volume_For_Bell);
+                    llSetObjectName("");
+                    llOwnerSay((string)username + " touched your collar. (secondlife:///app/agent/" + (string)toucher_key + "/about)" );
+                    llWhisper(0, (string)username + " plays with the trinket on " + (string)owner + "'s collar.");
+                    llSetObjectName(origName);
                     menu(toucher_key);
                 }
             }
@@ -386,144 +305,136 @@ default
 
     listen(integer channel, string name, key id, string message)
     {
-        g_kParticleTarget = id;
-        key targetKey;
         list owner = llParseString2List(llGetDisplayName(llGetOwner()), [""], []);
         llListenRemove(listen_handle);
-        if(channel == adminChannel){
-            if ((id == llGetOwner()) && (adminChannel_Active)){
-                integer space = llSubStringIndex(message, " ");
-                if (space > 0){
-                    string command = llGetSubString(message, 0, space - 1);
-                    string avatar = llGetSubString(message, space + 1, -1);
-                    targetKey = llName2Key(avatar);
-                    if (command == "add"){
-                        if (llListFindList(accessList, [avatar]) == -1){
-                            accessList = llListInsertList(accessList, [avatar], 0);
-                            llOwnerSay("Added: " + avatar + " to access list");
-                            llInstantMessage(targetKey, "secondlife:///app/agent/" + (string)id + "/about added you to her Collar");
-                            adminChannel_Active = FALSE;
-                            dumpAccessList();
-                        }
-                    }
-                    else if (command == "del"){
-                        integer pos = llListFindList(accessList, [avatar]);
-                        if (pos >= 0){
-                            accessList = llDeleteSubList(accessList, pos, pos);
-                            llOwnerSay("Added: " + avatar + " to access list");
-                            llInstantMessage(targetKey, "secondlife:///app/agent/" + (string)id + "/about removed you from her Collar");
-                            adminChannel_Active = FALSE;
-                            dumpAccessList();
-                        }
-                    }
-                }
-            }
-        }
-        else{
-            if (message == "▼")
-                return;
-            else if ((message == "Leash") || (message == "Unleash")){
-                if(leshedON){
-                    llInstantMessage(id, (string)owner + " is no longer following you.");
-                    llMessageLinked(LINK_ALL_OTHERS, Use_Particles, "leash|" + (string)g_kParticleTarget, g_kLeashedTo);
-
-                    //llMessageLinked(LINK_THIS, Use_Particles, "leash" + g_sCheck + "|" + (string)g_bLeashedToAvi, g_kLeashedTo);
-                    stopFollowing();
-                    StopParticles(TRUE);
-                }
-                else{
-                    llInstantMessage(id, (string)owner + " is now following you.");
-                    llMessageLinked(LINK_ALL_OTHERS, Use_Particles, "unleash", g_kLeashedTo);
-                    startFollowingKey(id);
-                    StartParticles(g_kParticleTarget);
-                }
-                leshedON = !leshedON;
-            }
-            else if((message == "On") || (message == "Off")){
-                if(!WalkingSound){
-                    llOwnerSay("Bell is now On..");
-                    WalkingSound = TRUE;
-                    ownermenu(id);
-                }
-                else{
-                    llOwnerSay("Bell is now Off..");
-                    WalkingSound = FALSE;
-                    ownermenu(id);
-                }
-                !WalkingSound = WalkingSound;
-            }
-            else if (message == "Textures")
-                texturesmenu(id);
-            else if (message == "Back")
-                ownermenu(id);
-            else if (message == "Black"){
-                llSetLinkTexture(LINK_THIS, blackTexture, ALL_SIDES);
-                texturesmenu(id);
-            }
-            else if (message == "White"){
-                llSetLinkTexture(LINK_THIS, whiteTexture, ALL_SIDES);
-                texturesmenu(id);
-            }
-            else if (message == "Users")
-            {
-                if(id == llGetOwner()){
-                    adminChannel_Active = TRUE;
-                    llOwnerSay("type /1add (username) or if you wish to remove users then type /1del (username), you have 1min (60seconds)!");
-                    llSetTimerEvent(60);
-                }
-            }
-            else if (message == "List")
-            {
-                if(id == llGetOwner())
-                    dumpAccessList();
-                else
-                    return;
-            }
-            else if (message == "menu")
-                ownermenu(id);
-            else if (message == "Reset")
-                llResetScript();
-        }
-    }
-
-    link_message(integer iSenderPrim, integer iNum, string sMessage, key kMessageID)
-    {
-        if (iNum == Use_Particles)
-        {
-            g_kLeashedTo = kMessageID;
-            if (sMessage == "unleash"){
-                StopParticles(TRUE);
-                llListenRemove(g_iLMListener);
-                llListenRemove(g_iLMListernerDetach);
+        if (message == "▼")
+            return;
+        else if ((message == "Leash") || (message == "Unleash")){
+            if(leshedON){
+                llInstantMessage(id, (string)owner + " is no longer following you.");
+                stopFollowing(id);
+                llSetObjectDesc(desc_);
             }
             else{
-                if(DEBUG)
-                    debug("leash active");
-                if (!g_bInvisibleLeash){
-                    integer bLeasherIsAv = (integer)llList2String(llParseString2List(sMessage, ["|"], [""]), 1);
-                    g_kParticleTarget = g_kLeashedTo;
-                    StartParticles(g_kParticleTarget);
-                    if (bLeasherIsAv){
-                        llListenRemove(g_iLMListener);
-                        llListenRemove(g_iLMListernerDetach);
-                        if (llGetSubString(sMessage, 0, 10)  == "leashhandle"){
-                            g_iLMListener = llListen(LockParticles, "", "", (string)g_kLeashedTo + "handle ok");
-                            g_iLMListernerDetach = llListen(LockParticles, "", "", (string)g_kLeashedTo + "handle detached");
-                        }
-                        else{
-                            g_iLMListener = llListen(LockParticles, "", "", "");
-                        }
-                        LMSay();
-                    }
-                }
+                llInstantMessage(id, (string)owner + " is now following you.");
+                startFollowingKey(id);
+                llSetObjectDesc("Following - " + (string)id + llKey2Name(id) + ".");
             }
+            leshedON = !leshedON;
         }
-    }
-
-    run_time_permissions(integer perm)
-    {
-        if (perm & PERMISSION_ATTACH | PERMISSION_TAKE_CONTROLS){
-            llAttachToAvatar(ATTACH_NECK);
+        else if((message == "On") || (message == "Off")){
+            if(!WalkingSound){
+                llOwnerSay("Bell is now On..");
+                WalkingSound = TRUE;
+                ownermenu(id);
+            }
+            else{
+                llOwnerSay("Bell is now Off..");
+                WalkingSound = FALSE;
+                ownermenu(id);
+            }
+            !WalkingSound = WalkingSound;
+        }
+        else if (message == "Textures")
+            texturesmenu(id);
+        else if (message == "←")
+            ownermenu(id);
+        else if (message == "Black"){
+            llSetLinkTexture(LINK_THIS, blackTexture, COLLAR_FACE);
+            texturesmenu(id);
+        }
+        else if (message == "White"){
+            llSetLinkTexture(LINK_THIS, whiteTexture, COLLAR_FACE);
+            texturesmenu(id);
+        }
+        else if (message == "Brown"){
+            llSetLinkTexture(LINK_THIS, brownTexture, COLLAR_FACE);
+            texturesmenu(id);
+        }
+        else if (message == "Red"){
+            llSetLinkTexture(LINK_THIS, redTexture, COLLAR_FACE);
+            texturesmenu(id);
+        }
+        else if (message == "Users"){
+            usersmenu(id);
+        }
+        else if (message == "List"){
+            dumpAccessList();
+        }
+        else if (message == "Add"){
+            state Owner;
+        }
+        else if (message == "Remove"){
+            state Remove;
+        }
+        else if (message == "menu")
+            ownermenu(id);
+        else if (message == "Reset")
+            llResetScript();
+        else if (message == "Distance")
+                distanceMenu(id);
+        else if (message == "▪Default"){
+            defdist       = TRUE;
+            fivemDist     = FALSE;
+            tenmDist      = FALSE;
+            fifteenmDist  = FALSE;
+            twentyMDist   = FALSE;
+            RANGE         = 2;
+            llOwnerSay("Follow Distance has been changed to. (DEFAULT)");
+            llInstantMessage(id, "Follow Distance set to DEFAULT.");
+        }
+        else if (message == "▫5Meters"){
+            RANGE         = 0;
+            defdist       = FALSE;
+            fivemDist     = TRUE;
+            tenmDist      = FALSE;
+            fifteenmDist  = FALSE;
+            twentyMDist   = FALSE;
+            RANGE         += 5;
+            llOwnerSay("Follow Distance has been changed to. (5Meters)");
+            llInstantMessage(id, "Follow Distance set to 5Meters.");
+        }
+        else if (message == "▫10Meters"){
+            RANGE         = 0;
+            defdist       = FALSE;
+            fivemDist     = FALSE;
+            tenmDist      = TRUE;
+            fifteenmDist  = FALSE;
+            twentyMDist   = FALSE;
+            RANGE         += 10;
+            llOwnerSay("Follow Distance has been changed to. (10Meters)");
+            llInstantMessage(id, "Follow Distance set to 10Meters.");
+        }
+        else if (message == "▫15Meters"){
+            RANGE         = 0;
+            defdist       = FALSE;
+            fivemDist     = FALSE;
+            tenmDist      = FALSE;
+            fifteenmDist  = TRUE;
+            twentyMDist   = FALSE;
+            RANGE         += 15;
+            llOwnerSay("Follow Distance has been changed to. (15Meters)");
+            llInstantMessage(id, "Follow Distance set to 15Meters.");
+        }
+        else if (message == "▫20Meters"){
+            RANGE         = 0;
+            defdist       = FALSE;
+            fivemDist     = FALSE;
+            tenmDist      = FALSE;
+            fifteenmDist  = FALSE;
+            twentyMDist   = TRUE;
+            RANGE         += 20;
+            llOwnerSay("Follow Distance has been changed to. (20Meters)");
+            llInstantMessage(id, "Follow Distance set to 20Meters.");
+        }
+        else{
+            defdist       = TRUE;
+            fivemDist     = FALSE;
+            tenmDist      = FALSE;
+            fifteenmDist  = FALSE;
+            twentyMDist   = FALSE;
+            RANGE         = 2;
+            llInstantMessage(id, "Follow Distance set to DEFAULT.");
         }
     }
 
@@ -531,6 +442,7 @@ default
     {
         if (_id != NULL_KEY){
             llRequestPermissions(llGetOwner(), PERMISSION_ATTACH | PERMISSION_TAKE_CONTROLS);
+            llAttachToAvatar(ATTACH_NECK);
             dumpAccessList();
         }
     }
@@ -540,12 +452,19 @@ default
         if (change & CHANGED_OWNER)
             llResetScript();
 
-        if (change & CHANGED_TELEPORT){
-            //TODO ---
+        if (change & CHANGED_TELEPORT)
             llOwnerSay("[INFO]: This is temp.. after TP :P");
-        }
+
         if(llGetInventoryNumber(INVENTORY_SOUND) > 0)
             asLoadSounds();
+    }
+
+    no_sensor()
+    {
+        string origName = llGetObjectName();
+        llSetObjectName(objectName);
+        llOwnerSay("Did not find anyone named "+ targetName);
+        llSetObjectName(origName);
     }
 
     sensor(integer n)
@@ -570,5 +489,116 @@ default
         }
         if(leshedON)
             keepFollowing();
+    }
+
+    /* state_exit()
+    {
+        llSetTimerEvent(0);
+    } */
+}
+
+state Remove
+{
+    state_entry()
+    {
+        llListen(listenChannel, "", llGetOwner(), "");
+        llOwnerSay("type /" + (string)listenChannel + "del (username), you have 1min (60seconds)!");
+        llSetTimerEvent(60);
+        dumpAccessList();
+    }
+
+    listen(integer channel, string name, key id, string message)
+    {
+        key targetKey;
+        string origName = llGetObjectName();
+        if (id == llGetOwner()){
+            integer space = llSubStringIndex(message, " ");
+            if (space > 0){
+                string command = llGetSubString(message, 0, space - 1);
+                string avatar = llGetSubString(message, space + 1, -1);
+                targetKey = llName2Key(avatar);
+                integer pos = llListFindList(accessList, [avatar]);
+                if (pos >= 0){
+                    accessList = llDeleteSubList(accessList, pos, pos);
+                    llSetObjectName("");
+                    llOwnerSay("Removed: secondlife:///app/agent/" + (string)targetKey + "/about for access list.");
+                    //llInstantMessage(targetKey, "secondlife:///app/agent/" + (string)id + "/about removed you from her Collar.");
+                    llSetObjectName(origName);
+                    state default;
+                }
+            }
+        }
+    }
+
+    timer()
+    {
+        llOwnerSay("Users delete time expired!");
+        state default;
+    }
+}
+
+state Owner
+{
+    state_entry()
+    {
+        llListen(listenChannel, "", llGetOwner(), "");
+        avatarList = [];
+        avatarUUIDs = [];
+        llSensor("", NULL_KEY, AGENT, 15.0, PI);
+    }
+
+    sensor(integer num_detected)
+    {
+        integer i;
+        while((i < num_detected) && (i < 9)){
+            if (llDetectedKey(i) != llGetOwner()){
+                avatarList += [llDetectedName(i)];
+                avatarUUIDs += [llDetectedKey(i)];
+            }
+            ++i;
+        }
+        if (llGetListLength(avatarList) > 0)
+            state OwnerDialog;
+    }
+}
+
+state OwnerDialog
+{
+    state_entry()
+    {
+        dlgHandle = llListen(listenChannel, "", "", "");
+        llSetTimerEvent(30.0);
+        avatarList += ["※Cancel"];
+        llDialog(llGetOwner(), "Please select an avatar you want", avatarList, listenChannel);
+        llOwnerSay("You have 30seconds to send this.. or else you have to start over!");
+    }
+
+    listen(integer channel, string name, key id, string message)
+    {
+        key targetKey;
+        string origName = llGetObjectName();
+        string avatar = llGetSubString(message, 0, -1);
+        targetKey = llName2Key(avatar);
+        if (llListFindList(accessList, [avatar]) == -1){
+            accessList = llListInsertList(accessList, [avatar], 0);
+            llSetObjectName("");
+            llOwnerSay("Added: secondlife:///app/agent/" + (string)targetKey + "/about to access list.");
+            llInstantMessage(targetKey, "secondlife:///app/agent/" + (string)id + "/about added you to her Collar.");
+            llSetObjectName(origName);
+            Cleanup();
+            state default;
+        }
+
+        if (message == "※Cancel"){
+            Cleanup();
+            state default;
+        }
+    }
+
+    timer()
+    {
+        llOwnerSay("Users add time expired!");
+        Cleanup();
+        state default;
     }
 }

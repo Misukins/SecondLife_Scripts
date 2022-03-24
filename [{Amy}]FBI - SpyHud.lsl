@@ -571,8 +571,8 @@ state SpyAvatar
                         fb += fbx;
                         llOwnerSay(fb);
                     }
-                    /* llSetObjectName(objName);
-                    state default; */
+                    llSetObjectName(objName);
+                    state default;
                 }
             }
         }

@@ -1,212 +1,144 @@
-integer ll_channel = -8888;
-//list g_lLeashPrims;
-//integer g_iLoop;
-integer particlesON = FALSE;
-string makersName;
+key Target_Key;
 
-string Texture = "9a342cda-d62a-ae1f-fc32-a77a24a85d73";
 integer Interpolate_Scale;
-vector Start_Scale;
-vector End_Scale;
 integer Interpolate_Colour;
-vector Start_Colour;
-vector End_Colour;
-float Start_Alpha;
-float End_Alpha;
 integer Emissive;
-float Age;
-float Rate;
 integer Count;
-float Life;
 integer Pattern;
-float Radius;
-float Begin_Angle;
-float End_Angle;
-vector Omega;
 integer Follow_Source;
 integer Follow_Velocity;
 integer Wind;
 integer Bounce;
+integer Target;
+integer Running;
+
+float Start_Alpha;
+float End_Alpha;
+float Age;
+float Rate;
+float Life;
+float Radius;
+float Begin_Angle;
+float End_Angle;
 float Minimum_Speed;
 float Maximum_Speed;
-vector Acceleration;
-integer Target;
-key Target_Key;
-/* 
-FindLinkedPrims()
-{
-    integer linkcount = llGetNumberOfPrims();
-    for (g_iLoop = 2; g_iLoop <= linkcount; g_iLoop++)
-    {
-        string sPrimDesc = (string)llGetObjectDetails(llGetLinkKey(g_iLoop), [OBJECT_DESC]);
-        list lTemp = llParseString2List(sPrimDesc, ["~"], []);
-        integer iLoop;
-        for (iLoop = 0; iLoop < llGetListLength(lTemp); iLoop++){
-            string sTest = llList2String(lTemp, iLoop);
-            if (llGetSubString(sTest, 0, 9) == "leashpoint"){
-                if (llGetSubString(sTest, 11, -1) == ""){
-                    g_lLeashPrims += [sTest, (string)g_iLoop, "1"];
-                }
-                else{
-                    g_lLeashPrims += [llGetSubString(sTest, 11, -1), (string)g_iLoop, "1"];
-                }
-            }
-        }
-    }
-    if (!llGetListLength(g_lLeashPrims))
-    {
-        g_lLeashPrims = ["collar", LINK_THIS, "1"];
-    }
-} */
 
-Particle_System()
-{
-    list Parameters = 
+string Texture;
+
+vector textColor;
+vector Start_Scale;
+vector End_Scale;
+vector Start_Colour;
+vector End_Colour;
+vector Omega;
+vector Acceleration;
+
+Particle_System(){
+    list Parameters =
     [
-    PSYS_PART_FLAGS,
-    (
-    (Emissive * PSYS_PART_EMISSIVE_MASK) |
-    (Bounce * PSYS_PART_BOUNCE_MASK) |
-    (Interpolate_Colour * PSYS_PART_INTERP_COLOR_MASK) |
-    (Interpolate_Scale * PSYS_PART_INTERP_SCALE_MASK) |
-    (Wind * PSYS_PART_WIND_MASK) |
-    (Follow_Source * PSYS_PART_FOLLOW_SRC_MASK) |
-    (Follow_Velocity * PSYS_PART_FOLLOW_VELOCITY_MASK) |
-    (Target * PSYS_PART_TARGET_POS_MASK)
-    ),
-    PSYS_PART_START_COLOR, Start_Colour,
-    PSYS_PART_END_COLOR, End_Colour,
-    PSYS_PART_START_ALPHA, Start_Alpha,
-    PSYS_PART_END_ALPHA, End_Alpha,
-    PSYS_PART_START_SCALE, Start_Scale,
-    PSYS_PART_END_SCALE, End_Scale,
-    PSYS_SRC_PATTERN, Pattern,
-    PSYS_SRC_BURST_PART_COUNT, Count,
-    PSYS_SRC_BURST_RATE, Rate,
-    PSYS_PART_MAX_AGE, Age,
-    PSYS_SRC_ACCEL, Acceleration,
-    PSYS_SRC_BURST_RADIUS, Radius,
-    PSYS_SRC_BURST_SPEED_MIN, Minimum_Speed,
-    PSYS_SRC_BURST_SPEED_MAX, Maximum_Speed,
-    PSYS_SRC_TARGET_KEY, Target_Key,
-    PSYS_SRC_ANGLE_BEGIN, Begin_Angle,
-    PSYS_SRC_ANGLE_END, End_Angle,
-    PSYS_SRC_OMEGA, Omega,
-    PSYS_SRC_MAX_AGE, Life,
-    PSYS_SRC_TEXTURE, Texture
+        PSYS_PART_FLAGS,
+        (
+        (Emissive * PSYS_PART_EMISSIVE_MASK) |
+        (Bounce * PSYS_PART_BOUNCE_MASK) |
+        (Interpolate_Colour * PSYS_PART_INTERP_COLOR_MASK) |
+        (Interpolate_Scale * PSYS_PART_INTERP_SCALE_MASK) |
+        (Wind * PSYS_PART_WIND_MASK) |
+        (Follow_Source * PSYS_PART_FOLLOW_SRC_MASK) |
+        (Follow_Velocity * PSYS_PART_FOLLOW_VELOCITY_MASK) |
+        (Target * PSYS_PART_TARGET_POS_MASK)
+        ),
+        PSYS_PART_START_COLOR, Start_Colour,
+        PSYS_PART_END_COLOR, End_Colour,
+        PSYS_PART_START_ALPHA, Start_Alpha,
+        PSYS_PART_END_ALPHA, End_Alpha,
+        PSYS_PART_START_SCALE, Start_Scale,
+        PSYS_PART_END_SCALE, End_Scale,
+        PSYS_SRC_PATTERN, Pattern,
+        PSYS_SRC_BURST_PART_COUNT, Count,
+        PSYS_SRC_BURST_RATE, Rate,
+        PSYS_PART_MAX_AGE, Age,
+        PSYS_SRC_ACCEL, Acceleration,
+        PSYS_SRC_BURST_RADIUS, Radius,
+        PSYS_SRC_BURST_SPEED_MIN, Minimum_Speed,
+        PSYS_SRC_BURST_SPEED_MAX, Maximum_Speed,
+        PSYS_SRC_TARGET_KEY, Target_Key,
+        PSYS_SRC_ANGLE_BEGIN, Begin_Angle,
+        PSYS_SRC_ANGLE_END, End_Angle,
+        PSYS_SRC_OMEGA, Omega,
+        PSYS_SRC_MAX_AGE, Life,
+        PSYS_SRC_TEXTURE, Texture
     ];
     llParticleSystem(Parameters);
 }
 
-MyParticle(key myTarget)
-{
-    saveData();
-    list details = llGetObjectDetails(myTarget, ([OBJECT_NAME, OBJECT_DESC,
-                            OBJECT_POS, OBJECT_ROT, OBJECT_VELOCITY,
-                            OBJECT_OWNER, OBJECT_GROUP, OBJECT_CREATOR]));
-    Interpolate_Scale = FALSE;
+MyParticle(key myTarget){
+    Texture = "e26260df-9989-0fa0-a9ee-d90da7c6f60b";
+    Interpolate_Scale = TRUE;
     Start_Scale = <0.04,0.04, 0>;
-    End_Scale = <0.04,0.04, 0>;
-    Interpolate_Colour = FALSE;
-    Start_Colour = < 1, 1, 1 >;
-    End_Colour = < 1, 1, 1 >;
+    End_Scale = <0.05,0.05, 0>;
+    Interpolate_Colour = TRUE;
+    Start_Colour = <llFrand(1.0),llFrand(1.0),llFrand(1.0)>;
+    End_Colour = <llFrand(1.0),llFrand(1.0),llFrand(1.0)>;
     Start_Alpha = 1;
-    End_Alpha =1;
+    End_Alpha = 0.1;
     Emissive = TRUE;
-    Age = 1;
-    Rate = 1;
+    Age = 4;
+    Rate = 0.5;
     Count = 50;
-    Life = 0;
+    Life = 10.0;
     Pattern = PSYS_SRC_PATTERN_EXPLODE;
-    Radius = 0;
+    Radius = 1.00;
     Begin_Angle = 0;
     End_Angle = 3.14159;
     Omega = < 0, 0, 0 >;
-    Follow_Source = TRUE;
-    Follow_Velocity = TRUE;
+    Follow_Source = FALSE;
+    Follow_Velocity = FALSE;
     Wind = FALSE;
-    Bounce = FALSE;
+    Bounce = TRUE;
     Minimum_Speed = 1;
-    Maximum_Speed = 1;
+    Maximum_Speed = 2;
     Acceleration = < 0, 0, 0 >;
     Target = TRUE;
     Target_Key = myTarget;
-
     Particle_System();
-    llOwnerSay( "UUID: " + (string)myTarget
-                    + "\nName: "          + llList2String(details, 0)
-                    + "\nDescription: "  + llList2String(details, 1)
-                    + "\nPosition: "      + llList2String(details, 2)
-                    + "\nRotation: "       + llList2String(details, 3)
-                    + "\nVelocity: "       + llList2String(details, 4)
-                    + "\nOwner: "          + llList2String(details, 5)
-                    + "\nGroup: "          + llList2String(details, 6)
-                    + "\nCreator: "        + llList2String(details, 7));
 }
 
-/*
-collision_start(integer num_detected)
-    {
-      key  id      = llDetectedKey(0);
-      list details = llGetObjectDetails(id, ([OBJECT_NAME, OBJECT_DESC,
-                            OBJECT_POS, OBJECT_ROT, OBJECT_VELOCITY,
-                            OBJECT_OWNER, OBJECT_GROUP, OBJECT_CREATOR]));
-      llShout(PUBLIC_CHANNEL, "UUID: " + (string)id
-                    + "\nName: "          + llList2String(details, 0)
-                    + "\nDescription: "  + llList2String(details, 1)
-                    + "\nPosition: "      + llList2String(details, 2)
-                    + "\nRotation: "       + llList2String(details, 3)
-                    + "\nVelocity: "       + llList2String(details, 4)
-                    + "\nOwner: "          + llList2String(details, 5)
-                    + "\nGroup: "          + llList2String(details, 6)
-                    + "\nCreator: "        + llList2String(details, 7));
-    }
-*/
-
-stopMyParticle(key myTarget)
+StopMyParticle()
 {
-    llSetObjectDesc("");
+    Running = FALSE;
     llParticleSystem([]);
-}
-
-
-saveData()
-{
-    list saveData;
-    saveData += (string)makersName;
-    llSetObjectDesc(llDumpList2String(saveData, ","));
 }
 
 default
 {
     state_entry()
     {
-        llListen(ll_channel, "", "", "");
+        StopMyParticle();
     }
-
-    listen(integer channel, string name, key id, string message) 
+    
+    attach(key agent)
     {
-        key MyTraget_key = llDetectedKey(0);
-        makersName = llKey2Name(MyTraget_key);
-        if(channel == ll_channel){
-            if (message == "Leash"){
-                MyParticle(id);
-            }
-            else if (message == "unLeash"){
-                stopMyParticle(id);
-            }
+        list owner_name = llParseString2List(llGetDisplayName(llGetOwnerKey(llGetKey())), [""], []);
+        if (agent){
+            Running = TRUE;
+            llOwnerSay("I love you " + (string)owner_name + " for ever! *kisses & hugs*");
+            llSetTimerEvent(20);
+        }
+    }
+    
+    changed(integer change)
+    {
+        if (change & CHANGED_OWNER)
+            llResetScript();
+        if (change & CHANGED_TELEPORT){
+            Running = TRUE;
+            MyParticle(llGetOwner());
+            llSetTimerEvent(20);
         }
     }
 
-    touch_start(integer total_number)
+    timer()
     {
-        key MyTraget_key = llGetObjectName(); //llGetObjectName(); ??? something like that..
-        makersName = llKey2Name(MyTraget_key);
-        if (!particlesON){
-            MyParticle(MyTraget_key);
-        }
-        else
-            stopMyParticle(MyTraget_key);
-        particlesON = !particlesON;
+        StopMyParticle();
     }
 }

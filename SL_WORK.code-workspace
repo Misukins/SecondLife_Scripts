@@ -4,5 +4,7 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"commentAnchors.tagHighlights.enabled": true
+	}
 }
