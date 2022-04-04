@@ -50,6 +50,12 @@ default
     {
         llResetScript();
     }
+
+    changed(integer change)
+    {
+        if (change & CHANGED_OWNER)
+        llResetScript();
+    }
     
     listen(integer chan, string name, key id, string msg)
     {

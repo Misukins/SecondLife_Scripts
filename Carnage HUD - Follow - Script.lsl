@@ -31,6 +31,9 @@ list avatarUUIDs      = [];
 list main_menu        = [];
 list distance_menu    = [];
 
+vector color_OFF        = <0.876, 0, 0>;
+vector color_ON         = <0, 0.876, 0>;
+
 // ► ◄ ▲ ▼ \\
 mainMenu(key id){
   main_menu = ["Follow", "Distance", "▼"];
@@ -70,7 +73,7 @@ Menu()
       else
         Last = TRUE;
     }
-    else if (All > gMenuPosition+9){
+    else if (All > gMenuPosition + 9){
       if((All - gMenuPosition) > 10)
         Buttons += "►";
       else
@@ -81,7 +84,7 @@ Menu()
     if (All > 0){
       integer b;
       integer len = llGetListLength(Buttons);
-      for(b = gMenuPosition + len + Last - 1 ; (len < 11)&&(b < All); ++b){
+      for(b = gMenuPosition + len + Last - 1 ; (len < 11) && (b < All); ++b){
           Buttons = Buttons + [llList2String(avatarList,b)];
           len = llGetListLength(Buttons);
       }
@@ -119,7 +122,7 @@ stopFollowing(string name)
   llSetTimerEvent(0.0);
   llSetObjectName(objectName);
   llOwnerSay("No longer following.");
-  //llInstantMessage(targetKey, "secondlife:///app/agent/" + (string)name + "/about is no longer following you.");
+  llSetLinkColor(LINK_THIS, color_OFF, ALL_SIDES);
   llSetObjectName(origName);
   llSetObjectDesc(desc_ + ".");
 }
@@ -138,6 +141,7 @@ startFollowingKey(key id)
   llOwnerSay("Now following "+ targetName +" type /" + (string)CHANNEL + "stop to stop following");
   llSetObjectName(origName);
   llSetObjectDesc(desc_ + ", Following: " + targetName + ".");
+  llSetLinkColor(LINK_THIS, color_ON, ALL_SIDES);
   keepFollowing();
   llSetTimerEvent(DELAY);
 }
@@ -156,7 +160,7 @@ keepFollowing()
     }
     announced = TRUE;
   }
-  else {
+  else{
     announced = FALSE;
     vector targetPos = llList2Vector(answer,0);
     float dist = llVecDist(targetPos,llGetPos());
@@ -408,7 +412,7 @@ state Dialog
           llResetScript();
   }
 
-  touch_start(integer total_number)
+  /* touch_start(integer total_number)
   {
     key _id = llDetectedKey(0);
     if (_id == llGetOwner()){
@@ -417,7 +421,7 @@ state Dialog
         reset();
         state default;
     }
-  }
+  } */
 
   listen(integer channel, string name, key id, string message)
   {
@@ -430,13 +434,11 @@ state Dialog
         targetKey = llName2Key(targetID);
         startFollowingName(message);
         followOn = TRUE;
-        //if(followOn)
-        //  llInstantMessage(targetKey, "secondlife:///app/agent/" + (string)id + "/about is now following you.");
       }
-      else if(message == "▼"){
-        reset();
-        state default;
-      }
+    }
+    else if(message == "▼"){
+      reset();
+      state default;
     }
     else if (~llSubStringIndex(message, "►")){
       gMenuPosition += 10;

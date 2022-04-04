@@ -1,72 +1,34 @@
-/* integer hit_value = 20;//How much health we loose each time we are hit.
-integer health_value = 500;//Our total health
+integer health = 10;
+
+string pList;
+list zList = [];
+
+vector color = <0,1,0>;
+
+list Charsetx = ["[","█","█","█","█","█","█","█","█","█","]"];
 
 default
 {
     state_entry()
     {
-        llMessageLinked(LINK_SET,0,"full",NULL_KEY);
+        llSetText("Health: " + (string)health + " "  +  llDumpList2String(Charsetx,"" ), color, 1.0);
     }
-
-    collision_start(integer total_number)
+    
+    collision_start(integer num)
     {
-        integer i;
-        for( i = 0; i < total_number; i++ ){
-            if(llDetectedType(i) & AGENT)
-                return;
-            health_value -= hit_value;
-            if ( healt_value <= 0 )
-                state collapse;
-            else if ( healt_value <= 100 )
-                llMessageLinked(LINK_SET,0,"100",NULL_KEY);
-            else if ( healt_value <= 200 )
-                llMessageLinked(LINK_SET,0,"200",NULL_KEY);
-            else if ( healt_value <= 300 )
-                llMessageLinked(LINK_SET,0,"300",NULL_KEY);
-            else if ( healt_value <= 400 )
-                llMessageLinked(LINK_SET,0,"400",NULL_KEY);
+        health -= num;
+        llOwnerSay("health " + (string)health);
+        if(health < 7)
+            color = <1,1,0>;
+        if(health < 4)
+            color = <1,0,0>;
+        if(health == 0){
+            llOwnerSay("dead");
+            health = 10;
+            color = <0,1,0>;
         }
-    }
-}
-    
-state collapse
-{
-    state_entry()
-    {
-        llSay(0, "You died.");
-    }
-}
- */
-//
-integer hit_value = 20;//How much health we loose each time we are hit.
-integer health_value = 500;//Our total health
-
-default
-{
-    state_entry()
-    {
-        llMessageLinked(LINK_SET,0,"full",NULL_KEY);
-    }
-    
-    collision_start(integer total_number)
-    {
-        integer i;
-        for( i = 0; i < total_number; i++ ){
-            if(llDetectedType(i) & AGENT)
-                return;
-            health_value -= hit_value;
-            if ( health_value <= 0 )
-                state collapse;
-            else if ( health_value <= 400 )
-                llMessageLinked(LINK_SET,0,(string)(((health_value-1)/100+1)*100),NULL_KEY)
-        }
-    }
-}
-    
-state collapse
-{
-    state_entry()
-    {
-        llSay(0, "You died.");
+        zList = llList2List(Charsetx, 0, health);
+        pList = llDumpList2String(zList, "");
+        llSetText("Health: " + (string)health + " " + pList, color, 1.0);
     }
 }

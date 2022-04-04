@@ -31,6 +31,12 @@ default
         llResetScript();
     }
 
+    changed(integer change)
+    {
+        if (change & CHANGED_OWNER)
+        llResetScript();
+    }
+
     attach(key attached)
     {
         if (attached != NULL_KEY)

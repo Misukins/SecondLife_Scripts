@@ -8,28 +8,34 @@ default
     state_entry()
     {
         llListen(llChan, "", "", "");
-        llPreloadSound("piano");
+        llPreloadSound("vampsleep1");
         if(llGetAttached())
             llRequestPermissions(llGetOwner(),PERMISSION_TRIGGER_ANIMATION);
+    }
+
+    changed(integer change)
+    {
+        if (change & CHANGED_OWNER)
+        llResetScript();
     }
 
     touch_start(integer detected)
     {
         if((meterON) && (gotPermission)){
-            llStartAnimation("rezz");  
-            llTriggerSound("piano", 1.0);
+            llStartAnimation("vampsleep");  
+            llTriggerSound("vampsleep1", 1.0);
             llSetTimerEvent(5.0);
-            llSay(listenChannel, "on");
+            llSay(listenChannel, "off");
         }
         else
-            llOwnerSay("no Meter");
+            llOwnerSay("Didn't find attachment: Carnage Meter");
     }
 
     run_time_permissions(integer perm)
     {
         if(perm & PERMISSION_TRIGGER_ANIMATION){
             gotPermission = TRUE;
-            llStopAnimation("rezz");
+            llStopAnimation("vampsleep");
         }
     }
 
@@ -46,7 +52,7 @@ default
     timer()
     {
         llSetTimerEvent(0.0);
-        llStopAnimation("rezz");  
+        llStopAnimation("vampsleep");  
         llStopSound();
      }
 }

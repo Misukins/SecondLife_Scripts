@@ -103,6 +103,8 @@ default
     {
         if (change & CHANGED_OWNER)
             llResetScript();
+        if (change & CHANGED_INVENTORY)
+            llResetScript();
     }
 
     state_entry()
@@ -115,12 +117,12 @@ default
     {
         list userName = llParseString2List(llGetDisplayName(user), [""], []);
         if(attached == NULL_KEY)
-		{
-			if (DEBUG == FALSE)
-				llSay(0, (string)userName + " (" +(string)llKey2Name(user) + ") has detached their " + (string)csName);
-			else
-				llOwnerSay((string)userName + " (" +(string)llKey2Name(user) + ") has detached their " + (string)csName);
-		}
+        {
+            if (DEBUG == FALSE)
+                llSay(0, (string)userName + " (" +(string)llKey2Name(user) + ") has detached their " + (string)csName);
+            else
+                llOwnerSay((string)userName + " (" +(string)llKey2Name(user) + ") has detached their " + (string)csName);
+        }
         else
         {
             hudStatus = 0;
@@ -149,7 +151,7 @@ default
                     statusText = "ONLINE";
                     setStatusText();
                     llOwnerSay((string)csName + " is now online");
-					llListen(_chan, "", user, "");
+                    llListen(_chan, "", user, "");
                 }
                 else if(message == "off")
                 {
@@ -160,8 +162,7 @@ default
                 }
                 else if(llGetSubString(message, 0,4) == "title")
                 {
-                    if(llGetSubString(message, 5,-1) != "")
-                    {
+                    if(llGetSubString(message, 5,-1) != ""){
                         customTitle = llGetSubString(message, 5,-1);
                         llOwnerSay("You have changed your title to " + customTitle + ".");
                         setStatusText();
@@ -183,61 +184,61 @@ default
                     llOwnerSay("Unknown command please try again");
             }
         }
-		
-		if(channel == _chan)
+        
+        if(channel == _chan)
         {
-			if(id == user)
-			{
-				if(hudStatus == 1)
-				{
-					if (message == "potion")
-					{
-						health += 50;
-						setStatusText();
-						if (DEBUG == TRUE)
-							llOwnerSay("DEBUG :: _chan 1001: Potion Heard");
-					}
-					else if (message == "revive")
-					{
-						if (DEBUG == TRUE)
-							llOwnerSay("DEBUG :: _chan 1001: Revive Heard");
-						if(deathStatus == 1)
-						{
-							llStopAnimation("Dead Pose");
-							llOwnerSay("You have been revived");
-							deathStatus = 0;
-							health += 20;
-							setStatusText();
-						}
-						else
-							llOwnerSay("you cannot use Reviver at this moment...");
-					}
-					else if (message == "death")
-					{
-						list userName = llParseString2List(llGetDisplayName(user), [""], []);
-						deathStatus = 1;
-						if (DEBUG == TRUE)
-							llOwnerSay((string)userName + " (" +(string)llKey2Name(user) + ") took the easy way out!");
-						else
-							llSay(0, (string)userName + " (" +(string)llKey2Name(user) + ") took the easy way out!");
-						llStartAnimation("Dead Pose");
-						health = 0;
-						setStatusText();
-						llSetTimerEvent(deathTime);
-						if (DEBUG == TRUE)
-							llOwnerSay("DEBUG :: _chan 1001: Death Potion Heard");
-					}
-				}
-				else
-				{
-					if (DEBUG == TRUE)
-						llOwnerSay("HUD OFFLINE");
-					else
-						llSay(0, "HUD OFFLINE");
-				}
-			}
-		}
-		
+            if(id == user)
+            {
+                if(hudStatus == 1)
+                {
+                    if (message == "potion")
+                    {
+                        health += 50;
+                        setStatusText();
+                        if (DEBUG == TRUE)
+                            llOwnerSay("DEBUG :: _chan 1001: Potion Heard");
+                    }
+                    else if (message == "revive")
+                    {
+                        if (DEBUG == TRUE)
+                            llOwnerSay("DEBUG :: _chan 1001: Revive Heard");
+                        if(deathStatus == 1)
+                        {
+                            llStopAnimation("Dead Pose");
+                            llOwnerSay("You have been revived");
+                            deathStatus = 0;
+                            health += 20;
+                            setStatusText();
+                        }
+                        else
+                            llOwnerSay("you cannot use Reviver at this moment...");
+                    }
+                    else if (message == "death")
+                    {
+                        list userName = llParseString2List(llGetDisplayName(user), [""], []);
+                        deathStatus = 1;
+                        if (DEBUG == TRUE)
+                            llOwnerSay((string)userName + " (" +(string)llKey2Name(user) + ") took the easy way out!");
+                        else
+                            llSay(0, (string)userName + " (" +(string)llKey2Name(user) + ") took the easy way out!");
+                        llStartAnimation("Dead Pose");
+                        health = 0;
+                        setStatusText();
+                        llSetTimerEvent(deathTime);
+                        if (DEBUG == TRUE)
+                            llOwnerSay("DEBUG :: _chan 1001: Death Potion Heard");
+                    }
+                }
+                else
+                {
+                    if (DEBUG == TRUE)
+                        llOwnerSay("HUD OFFLINE");
+                    else
+                        llSay(0, "HUD OFFLINE");
+                }
+            }
+        }
+        
         if(message == "» On «")
         {
             hudStatus = 1;
@@ -272,24 +273,22 @@ default
             llTextBox(id, "To change your title type : title (name) so for example you might type.... title Unamed Player", chan);
         else if(message == "» Color «")
             llDialog(id, "\n\nSelect a color group", main_menu, channel);
-        else if (message == "» Help «")
-        {
+        else if (message == "» Help «"){
             help();
             menu();
         }
-		else if (message == "» Suicide «")
-		{
-			list userName = llParseString2List(llGetDisplayName(user), [""], []);
-			deathStatus = 1;
-			if (DEBUG == TRUE)
-				llOwnerSay((string)userName + " (" +(string)llKey2Name(user) + ") took the easy way out!");
-			else
-				llSay(0, (string)userName + " (" +(string)llKey2Name(user) + ") took the easy way out!");
-			llStartAnimation("Dead Pose");
-			health = 0;
-			setStatusText();
-			llSetTimerEvent(deathTime);
-		}
+        else if (message == "» Suicide «"){
+            list userName = llParseString2List(llGetDisplayName(user), [""], []);
+            deathStatus = 1;
+            if (DEBUG == TRUE)
+                llOwnerSay((string)userName + " (" +(string)llKey2Name(user) + ") took the easy way out!");
+            else
+                llSay(0, (string)userName + " (" +(string)llKey2Name(user) + ") took the easy way out!");
+            llStartAnimation("Dead Pose");
+            health = 0;
+            setStatusText();
+            llSetTimerEvent(deathTime);
+        }
 
         if (llListFindList(main_menu, [message]) != -1)
         {
@@ -340,10 +339,10 @@ default
         {
             list userName = llParseString2List(llGetDisplayName(user), [""], []);
             deathStatus = 1;
-			if (DEBUG == TRUE)
-				llOwnerSay((string)userName + " (" +(string)llKey2Name(user) + ") has died in combat.");
-			else
-				llSay(0, (string)userName + " (" +(string)llKey2Name(user) + ") has died in combat.");
+            if (DEBUG == TRUE)
+                llOwnerSay((string)userName + " (" +(string)llKey2Name(user) + ") has died in combat.");
+            else
+                llSay(0, (string)userName + " (" +(string)llKey2Name(user) + ") has died in combat.");
             llStartAnimation("Dead Pose");
             health = 0;
             setStatusText();
@@ -355,17 +354,17 @@ default
     {
         if(deathStatus == 1)
         {
-			if(health < healthMax)
-			{
-				health += 5;
-				if(health > healthMax)
-					health = healthMax;
-			}
+            if(health < healthMax)
+            {
+                health += 5;
+                if(health > healthMax)
+                    health = healthMax;
+            }
             llStopAnimation("Dead Pose");
             llOwnerSay("You have been revived");
             deathStatus = 0;
         }
         health += 1;
-		setStatusText();
+        setStatusText();
     }
 }

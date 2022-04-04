@@ -8,28 +8,34 @@ default
     state_entry()
     {
         llListen(llChan, "", "", "");
-        llPreloadSound("vamplaugh");
+        llPreloadSound("chokehigh");
         if(llGetAttached())
             llRequestPermissions(llGetOwner(),PERMISSION_TRIGGER_ANIMATION);
+    }
+
+    changed(integer change)
+    {
+        if (change & CHANGED_OWNER)
+        llResetScript();
     }
 
     touch_start(integer detected)
     {
         if((batsON) && (gotPermission)){
-            llStartAnimation("fist_idle");  
-            llTriggerSound("vamplaugh", 1.0);
+            llStartAnimation("whistle");  
+            llTriggerSound("chokehigh", 1.0);
             llSetTimerEvent(5.0);
-            llSay(listenChannel, "draw sword");
+            llSay(listenChannel, "sheath sword");
         }
         else
-            llOwnerSay("no Bat Swarm (Add)");
+            llOwnerSay("Didn't find attachment: Carnage Bat Swarm");
     }
 
     run_time_permissions(integer perm)
     {
         if(perm & PERMISSION_TRIGGER_ANIMATION){
             gotPermission = TRUE;
-            llStopAnimation("fist_idle");
+            llStopAnimation("whistle");
         }
     }
 
@@ -46,7 +52,7 @@ default
     timer()
     {
         llSetTimerEvent(0.0);
-        llStopAnimation("fist_idle");  
+        llStopAnimation("whistle");  
         llStopSound();
      }
 }

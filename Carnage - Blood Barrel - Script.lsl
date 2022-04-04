@@ -7,7 +7,6 @@ integer ll_channel      = -98754465;
 integer channel;
 integer listen_handle;
 integer DEBUG           = TRUE;
-
 integer Group_Only      = FALSE;
 integer Owner_Only      = TRUE;
 integer Public_Access   = FALSE;
@@ -277,16 +276,19 @@ default
             }
         }
         else if (message == "1 liter"){
-            if(currentBlood != totalBlood){
-                if(currentBlood < totalBlood){
-                    currentBlood += 0.25;
-                    llShout(ll_channel, "depositBlood2");
-                    if(currentBlood > totalBlood)
-                        currentBlood = totalBlood;
+            if(HUDon)
+                if(currentBlood != totalBlood){
+                    if(currentBlood < totalBlood){
+                        currentBlood += 0.25;
+                        llShout(ll_channel, "depositBlood2");
+                        if(currentBlood > totalBlood)
+                            currentBlood = totalBlood;
+                    }
                 }
-            }
+                else
+                    llOwnerSay("BARREL FULL!!");
             else
-                llOwnerSay("BARREL FULL!!");
+                llOwnerSay("no HUD");
             DepositMenu(id);
             updateTimeDisp();
         }
@@ -421,7 +423,7 @@ default
         else
             menu(id);
 
-        if (channel == ll_channel){
+        /* if (channel == ll_channel){
             if(message == "depositBlood"){
                 if(DEBUG)
                     llOwnerSay("HEARD: depositBlood");
@@ -430,7 +432,7 @@ default
                 if(DEBUG)
                     llOwnerSay("HEARD: withdrawBlood");
             }
-        }
+        } */
     }
 }
 

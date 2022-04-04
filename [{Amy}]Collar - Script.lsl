@@ -13,6 +13,7 @@ float Walking_Sound_Speed = 1.0;
 float Volume_For_Sounds = 0.05;
 float Volume_For_Bell = 0.2;
 float seconds_to_check_when_avatar_walks = 0.01;
+float soundsVolume = 1.0;
 
 integer RANGE = 2;
 integer WalkingSound;
@@ -27,7 +28,7 @@ integer fivemDist     = FALSE;
 integer tenmDist      = FALSE;
 integer fifteenmDist  = FALSE;
 integer twentyMDist   = FALSE;
-
+integer gotPermission = FALSE;
 integer globalListenHandle  = -0;
 integer channel;
 integer listen_handle;
@@ -42,7 +43,8 @@ list users_menu         = ["Add", "Remove", "List", "←", "▼"];
 list accessList         = [];
 list avatarList         = [];
 list avatarUUIDs        = [];
-list distance_menu       = [];
+list distance_menu      = [];
+list anims_menu          = [];
 /* //NOTE Coming soon.. (walk sounds) with on/off option
 string Default_Start_Walking_Sound = "";
 string Default_Walking_Sound = "";
@@ -65,7 +67,9 @@ string sound_8 = "1dc1e689-3fd8-13c5-b57f-3fedd06b827a";
 string blackTexture = "9af0ef91-122c-d867-d066-81c7929cdb40"; //Black
 string whiteTexture = "6b2ffa5f-dc71-c551-c9eb-9ce636c7ef84"; //White
 string brownTexture = "1d32a1d4-538c-a1fe-1d9f-33a95867e060"; // Brown
-string redTexture = "ed55e038-2e2d-4372-d0c8-a1ce50e74b81"; // Red
+string redTexture   = "ed55e038-2e2d-4372-d0c8-a1ce50e74b81"; // Red
+
+string tpSound      = "93070de9-ffe7-8f9e-cbbe-7a570a9a0410";
 
 string API_Start_Sound;
 string API_Stop_Sound;
@@ -108,7 +112,7 @@ menu(key _id)
         llDialog(_id, "Hello " + (string)avatar_name + " Select a an option\nCurrent Follow Distance :: " + (string)RANGE + " meter(s)", main_menu, channel);
     }
     else{
-        main_menu = ["Unleash", "Distance", "▼"];
+        main_menu = ["Unleash", "Animation", "Distance", "▼"];
         llDialog(_id, "Hello " + (string)avatar_name + " Select a an option\nCurrent Follow Distance :: " + (string)RANGE + " meter(s)", main_menu, channel);
     }
 }
@@ -116,9 +120,9 @@ menu(key _id)
 ownermenu(key _id)
 {
     if(!WalkingSound)
-        main_menu = ["On", "Textures", "Users", "Reset", "▼"];
+        main_menu = ["On", "Animation", "Textures", "Users", "Reset", "▼"];
     else
-        main_menu = ["Off", "Textures", "Users", "Reset", "▼"];
+        main_menu = ["Off", "Animation", "Textures", "Users", "Reset", "▼"];
     list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", _id, "");
@@ -157,6 +161,15 @@ distanceMenu(key id)
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", id, "");
     llDialog(id, "Hello " + (string)avatar_name + " Select a an option\nCurrent Distance :: "+ (string)RANGE + " meter(s)", distance_menu, channel);
+}
+
+animsmenu(key _id)
+{
+    anims_menu = ["booty", "bendover", "cutie", "kneel", "doggie", "STOP", "▼"];
+    list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
+    channel = llFloor(llFrand(2000000));
+    listen_handle = llListen(channel, "", _id, "");
+    llDialog(_id, "Hello " + (string)avatar_name + " Select a an option", anims_menu, channel);
 }
 
 dumpAccessList()
@@ -249,6 +262,14 @@ keepFollowing()
   }
 }
 
+stopAllAnimations()
+{
+    list anims = llGetAnimationList(llGetOwner());
+    integer n;
+    for (n = 0; n < llGetListLength(anims); n++)
+        llStopAnimation(llList2String(anims,n));
+}
+
 default
 {
     state_entry()
@@ -258,6 +279,9 @@ default
         globalListenHandle = llListen(ll_channel, "", llGetOwner(), "");
         llSetObjectName(llKey2Name(llGetOwner()) + "'s Collar");
         llOwnerSay("Type /" +  (string)ll_channel + "menu for Menu");
+        llPreloadSound(tpSound);
+        if(llGetAttached())
+            llRequestPermissions(llGetOwner(), PERMISSION_TRIGGER_ANIMATION);
         if(llGetAttached() != 0){
             llSetTimerEvent(seconds_to_check_when_avatar_walks);
             asLoadSounds();
@@ -355,20 +379,40 @@ default
             llSetLinkTexture(LINK_THIS, redTexture, COLLAR_FACE);
             texturesmenu(id);
         }
-        else if (message == "Users"){
+        else if (message == "Users")
             usersmenu(id);
-        }
-        else if (message == "List"){
+        else if (message == "List")
             dumpAccessList();
-        }
-        else if (message == "Add"){
+        else if (message == "Add")
             state Owner;
-        }
-        else if (message == "Remove"){
+        else if (message == "Remove")
             state Remove;
-        }
         else if (message == "menu")
             ownermenu(id);
+        else if (message == "Animation")
+            animsmenu(id);
+        else if (message == "booty"){
+            if(gotPermission)
+                llStartAnimation("booty");
+        }
+        else if (message == "bendover"){
+            if(gotPermission)
+                llStartAnimation("bendover");
+        }
+        else if (message == "cutie"){
+            if(gotPermission)
+                llStartAnimation("cutie");
+        }
+        else if (message == "kneel"){
+            if(gotPermission)
+                llStartAnimation("kneel");
+        }
+        else if (message == "doggie"){
+            if(gotPermission)
+                llStartAnimation("doggie");
+        }
+        else if (message == "STOP")
+            stopAllAnimations();
         else if (message == "Reset")
             llResetScript();
         else if (message == "Distance")
@@ -453,10 +497,19 @@ default
             llResetScript();
 
         if (change & CHANGED_TELEPORT)
-            llOwnerSay("[INFO]: This is temp.. after TP :P");
+        {
+            llTriggerSound(tpSound, soundsVolume);
+            //TODO
+        }
 
         if(llGetInventoryNumber(INVENTORY_SOUND) > 0)
             asLoadSounds();
+    }
+
+    run_time_permissions(integer perm)
+    {
+        if(perm & PERMISSION_TRIGGER_ANIMATION)
+            gotPermission = TRUE;
     }
 
     no_sensor()
