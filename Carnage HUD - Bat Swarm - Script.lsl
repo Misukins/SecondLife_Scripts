@@ -6,6 +6,7 @@ integer llChan          = -458702;
 integer batsON          = FALSE;
 integer gotPermission   = FALSE;
 integer draw            = FALSE;
+integer HUD_ON;
 
 vector color_OFF        = <0.876, 0, 0>;
 vector color_ON         = <0, 0.876, 0>;
@@ -31,24 +32,28 @@ default
 
     touch_start(integer detected)
     {
-        if((batsON) && (gotPermission) && (!draw)){
-            draw = TRUE;
-            llStartAnimation("fist_idle");
-            llTriggerSound(vamplaugh, 1.0);
-            llSetTimerEvent(5.0);
-            llSay(listenChannel, "draw bats");
-            llSetLinkColor(LINK_THIS, color_ON, ALL_SIDES);
-        }
-        else if((batsON) && (gotPermission) && (draw)){
-            draw = FALSE;
-            llStartAnimation("whistle");  
-            llTriggerSound(chokehigh, 1.0);
-            llSetTimerEvent(5.0);
-            llSay(listenChannel, "sheath bats");
-            llSetLinkColor(LINK_THIS, color_OFF, ALL_SIDES);
+        if(HUD_ON){
+            if((batsON) && (gotPermission) && (!draw)){
+                draw = TRUE;
+                llStartAnimation("fist_idle");
+                llTriggerSound(vamplaugh, 1.0);
+                llSetTimerEvent(5.0);
+                llSay(listenChannel, "draw bats");
+                llSetLinkColor(LINK_THIS, color_ON, ALL_SIDES);
+            }
+            else if((batsON) && (gotPermission) && (draw)){
+                draw = FALSE;
+                llStartAnimation("whistle");  
+                llTriggerSound(chokehigh, 1.0);
+                llSetTimerEvent(5.0);
+                llSay(listenChannel, "sheath bats");
+                llSetLinkColor(LINK_THIS, color_OFF, ALL_SIDES);
+            }
+            else
+                llOwnerSay("Didn't find attachment: Carnage Bat Swarm");
         }
         else
-            llOwnerSay("Didn't find attachment: Carnage Bat Swarm");
+            llOwnerSay("no hud online"); //FIX
     }
 
     run_time_permissions(integer perm)
@@ -63,19 +68,29 @@ default
     listen(integer chan, string name, key id, string msg)
     {
         if(chan == llChan){
-            if(msg == "batsON")
-                batsON = TRUE;
-            else if(msg == "batsOFF")
-                batsON = FALSE;
-        }
-        if(chan == listenChannel){
-            if(msg == "Bats_Active"){
-                llSetLinkColor(LINK_THIS, color_ON, ALL_SIDES);
-                draw = TRUE;
+            if(llGetOwnerKey(id) == llGetOwner()){
+                if(msg == "batsON")
+                    batsON = TRUE;
+                else if(msg == "batsOFF")
+                    batsON = FALSE;
             }
-            else if(msg == "Bats_Deactive"){
-                llSetLinkColor(LINK_THIS, color_OFF, ALL_SIDES);
-                draw = FALSE;
+        }
+        else if(chan == listenChannel){
+            if(llGetOwnerKey(id) == llGetOwner()){
+                if(msg == "Bats_Active"){
+                    llSetLinkColor(LINK_THIS, color_ON, ALL_SIDES);
+                    draw = TRUE;
+                }
+                else if(msg == "Bats_Deactive"){
+                    llSetLinkColor(LINK_THIS, color_OFF, ALL_SIDES);
+                    draw = FALSE;
+                }
+                else if(msg == "HUD_ON"){
+                    HUD_ON = TRUE;
+                }
+                else if(msg == "HUD_OFF"){
+                    HUD_ON = FALSE;
+                }
             }
         }
     }
