@@ -32,6 +32,7 @@ default
                 llTriggerSound("piano", 1.0);
                 llSetTimerEvent(5.0);
                 llSay(listenChannel, "on");
+                llSay(-458790, "HUD_ON");
                 llSetLinkColor(LINK_THIS, color_ON, ALL_SIDES);
                 toggle = TRUE;
             }
@@ -43,6 +44,7 @@ default
             llTriggerSound("vampsleep1", 1.0);
             llSetTimerEvent(5.0);
             llSay(listenChannel, "off");
+            llSay(-458790, "HUD_OFF");
             llSetLinkColor(LINK_THIS, color_OFF, ALL_SIDES);
             toggle = FALSE;
         }
