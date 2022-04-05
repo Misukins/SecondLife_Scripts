@@ -32,8 +32,8 @@ default
 
     touch_start(integer detected)
     {
-        if(HUD_ON){
-            if((batsON) && (gotPermission) && (!draw)){
+        if((batsON) && (gotPermission) && (!draw)){
+            if(HUD_ON){
                 draw = TRUE;
                 llStartAnimation("fist_idle");
                 llTriggerSound(vamplaugh, 1.0);
@@ -41,19 +41,22 @@ default
                 llSay(listenChannel, "draw bats");
                 llSetLinkColor(LINK_THIS, color_ON, ALL_SIDES);
             }
-            else if((batsON) && (gotPermission) && (draw)){
-                draw = FALSE;
-                llStartAnimation("whistle");  
-                llTriggerSound(chokehigh, 1.0);
-                llSetTimerEvent(5.0);
-                llSay(listenChannel, "sheath bats");
-                llSetLinkColor(LINK_THIS, color_OFF, ALL_SIDES);
+            else{
+                llOwnerSay("no hud online"); //FIX
+                return;
             }
-            else
-                llOwnerSay("Didn't find attachment: Carnage Bat Swarm");
+        }
+        else if((batsON) && (gotPermission) && (draw)){
+            draw = FALSE;
+            llStartAnimation("whistle");  
+            llTriggerSound(chokehigh, 1.0);
+            llSetTimerEvent(5.0);
+            llSay(listenChannel, "sheath bats");
+            llSetLinkColor(LINK_THIS, color_OFF, ALL_SIDES);
         }
         else
-            llOwnerSay("no hud online"); //FIX
+            llOwnerSay("Didn't find attachment: Carnage Bat Swarm");
+        
     }
 
     run_time_permissions(integer perm)
