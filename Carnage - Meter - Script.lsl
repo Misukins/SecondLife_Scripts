@@ -112,14 +112,14 @@ vector color_RP         = <0, 0.876, 0>; //NOTE GREEN
 doMenu(key id)
 {
     if ((!hudStatus) && (!DEBUG)) //NOTE DEBUG not on
-        main_buttons = [ "» On «", "» Title «", "» Color «", "» Silent «", "» Stats «", "» Help «", "▼" ];
+        main_buttons = [ "» Title «", "» Color «", "» Silent «", "» Stats «", "» Help «", "▼" ];
     else if ((!hudStatus) && (DEBUG)) //NOTE if DEBUG is on
-        main_buttons = [ "» On «", "» Title «", "» Color «", "» Silent «", "» Stats «", "levelup", "damage", "reset", "» Help «", "▼" ];
-    else{ //NOTE else this
+        main_buttons = [ "» Title «", "» Color «", "» Silent «", "» Stats «", "levelup", "damage", "reset", "» Help «", "▼" ];
+    else{
         if(attributePoints >= 1)
-            main_buttons = [ "» Off «", "» Suicide «", "» Title «", "» Color «", "» Perks «", "» Help «", "▼" ];
+            main_buttons = [ "» Suicide «", "» Title «", "» Color «", "» Perks «", "» Help «", "▼" ];
         else
-            main_buttons = [ "» Off «", "» Suicide «", "» Title «", "» Color «", "» Help «", "▼" ];
+            main_buttons = [ "» Suicide «", "» Title «", "» Color «", "» Stats «", "» Help «", "▼" ];
     }
     llListenRemove(hand);
     _chan = llFloor(llFrand(2000000));
@@ -252,12 +252,12 @@ stats()
 {
     llOwnerSay("--------------------------------------------\n"
         + "[" + (string)csName + (string)version + "]\n"
-        + "Health:" + (string)health + "/" + (string)healthMax + "\n"
-        + "Stamina:" + (string)mana + "/" + (string)manaMax + "\n"
-        + "Blood:" + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE)
-        + "Armor:" + (string)armor + "\n"
-        + "Damage:" + (string)damage + "\n"
-        + "Level/EXP:" + (string)level + " : " + (string)Float2String(gain, 2, FALSE) + "/" + (string)Float2String(totalExperience, 2, FALSE) + "\n"
+        + "Health: " + (string)health + "/" + (string)healthMax + "\n"
+        + "Stamina: " + (string)mana + "/" + (string)manaMax + "\n"
+        + "Blood: " + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + "\n"
+        + "Armor: " + (string)armor + "\n"
+        + "Damage: " + (string)damage + "\n"
+        + "Level/EXP: " + (string)level + " : " + (string)Float2String(gain, 2, FALSE) + "/" + (string)Float2String(totalExperience, 2, FALSE) + "\n"
         + "--------------------------------------------"
     );
 }
@@ -400,8 +400,12 @@ default
                 llOwnerSay((string)csName + (string)version + " - RP+COMBAT");
             else
                 llOwnerSay((string)csName + (string)version + " - OOC/AFK");
-            if(silentMode)
+            if(silentMode){
                 llOwnerSay("Silentmode Active (Combat Disabled)");
+                llSay(listenChannel, "silentModeON");
+            }
+            else
+                llSay(listenChannel, "silentModeOFF");
         }
     }
 
@@ -424,6 +428,7 @@ default
                         statusText = "RP+COMBAT"; 
                         setStatusText(); 
                         llOwnerSay((string)csName + (string)version + " is now in RP");
+                        doMenu(user);
                     }
                     else
                         llOwnerSay("You need to disable SilentMode!");
@@ -465,10 +470,12 @@ default
                 else if (message == "damage"){
                     health -= damage + 20;
                     llOwnerSay((string)csName + (string)version + (string)health + "/" + (string)healthMax + ".");
+                    doMenu(user);
                     setStatusText();
                 }
                 else if(message == "levelup"){
                     llTriggerSound(levelupSound, 1.0);
+                    doMenu(user);
                     level += 1;
                     Leveling();
                     setStatusText();
@@ -476,15 +483,21 @@ default
                 else if (message == "silent"){
                     if(!silentMode){
                         silentMode = TRUE;
+                        llSay(listenChannel, "silentModeON");
                         llOwnerSay("Silentmode Active (Combat Disabled)"); // you can still FEED without title texts
                     }
                     else{
                         silentMode = FALSE;
+                        llSay(listenChannel, "silentModeOFF");
                         llOwnerSay("Silentmode Deactive (Combat Enabled)");
                     }
                 }
-                else if (message == "stats")
+                else if (message == "stats"){
                     stats();
+                    doMenu(user);
+                }
+                else if (message == "menu")
+                    doMenu(user);
                 else
                     llOwnerSay("Unknown command please try again"); 
             }
@@ -619,7 +632,7 @@ default
             setStatusText();
         }
 
-        if(message == "» On «"){
+        /* if(message == "» On «"){
             if(!silentMode){
                 hudStatus = TRUE;
                 statusText = "RP+COMBAT"; 
@@ -637,10 +650,13 @@ default
             llOwnerSay((string)csName + (string)version + " is now AFK/OOC");
             doMenu(id);
         }
-        else if (message == "» Stats «")
+        else */
+        if (message == "» Stats «"){
             stats();
+            doMenu(user);
+        }
         else if(message == "» Title «")
-            llTextBox(id, "To change your title type : title (name) so for example you might type.... title Unamed Player", chan);
+            llTextBox(id, "To change your title type : title (name)\nso for example you might type.. title Unamed Player", chan);
         else if(message == "» Color «")
             llDialog(id, "\n\nSelect a color group", main_menu, channel);
         else if (message == "» Help «"){
@@ -651,10 +667,12 @@ default
         {
             if(!silentMode){
                 silentMode = TRUE;
+                llSay(listenChannel, "silentModeON");
                 llOwnerSay("Silentmode Active (Combat Disabled)"); // you can still FEED without title texts
             }
             else{
                 silentMode = FALSE;
+                llSay(listenChannel, "silentModeOFF");
                 llOwnerSay("Silentmode Deactive (Combat Enabled)");
             }
         }
@@ -718,11 +736,8 @@ default
         }
         else if (message == "◄")
             doMenu(user);
-        else if (message == "reset")
-            llResetScript();
-        else
+        else if (message == "▼")
             return;
-
         if (llListFindList(main_menu, [message]) != -1){
             if (message == "grayscale")
                 sub_menu = grayscale + "▼"; 
@@ -754,10 +769,6 @@ default
         if (index != -1){
             override_titleC = TRUE;
             color = llList2Vector(sub_menu, index + 1);
-            setStatusText();
-        }
-        else{
-            override_titleC = FALSE;
             setStatusText();
         }
     }
