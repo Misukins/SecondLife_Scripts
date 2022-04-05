@@ -7,16 +7,21 @@ integer llChan          = -458704;
 integer listenChannel   = -458790;
 integer casterON        = FALSE;
 integer gotPermission   = FALSE;
+integer HUD_ON;
 
 vector color_USED       = <0.30, 0.30, 0.30>;
 vector color_UNUSED     = <1, 1, 1>;
 vector color_ONCOOLDOWN = <0, 0, 0>;
 
+/*
+    IM GONNA MAKE HUGE REWRITE ON THIS SCRIPT!!
+*/
+
 cast()
 {
     llSay(listenChannel, "BloodBall_Casted");
     llTriggerSound(fireballcast, 1.0);
-    llSay(330, llKey2Name(llGetOwner())+ "shoot");
+    llSay(330, llKey2Name(llGetOwner())+ "shoot"); //FIXME
     llStartAnimation("Attack11");
 }   
 
@@ -65,9 +70,13 @@ default
             else if(msg == "casterOFF")
                 casterON = FALSE;
         }
-        if(chan == listenChannel){
+        else if(chan == listenChannel){
             if(msg == "noBlood")
                 state noBlood;
+            else if(msg == "HUD_ON")
+                HUD_ON = TRUE;
+            else if(msg == "HUD_OFF")
+                HUD_ON = FALSE;
         }
     }
 }
@@ -90,10 +99,13 @@ state noBlood
             else if(msg == "casterOFF")
                 casterON = FALSE;
         }
-
-        if(chan == listenChannel){
-            if(msg == "okBlood")
-                state default;
+        else if(chan == listenChannel){
+            if(msg == "noBlood")
+                state noBlood;
+            else if(msg == "HUD_ON")
+                HUD_ON = TRUE;
+            else if(msg == "HUD_OFF")
+                HUD_ON = FALSE;
         }
     }
 }
