@@ -389,8 +389,10 @@ default
             state Remove;
         else if (message == "menu")
             ownermenu(id);
-        else if (message == "Animation")
+        else if (message == "Animation"){
             animsmenu(id);
+            stopAllAnimations();
+        }
         else if (message == "booty"){
             if(gotPermission)
                 llStartAnimation("booty");
@@ -402,6 +404,7 @@ default
         else if (message == "cutie"){
             if(gotPermission)
                 llStartAnimation("cutie");
+            
         }
         else if (message == "kneel"){
             if(gotPermission)
@@ -485,7 +488,7 @@ default
     attach(key _id)
     {
         if (_id != NULL_KEY){
-            llRequestPermissions(llGetOwner(), PERMISSION_ATTACH | PERMISSION_TAKE_CONTROLS);
+            llRequestPermissions(llGetOwner(), PERMISSION_ATTACH | PERMISSION_TRIGGER_ANIMATION);
             llAttachToAvatar(ATTACH_NECK);
             dumpAccessList();
         }
