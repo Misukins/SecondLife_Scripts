@@ -126,7 +126,7 @@ doMenu(key id)
     llDialog(id, (string)llGetDisplayName(id) + " Carnage Meter Menu\n"
         + "You have "   + (string)attributePoints + " Perk Points to use.\nCurrent Stats :: \n"
         + "Health: "    + (string)healthMax + "\n"
-        + "Mana: "      + (string)manaMax + "\n"
+        + "Stamina: "   + (string)manaMax + "\n"
         + "Blood: "     + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters.\n"
         + "Armor: "     + (string)armor + "\n"
         + "Damage: "    + (string)damage + "\n", main_buttons, _chan);
@@ -145,14 +145,14 @@ doEXPMenu(key id)
 
 doPerksMenu(key id)
 {
-    perk_buttons = [ "Health+", "Mana+", "Blood+", "Armor+", "Damage+", "◄", "▼" ];
+    perk_buttons = [ "Health+", "Stamina+", "Blood+", "Armor+", "Damage+", "◄", "▼" ];
     llListenRemove(hand);
     _chan = llFloor(llFrand(2000000));
     hand = llListen(_chan, "", id, "");
     llDialog(id, (string)llGetDisplayName(id) + " Select what stast you want to increase\n"
         + "You have "   + (string)attributePoints + " Perk Points to use.\nCurrent Stats :: \n"
         + "Health: "    + (string)healthMax + "\n"
-        + "Mana: "      + (string)manaMax + "\n"
+        + "Stamina: "   + (string)manaMax + "\n"
         + "Blood: "     + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters.\n"
         + "Armor: "     + (string)armor + "\n"
         + "Damage: "    + (string)damage + "\n", perk_buttons, _chan);
@@ -164,25 +164,25 @@ setStatusText()
         if((!hudStatus) && (!override_titleC))
             llSetText("[" + csName + version + "]" 
                 + "\n" + "Health : " + (string)health + "/" + (string)healthMax 
-                + "\n" + "Mana : " + (string)mana + "/" + (string)manaMax 
+                + "\n" + "Stamina : " + (string)mana + "/" + (string)manaMax 
                 + "\n" + "Blood : " + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters."
                 + "\n" +  customTitle + "\n" + statusText, color_AFK, 1.0);
         else if((hudStatus) && (!override_titleC))
             llSetText("[" + csName + version + "]"
                 + "\n" + "Health : " + (string)health + "/" + (string)healthMax 
-                + "\n" + "Mana : " + (string)mana + "/" + (string)manaMax 
+                + "\n" + "Stamina : " + (string)mana + "/" + (string)manaMax 
                 + "\n" + "Blood : " + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters."
                 + "\n" +  customTitle + "\n" + statusText, color_RP, 1.0);
         else if((!hudStatus) && (override_titleC))
             llSetText("[" + csName + version + "]"
                 + "\n" + "Health : " + (string)health + "/" + (string)healthMax 
-                + "\n" + "Mana : " + (string)mana + "/" + (string)manaMax 
+                + "\n" + "Stamina : " + (string)mana + "/" + (string)manaMax 
                 + "\n" + "Blood : " + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters."
                 + "\n" +  customTitle + "\n" + statusText, color, 1.0);
         else if((hudStatus) && (override_titleC))
             llSetText("[" + csName + version + "]"
                 + "\n" + "Health : " + (string)health + "/" + (string)healthMax 
-                + "\n" + "Mana : " + (string)mana + "/" + (string)manaMax 
+                + "\n" + "Stamina : " + (string)mana + "/" + (string)manaMax 
                 + "\n" + "Blood : " + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters."
                 + "\n" +  customTitle + "\n" + statusText, color, 1.0);
     }
@@ -191,7 +191,7 @@ setStatusText()
             llSetText("[" + csName + version + "]"
                 + "\n" + "Level : [" + (string)level + "]" 
                 + "\n" + "Health : " + (string)health + "/" + (string)healthMax 
-                + "\n" + "Mana : " + (string)mana + "/" + (string)manaMax 
+                + "\n" + "Stamina : " + (string)mana + "/" + (string)manaMax 
                 + "\n" + "Blood : " + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters." 
                 + "\n" + "EXP : " + (string)Float2String(gain, 2, FALSE) + "/" + (string)Float2String(totalExperience, 2, FALSE) 
                 + "\n" + "Perk Points : [" + (string)attributePoints + "]" 
@@ -200,7 +200,7 @@ setStatusText()
             llSetText("[" + csName + version + "]"
                 + "\n" + "Level : [" + (string)level + "]" 
                 + "\n" + "Health : " + (string)health + "/" + (string)healthMax 
-                + "\n" + "Mana : " + (string)mana + "/" + (string)manaMax 
+                + "\n" + "Stamina : " + (string)mana + "/" + (string)manaMax 
                 + "\n" + "Blood : " + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters."
                 + "\n" + "EXP : " + (string)Float2String(gain, 2, FALSE) + "/" + (string)Float2String(totalExperience, 2, FALSE) 
                 + "\n" + "Perk Points : [" + (string)attributePoints + "]" 
@@ -209,7 +209,7 @@ setStatusText()
             llSetText("[" + csName + version + "]"
                 + "\n" + "Level : [" + (string)level + "]" 
                 + "\n" + "Health : " + (string)health + "/" + (string)healthMax 
-                + "\n" + "Mana : " + (string)mana + "/" + (string)manaMax 
+                + "\n" + "Stamina : " + (string)mana + "/" + (string)manaMax 
                 + "\n" + "Blood : " + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters."
                 + "\n" + "EXP : " + (string)Float2String(gain, 2, FALSE) + "/" + (string)Float2String(totalExperience, 2, FALSE) 
                 + "\n" + "Perk Points : [" + (string)attributePoints + "]" 
@@ -218,7 +218,7 @@ setStatusText()
             llSetText("[" + csName + version + "]"
                 + "\n" + "Level : [" + (string)level + "]" 
                 + "\n" + "Health : " + (string)health + "/" + (string)healthMax 
-                + "\n" + "Mana : " + (string)mana + "/" + (string)manaMax 
+                + "\n" + "Stamina : " + (string)mana + "/" + (string)manaMax 
                 + "\n" + "Blood : " + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters."
                 + "\n" + "EXP : " + (string)Float2String(gain, 2, FALSE) + "/" + (string)Float2String(totalExperience, 2, FALSE) 
                 + "\n" + "Perk Points : [" + (string)attributePoints + "]" 
@@ -248,7 +248,7 @@ stats()
     llOwnerSay("--------------------------------------------\n"
         + "[" + (string)csName + (string)version + "]\n"
         + "Health:" + (string)health + "/" + (string)healthMax + "\n"
-        + "Mana:" + (string)mana + "/" + (string)manaMax + "\n"
+        + "Stamina:" + (string)mana + "/" + (string)manaMax + "\n"
         + "Blood:" + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE)
         + "Armor:" + (string)armor + "\n"
         + "Damage:" + (string)damage + "\n"
@@ -486,12 +486,13 @@ default
                 else
                     health -= damage + 10; //NOTE JUST FOR BACKUP... everytype of weapon works with this now
                 llOwnerSay(attacker + " hit you with damage of type " + damagetype + " ( " + subdamagetype + " )"); //NOTE will change abit
-                addEXP(attacker, 2); //NOTE 2exp per hit.
             }
         }
         else if(channel == listenChannel){
             if(llGetOwnerKey(id) == user){
-                if (message == "give_exp10")
+                if (message == "give_exp4")
+                    addEXP(user, 4);
+                else if (message == "give_exp10")
                     addEXP(user, 10);
                 else if (message == "give_exp20")
                     addEXP(user, 20);
@@ -627,10 +628,10 @@ default
             if(attributePoints >= 1)
                 doPerksMenu(user);
         }
-        else if (message == "Mana+"){
+        else if (message == "Stamina+"){
             manaMax += 10;
             attributePoints -= 1;
-            llOwnerSay("You have increaced your MaxMana to " + (string)manaMax + ".");
+            llOwnerSay("You have increaced your MaxStamina to " + (string)manaMax + ".");
             if(attributePoints >= 1)
                 doPerksMenu(user);
         }
@@ -849,12 +850,6 @@ default
             setStatusText();
             state dead;
         }
-
-        if(mana == 0){
-            llOwnerSay("You are out of Mana!");
-            mana = 0;
-            setStatusText();
-        }
     }
 
     timer()
@@ -897,6 +892,7 @@ default
 
         if(mana <= 0){
             llSay(listenChannel,"noMana");
+            llOwnerSay("You are out of Stamina!");
             mana = 0;
         }
 
