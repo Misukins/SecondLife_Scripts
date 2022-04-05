@@ -1,8 +1,10 @@
 integer listenChannel   = 4;
 integer llChan          = -458703;
+integer _llChan         = -458790;
 integer meterON         = FALSE;
 integer gotPermission   = FALSE;
 integer toggle          = FALSE;
+integer silentMode      = FALSE;
 
 vector color_OFF        = <0.876, 0, 0>;
 vector color_ON         = <0, 0.876, 0>;
@@ -12,6 +14,7 @@ default
     state_entry()
     {
         llListen(llChan, "", "", "");
+        llListen(_llChan, "", "", "");
         llPreloadSound("piano");
         llPreloadSound("vampsleep1");
         if(llGetAttached())
@@ -26,28 +29,30 @@ default
 
     touch_start(integer detected)
     {
-        if(!toggle){
+        if((!toggle) && (!silentMode)){
             if((meterON) && (gotPermission)){
-                llStartAnimation("rezz");  
+                llStartAnimation("rezz");
                 llTriggerSound("piano", 1.0);
                 llSetTimerEvent(5.0);
                 llSay(listenChannel, "on");
-                llSay(-458790, "HUD_ON");
+                llSay(_llChan, "HUD_ON");
                 llSetLinkColor(LINK_THIS, color_ON, ALL_SIDES);
                 toggle = TRUE;
             }
             else
                 llOwnerSay("Didn't find attachment: Carnage Meter");
         }
-        else{
+        else if(toggle){
             llStartAnimation("vampsleep");  
             llTriggerSound("vampsleep1", 1.0);
             llSetTimerEvent(5.0);
             llSay(listenChannel, "off");
-            llSay(-458790, "HUD_OFF");
+            llSay(_llChan, "HUD_OFF");
             llSetLinkColor(LINK_THIS, color_OFF, ALL_SIDES);
             toggle = FALSE;
         }
+        else
+            llOwnerSay("You need to disable SilentMode!");
     }
 
     run_time_permissions(integer perm)
@@ -66,6 +71,12 @@ default
                 meterON = TRUE;
             else if(msg == "meterOFF")
                 meterON = FALSE;
+        }
+        else if(chan == _llChan){
+            if(msg == "silentModeON")
+                silentMode = TRUE;
+            else if(msg == "silentModeOFF")
+                silentMode = FALSE;
         }
     }
 
