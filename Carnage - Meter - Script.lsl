@@ -43,6 +43,7 @@ integer override_titleC = FALSE; //NOTE for overiting custom title colors that u
 integer Bats_Active     = FALSE;
 integer DEBUG           = TRUE;
 integer EnableLeveling  = TRUE;
+integer silentMode      = FALSE;
 integer level           = 1;
 integer attributePoints;
 integer batsCost        = 10; //NOTE casting Bat Swarm cost
@@ -111,9 +112,9 @@ vector color_RP         = <0, 0.876, 0>; //NOTE GREEN
 doMenu(key id)
 {
     if ((!hudStatus) && (!DEBUG)) //NOTE DEBUG not on
-        main_buttons = [ "» On «", "» Title «", "» Color «", "» Help «", "▼" ];
+        main_buttons = [ "» On «", "» Title «", "» Color «", "» Silent «", "» Stats «", "» Help «", "▼" ];
     else if ((!hudStatus) && (DEBUG)) //NOTE if DEBUG is on
-        main_buttons = [ "» On «", "» Title «", "» Color «", "levelup", "damage", "stats", "exp", "blood 0.1", "blood 0.25", "reset", "» Help «", "▼" ];
+        main_buttons = [ "» On «", "» Title «", "» Color «", "» Silent «", "» Stats «", "levelup", "damage", "reset", "» Help «", "▼" ];
     else{ //NOTE else this
         if(attributePoints >= 1)
             main_buttons = [ "» Off «", "» Suicide «", "» Title «", "» Color «", "» Perks «", "» Help «", "▼" ];
@@ -160,70 +161,74 @@ doPerksMenu(key id)
 
 setStatusText()
 {
-    if(!EnableLeveling){
-        if((!hudStatus) && (!override_titleC))
-            llSetText("[" + csName + version + "]" 
-                + "\n" + "Health : " + (string)health + "/" + (string)healthMax 
-                + "\n" + "Stamina : " + (string)mana + "/" + (string)manaMax 
-                + "\n" + "Blood : " + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters."
-                + "\n" +  customTitle + "\n" + statusText, color_AFK, 1.0);
-        else if((hudStatus) && (!override_titleC))
-            llSetText("[" + csName + version + "]"
-                + "\n" + "Health : " + (string)health + "/" + (string)healthMax 
-                + "\n" + "Stamina : " + (string)mana + "/" + (string)manaMax 
-                + "\n" + "Blood : " + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters."
-                + "\n" +  customTitle + "\n" + statusText, color_RP, 1.0);
-        else if((!hudStatus) && (override_titleC))
-            llSetText("[" + csName + version + "]"
-                + "\n" + "Health : " + (string)health + "/" + (string)healthMax 
-                + "\n" + "Stamina : " + (string)mana + "/" + (string)manaMax 
-                + "\n" + "Blood : " + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters."
-                + "\n" +  customTitle + "\n" + statusText, color, 1.0);
-        else if((hudStatus) && (override_titleC))
-            llSetText("[" + csName + version + "]"
-                + "\n" + "Health : " + (string)health + "/" + (string)healthMax 
-                + "\n" + "Stamina : " + (string)mana + "/" + (string)manaMax 
-                + "\n" + "Blood : " + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters."
-                + "\n" +  customTitle + "\n" + statusText, color, 1.0);
+    if(!silentMode){
+        if(!EnableLeveling){
+            if((!hudStatus) && (!override_titleC))
+                llSetText("[" + csName + version + "]" 
+                    + "\n" + "Health : " + (string)health + "/" + (string)healthMax 
+                    + "\n" + "Stamina : " + (string)mana + "/" + (string)manaMax 
+                    + "\n" + "Blood : " + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters."
+                    + "\n" +  customTitle + "\n" + statusText, color_AFK, 1.0);
+            else if((hudStatus) && (!override_titleC))
+                llSetText("[" + csName + version + "]"
+                    + "\n" + "Health : " + (string)health + "/" + (string)healthMax 
+                    + "\n" + "Stamina : " + (string)mana + "/" + (string)manaMax 
+                    + "\n" + "Blood : " + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters."
+                    + "\n" +  customTitle + "\n" + statusText, color_RP, 1.0);
+            else if((!hudStatus) && (override_titleC))
+                llSetText("[" + csName + version + "]"
+                    + "\n" + "Health : " + (string)health + "/" + (string)healthMax 
+                    + "\n" + "Stamina : " + (string)mana + "/" + (string)manaMax 
+                    + "\n" + "Blood : " + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters."
+                    + "\n" +  customTitle + "\n" + statusText, color, 1.0);
+            else if((hudStatus) && (override_titleC))
+                llSetText("[" + csName + version + "]"
+                    + "\n" + "Health : " + (string)health + "/" + (string)healthMax 
+                    + "\n" + "Stamina : " + (string)mana + "/" + (string)manaMax 
+                    + "\n" + "Blood : " + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters."
+                    + "\n" +  customTitle + "\n" + statusText, color, 1.0);
+        }
+        else{
+            if((!hudStatus) && (!override_titleC))
+                llSetText("[" + csName + version + "]"
+                    + "\n" + "Level : [" + (string)level + "]" 
+                    + "\n" + "Health : " + (string)health + "/" + (string)healthMax 
+                    + "\n" + "Stamina : " + (string)mana + "/" + (string)manaMax 
+                    + "\n" + "Blood : " + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters." 
+                    + "\n" + "EXP : " + (string)Float2String(gain, 2, FALSE) + "/" + (string)Float2String(totalExperience, 2, FALSE) 
+                    + "\n" + "Perk Points : [" + (string)attributePoints + "]" 
+                    + "\n" +  customTitle + "\n" + statusText, color_AFK, 1.0);
+            else if((hudStatus) && (!override_titleC))
+                llSetText("[" + csName + version + "]"
+                    + "\n" + "Level : [" + (string)level + "]" 
+                    + "\n" + "Health : " + (string)health + "/" + (string)healthMax 
+                    + "\n" + "Stamina : " + (string)mana + "/" + (string)manaMax 
+                    + "\n" + "Blood : " + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters."
+                    + "\n" + "EXP : " + (string)Float2String(gain, 2, FALSE) + "/" + (string)Float2String(totalExperience, 2, FALSE) 
+                    + "\n" + "Perk Points : [" + (string)attributePoints + "]" 
+                    + "\n" +  customTitle + "\n" + statusText, color_RP, 1.0);
+            else if((!hudStatus) && (override_titleC))
+                llSetText("[" + csName + version + "]"
+                    + "\n" + "Level : [" + (string)level + "]" 
+                    + "\n" + "Health : " + (string)health + "/" + (string)healthMax 
+                    + "\n" + "Stamina : " + (string)mana + "/" + (string)manaMax 
+                    + "\n" + "Blood : " + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters."
+                    + "\n" + "EXP : " + (string)Float2String(gain, 2, FALSE) + "/" + (string)Float2String(totalExperience, 2, FALSE) 
+                    + "\n" + "Perk Points : [" + (string)attributePoints + "]" 
+                    + "\n" +  customTitle + "\n" + statusText, color, 1.0);
+            else if((hudStatus) && (override_titleC))
+                llSetText("[" + csName + version + "]"
+                    + "\n" + "Level : [" + (string)level + "]" 
+                    + "\n" + "Health : " + (string)health + "/" + (string)healthMax 
+                    + "\n" + "Stamina : " + (string)mana + "/" + (string)manaMax 
+                    + "\n" + "Blood : " + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters."
+                    + "\n" + "EXP : " + (string)Float2String(gain, 2, FALSE) + "/" + (string)Float2String(totalExperience, 2, FALSE) 
+                    + "\n" + "Perk Points : [" + (string)attributePoints + "]" 
+                    + "\n" +  customTitle + "\n" + statusText, color, 1.0);
+        }
     }
-    else{
-        if((!hudStatus) && (!override_titleC))
-            llSetText("[" + csName + version + "]"
-                + "\n" + "Level : [" + (string)level + "]" 
-                + "\n" + "Health : " + (string)health + "/" + (string)healthMax 
-                + "\n" + "Stamina : " + (string)mana + "/" + (string)manaMax 
-                + "\n" + "Blood : " + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters." 
-                + "\n" + "EXP : " + (string)Float2String(gain, 2, FALSE) + "/" + (string)Float2String(totalExperience, 2, FALSE) 
-                + "\n" + "Perk Points : [" + (string)attributePoints + "]" 
-                + "\n" +  customTitle + "\n" + statusText, color_AFK, 1.0);
-        else if((hudStatus) && (!override_titleC))
-            llSetText("[" + csName + version + "]"
-                + "\n" + "Level : [" + (string)level + "]" 
-                + "\n" + "Health : " + (string)health + "/" + (string)healthMax 
-                + "\n" + "Stamina : " + (string)mana + "/" + (string)manaMax 
-                + "\n" + "Blood : " + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters."
-                + "\n" + "EXP : " + (string)Float2String(gain, 2, FALSE) + "/" + (string)Float2String(totalExperience, 2, FALSE) 
-                + "\n" + "Perk Points : [" + (string)attributePoints + "]" 
-                + "\n" +  customTitle + "\n" + statusText, color_RP, 1.0);
-        else if((!hudStatus) && (override_titleC))
-            llSetText("[" + csName + version + "]"
-                + "\n" + "Level : [" + (string)level + "]" 
-                + "\n" + "Health : " + (string)health + "/" + (string)healthMax 
-                + "\n" + "Stamina : " + (string)mana + "/" + (string)manaMax 
-                + "\n" + "Blood : " + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters."
-                + "\n" + "EXP : " + (string)Float2String(gain, 2, FALSE) + "/" + (string)Float2String(totalExperience, 2, FALSE) 
-                + "\n" + "Perk Points : [" + (string)attributePoints + "]" 
-                + "\n" +  customTitle + "\n" + statusText, color, 1.0);
-        else if((hudStatus) && (override_titleC))
-            llSetText("[" + csName + version + "]"
-                + "\n" + "Level : [" + (string)level + "]" 
-                + "\n" + "Health : " + (string)health + "/" + (string)healthMax 
-                + "\n" + "Stamina : " + (string)mana + "/" + (string)manaMax 
-                + "\n" + "Blood : " + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters."
-                + "\n" + "EXP : " + (string)Float2String(gain, 2, FALSE) + "/" + (string)Float2String(totalExperience, 2, FALSE) 
-                + "\n" + "Perk Points : [" + (string)attributePoints + "]" 
-                + "\n" +  customTitle + "\n" + statusText, color, 1.0);
-    }
+    else
+        llSetText("", <1, 1, 1>, 1.0); //NOTE WHITE
 }
 
 help(key user)
@@ -386,6 +391,8 @@ default
                 llOwnerSay((string)csName + (string)version + " - RP+COMBAT");
             else
                 llOwnerSay((string)csName + (string)version + " - OOC/AFK");
+            if(silentMode)
+                llOwnerSay("Silentmode Active (Combat Disabled)");
         }
     }
 
@@ -403,10 +410,14 @@ default
                 if(message == "help")
                     help(user);
                 else if(message == "on"){
-                    hudStatus = TRUE;
-                    statusText = "RP+COMBAT"; 
-                    setStatusText(); 
-                    llOwnerSay((string)csName + (string)version + " is now in RP"); 
+                    if(!silentMode){
+                        hudStatus = TRUE;
+                        statusText = "RP+COMBAT"; 
+                        setStatusText(); 
+                        llOwnerSay((string)csName + (string)version + " is now in RP");
+                    }
+                    else
+                        llOwnerSay("You need to disable SilentMode!");
                 }
                 else if(message == "suicide"){
                     deathStatus = TRUE; 
@@ -452,6 +463,16 @@ default
                     level += 1;
                     Leveling();
                     setStatusText();
+                }
+                else if (message == "silent"){
+                    if(!silentMode){
+                        silentMode = TRUE;
+                        llOwnerSay("Silentmode Active (Combat Disabled)"); // you can still FEED without title texts
+                    }
+                    else{
+                        silentMode = FALSE;
+                        llOwnerSay("Silentmode Deactive (Combat Enabled)");
+                    }
                 }
                 else if (message == "stats")
                     stats();
@@ -590,11 +611,15 @@ default
         }
 
         if(message == "» On «"){
-            hudStatus = TRUE;
-            statusText = "RP+COMBAT"; 
-            setStatusText(); 
-            llOwnerSay((string)csName + (string)version +" is now in RP"); 
-            doMenu(id);
+            if(!silentMode){
+                hudStatus = TRUE;
+                statusText = "RP+COMBAT"; 
+                setStatusText(); 
+                llOwnerSay((string)csName + (string)version +" is now in RP"); 
+                doMenu(id);
+            }
+            else
+                llOwnerSay("You need to disable SilentMode!");
         }
         else if(message == "» Off «"){
             hudStatus = FALSE;
@@ -603,6 +628,8 @@ default
             llOwnerSay((string)csName + (string)version + " is now AFK/OOC");
             doMenu(id);
         }
+        else if (message == "» Stats «")
+            stats();
         else if(message == "» Title «")
             llTextBox(id, "To change your title type : title (name) so for example you might type.... title Unamed Player", chan);
         else if(message == "» Color «")
@@ -610,6 +637,17 @@ default
         else if (message == "» Help «"){
             help(id);
             doMenu(id);
+        }
+        else if (message == "» Silent «")
+        {
+            if(!silentMode){
+                silentMode = TRUE;
+                llOwnerSay("Silentmode Active (Combat Disabled)"); // you can still FEED without title texts
+            }
+            else{
+                silentMode = FALSE;
+                llOwnerSay("Silentmode Deactive (Combat Enabled)");
+            }
         }
         else if(message == "» Suicide «"){
             deathStatus = TRUE;
@@ -620,7 +658,6 @@ default
         }
         else if (message == "» Perks «")
             doPerksMenu(user);
-        
         else if (message == "Health+"){
             healthMax += 10;
             attributePoints -= 1;
@@ -670,123 +707,6 @@ default
             setStatusText();
             doMenu(user);
         }
-        else if (message == "stats"){
-            stats();
-            doMenu(user);
-        }
-        /* else if (message == "exp")
-            doEXPMenu(user);
-        else if (message == "give_exp10"){
-            addEXP(user, 10);
-            //doEXPMenu(user);
-        }
-        else if (message == "give_exp20"){
-            addEXP(user, 20);
-            //doEXPMenu(user);
-        }
-        else if (message == "give_exp30"){
-            addEXP(user, 30);
-            //doEXPMenu(user);
-        }
-        else if (message == "give_exp40"){
-            addEXP(user, 40);
-            //doEXPMenu(user);
-        }
-        else if (message == "give_exp50"){
-            addEXP(user, 50);
-            //doEXPMenu(user);
-        }
-        else if (message == "give_exp60"){
-            addEXP(user, 60);
-            //doEXPMenu(user);
-        }
-        else if (message == "give_exp70"){
-            addEXP(user, 70);
-            //doEXPMenu(user);
-        }
-        else if (message == "give_exp80"){
-            addEXP(user, 80);
-            //doEXPMenu(user);
-        }
-        else if (message == "give_exp90"){
-            addEXP(user, 90);
-            //doEXPMenu(user);
-        }
-        else if (message == "give_exp100"){
-            addEXP(user, 100);
-            //doEXPMenu(user);
-        }
-        else if(message == "Bats_Active"){
-            Bats_Active = TRUE;
-            mana -= batsCost;
-        }
-        else if(message == "Bats_Deactive")
-            Bats_Active = FALSE;
-        else if(message == "BloodBall_Casted"){
-            blood -= bloodBallCost;
-        }
-        else if (message == "blood " + (string)Float2String(feedMin, 2, FALSE)){
-            if(blood != bloodMax){
-                if(blood < bloodMax){
-                    blood += feedMin;
-                    if(blood > bloodMax)
-                        blood = bloodMax;
-                }
-                if(blood >= 1.0){
-                    llOwnerSay("You sense fresh blood nearby!\nCurrent Blood: " 
-                    + (string)Float2String(blood, 2, FALSE) 
-                    + "/" + (string)Float2String(bloodMax, 2, FALSE) 
-                    + " liters.");
-                    llSay(listenChannel, "okBlood");
-                }
-                else
-                    llOwnerSay("You need more blood to cast bloodmagic!\nCurrent Blood: " 
-                    + (string)Float2String(blood, 2, FALSE) 
-                    + "/" + (string)Float2String(bloodMax, 2, FALSE) 
-                    + " liters.");
-            }
-            if(blood == bloodMax){
-                llOwnerSay("You are full!\nCurrent Blood: " 
-                + (string)Float2String(blood, 2, FALSE) 
-                + "/" + (string)Float2String(bloodMax, 2, FALSE) 
-                + " liters.");
-                addEXP(user, -10);
-            }
-        }
-        else if (message == "blood " + (string)Float2String(feedMax, 2, FALSE)){
-            if(blood != bloodMax){
-                if(blood < bloodMax){
-                    blood += feedMax;
-                    if(blood > bloodMax)
-                        blood = bloodMax;
-                }
-                if(blood >= 1.0){
-                    llOwnerSay("You sense fresh blood nearby!\nCurrent Blood: " 
-                    + (string)Float2String(blood, 2, FALSE) 
-                    + "/" + (string)Float2String(bloodMax, 2, FALSE) 
-                    + " liters.");
-                    llSay(listenChannel, "okBlood");
-                }
-                else if(blood == bloodMax)
-                    llOwnerSay("You are full!\nCurrent Blood: " 
-                    + (string)Float2String(blood, 2, FALSE) 
-                    + "/" + (string)Float2String(bloodMax, 2, FALSE) 
-                    + " liters.");
-                else
-                    llOwnerSay("You need more blood to cast bloodmagic!\nCurrent Blood: " 
-                    + (string)Float2String(blood, 2, FALSE) 
-                    + "/" + (string)Float2String(bloodMax, 2, FALSE) 
-                    + " liters.");
-            }
-
-            if(blood == bloodMax){
-                llOwnerSay("You are full!\nCurrent Blood: " 
-                + (string)Float2String(blood, 2, FALSE) 
-                + "/" + (string)Float2String(bloodMax, 2, FALSE) 
-                + " liters.");
-                addEXP(user, -20);
-            }
-        } */
         else if (message == "◄")
             doMenu(user);
         else if (message == "reset")
