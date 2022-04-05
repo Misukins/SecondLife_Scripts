@@ -1,17 +1,17 @@
-string WeaponType = "bats";
-string DamageType = "bats";
-string SubDamageType = "sword";
-string HitSound = "hit";
-string MissSound = "swingmiss2";
-string DrawSound = "draw1";
-string SheathSound = "sheath";
+string WeaponType       = "bats";
+string DamageType       = "bats";
+string SubDamageType    = "sword";
+string HitSound         = "hit";
+string MissSound        = "swingmiss2";
+string DrawSound        = "draw1";
+string SheathSound      = "sheath";
 
-float SoundVolume = 1.0;
-float Range = 2.5;
-float Speed = 0.55;
-float bats_duration = 20.0; //NOTE 20seconds
+float SoundVolume   = 1.0;
+float Range         = 2.5;
+float Speed         = 0.55;
+float bats_duration = 20.0; //NOTE 20seconds or if out of stamina
 
-integer Drawn = FALSE;
+integer Drawn           = FALSE;
 integer AutoSheathOnRez = TRUE;
 integer listenChannel   = -458790;
 integer llChan          = -458702;
@@ -27,6 +27,7 @@ Attack()
 {
     llResetTime();
     llSensor("", NULL_KEY,AGENT, Range, PI_BY_TWO);
+    llSay(listenChannel, "give_exp4");
 }
 
 default
@@ -38,8 +39,11 @@ default
         }
         if(AutoSheathOnRez)
             llSetLinkAlpha(LINK_SET,0,ALL_SIDES);
-        //llListen(PUBLIC_CHANNEL,"", llGetOwner(), "");
-        //llListen(1,"", llGetOwner(), "");
+        /*
+        //NOTE UNUSED
+        llListen(PUBLIC_CHANNEL,"", llGetOwner(), "");
+        llListen(1,"", llGetOwner(), "");
+        */
         llListen(listenChannel, "", "", "");
         llTargetOmega(<0, 0, 0>, 0, 0);
     }
@@ -58,32 +62,34 @@ default
     listen(integer chan, string name, key id, string msg)
     {
         if(chan == listenChannel){
-            if(msg == llToLower("draw "+ WeaponType) && !Drawn){
-                Drawn = TRUE;
-                if(DrawSound != "")
-                    llPlaySound(DrawSound,SoundVolume);
-                llSetLinkAlpha(LINK_SET, 1, ALL_SIDES);
-                llTargetOmega(<0, 0, 1>, PI, 1.0);
-                Attack();
-                llSay(listenChannel, "Bats_Active");
-                llSetTimerEvent(bats_duration);
-            }
-            else if(msg == llToLower("sheath "+ WeaponType) && Drawn){
-                Drawn = FALSE;
-                llSetLinkAlpha(LINK_SET, 0, ALL_SIDES);
-                if(SheathSound != "")
-                    llPlaySound(SheathSound,SoundVolume);
-                llSay(listenChannel, "Bats_Deactive");
-                llTargetOmega(<0, 0, 0>, 0, 0);
-            }
-            else if(msg == "noMana"){
-                Drawn = FALSE;
-                llSetLinkAlpha(LINK_SET, 0, ALL_SIDES);
-                if(SheathSound != "")
-                    llPlaySound(SheathSound, SoundVolume);
-                llTargetOmega(<0, 0, 0>, 0, 0);
-                llSay(listenChannel, "Bats_Deactive");
-                llOwnerSay("You are out of Mana!");
+            if(llGetOwnerKey(id) == llGetOwner()){
+                if(msg == llToLower("draw "+ WeaponType) && !Drawn){
+                    Drawn = TRUE;
+                    if(DrawSound != "")
+                        llPlaySound(DrawSound,SoundVolume);
+                    llSetLinkAlpha(LINK_SET, 1, ALL_SIDES);
+                    llTargetOmega(<0, 0, 1>, PI, 1.0);
+                    Attack();
+                    llSay(listenChannel, "Bats_Active");
+                    llSetTimerEvent(bats_duration);
+                }
+                else if(msg == llToLower("sheath "+ WeaponType) && Drawn){
+                    Drawn = FALSE;
+                    llSetLinkAlpha(LINK_SET, 0, ALL_SIDES);
+                    if(SheathSound != "")
+                        llPlaySound(SheathSound,SoundVolume);
+                    llSay(listenChannel, "Bats_Deactive");
+                    llTargetOmega(<0, 0, 0>, 0, 0);
+                }
+                else if(msg == "noMana"){
+                    Drawn = FALSE;
+                    llSetLinkAlpha(LINK_SET, 0, ALL_SIDES);
+                    if(SheathSound != "")
+                        llPlaySound(SheathSound, SoundVolume);
+                    llTargetOmega(<0, 0, 0>, 0, 0);
+                    llSay(listenChannel, "Bats_Deactive");
+                    llOwnerSay("You are out of Stamina!");
+                }
             }
         }
     }
