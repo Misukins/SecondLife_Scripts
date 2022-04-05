@@ -307,19 +307,28 @@ Leveling()
     }
 }
 
-updateHealth(string value)
-{
-    //llSay(listenChannel, value);
-}
-
-updateMana()
+updateHealthMeter(string health)
 {
     //TODO
+    //llSay(listenChannel, health);
 }
 
-updateBlood()
+updateStaminaMeter(string mana)
 {
     //TODO
+    //llSay(listenChannel, mana);
+}
+
+updateBloodMeter(string blood)
+{
+    //TODO
+    //llSay(listenChannel, (string)Float2String(blood, 2, FALSE));
+}
+
+updateEXPMeter(string experience)
+{
+    //TODO
+    //llSay(listenChannel, (string)Float2String(experience, 2, FALSE));
 }
 
 default
