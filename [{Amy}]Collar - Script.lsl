@@ -210,15 +210,15 @@ soundsOFF()
 
 stopFollowing(key id)
 {
-  string origName = llGetObjectName();
-  list username = llParseString2List(llGetDisplayName(id), [""], []);
-  list owner = llParseString2List(llGetDisplayName(llGetOwner()), [""], []);
-  llTargetRemove(tid);
-  llStopMoveToTarget();
-  llSetObjectName(llKey2Name(llGetOwner())+ "'s Collar");
-  llOwnerSay("No longer following " + (string)username + ".");
-  llSay(0, (string)username + " lets go " + (string)owner + "'s leash.");
-  llSetObjectName(origName);
+    string origName = llGetObjectName();
+    list username = llParseString2List(llGetDisplayName(id), [""], []);
+    list owner = llParseString2List(llGetDisplayName(llGetOwner()), [""], []);
+    llTargetRemove(tid);
+    llStopMoveToTarget();
+    llSetObjectName(llKey2Name(llGetOwner())+ "'s Collar");
+    llOwnerSay("No longer following " + (string)username + ".");
+    llSay(0, (string)username + " lets go " + (string)owner + "'s leash.");
+    llSetObjectName(origName);
 }
 
 startFollowingName(string name)
@@ -229,37 +229,43 @@ startFollowingName(string name)
 
 startFollowingKey(key id)
 {
-  string origName = llGetObjectName();
-  list username = llParseString2List(llGetDisplayName(id), [""], []);
-  list owner = llParseString2List(llGetDisplayName(llGetOwner()), [""], []);
-  targetKey = id;
-  llSetObjectName(llKey2Name(llGetOwner())+ "'s Collar");
-  llOwnerSay("You are now following " + (string)username + ".");
-  llSay(0, (string)username + " grabs " + (string)owner + "'s leash.");
-  llSetObjectName(origName);
-  keepFollowing();
-  llSetTimerEvent(DELAY);
+    string origName = llGetObjectName();
+    list username = llParseString2List(llGetDisplayName(id), [""], []);
+    list owner = llParseString2List(llGetDisplayName(llGetOwner()), [""], []);
+    targetKey = id;
+    llSetObjectName(llKey2Name(llGetOwner())+ "'s Collar");
+    llOwnerSay("You are now following " + (string)username + ".");
+    llSay(0, (string)username + " grabs " + (string)owner + "'s leash.");
+    llSetObjectName(origName);
+    keepFollowing();
+    llSetTimerEvent(DELAY);
 }
 
 keepFollowing()
 {
-  llTargetRemove(tid);
-  llStopMoveToTarget();
-  list answer = llGetObjectDetails(targetKey,[OBJECT_POS]);
-  string origName = llGetObjectName();
-  if (llGetListLength(answer) == 0)
-    announced = TRUE;
-  else{
-    announced = FALSE;
-    vector targetPos = llList2Vector(answer,0);
-    float dist = llVecDist(targetPos, llGetPos());
-    if (dist > RANGE) {
-      tid = llTarget(targetPos, RANGE);
-      if (dist>LIMIT)
-        targetPos = llGetPos() + LIMIT * llVecNorm( targetPos - llGetPos() );
-      llMoveToTarget(targetPos,TAU);
+    llTargetRemove(tid);
+    llStopMoveToTarget();
+    list answer = llGetObjectDetails(targetKey,[OBJECT_POS]);
+    string origName = llGetObjectName();
+    if (llGetListLength(answer) == 0){
+        if (!announced){
+            llSetObjectName(objectName);
+            llOwnerSay(targetName + " seems to be out of range.  Waiting for return...");
+            llSetObjectName(origName);
+        }
+        announced = TRUE;
     }
-  }
+    else {
+        announced = FALSE;
+        vector targetPos = llList2Vector(answer,0);
+        float dist = llVecDist(targetPos,llGetPos());
+        if (dist > RANGE) {
+            tid = llTarget(targetPos, RANGE);
+            if (dist>LIMIT)
+                targetPos = llGetPos() + LIMIT * llVecNorm( targetPos - llGetPos() );
+            llMoveToTarget(targetPos,TAU);
+        }
+    }
 }
 
 stopAllAnimations()
