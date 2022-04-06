@@ -19,7 +19,8 @@ less lag if i do them this way
 */
 integer bloodBarFace = ALL_SIDES;
 integer bloodBarLink = LINK_THIS;
-vector bloodBar = <0.855, 0.298, 0.314>;
+
+vector bloodBar = <1.0, 0.098, 0.114>;
 /* ------------------------------------------ */
 
 /*
@@ -30,7 +31,6 @@ default
 {
     state_entry()
     {
-        user = llGetOwner();
         llListen(listenChannel, "", "", "");
         //NOTE just for default color
         llSetLinkColor(bloodBarLink, bloodBar, bloodBarFace);
@@ -44,23 +44,19 @@ default
     listen(integer channel, string name, key id, string message)
     {
         if(channel == listenChannel){
-            if(llGetOwnerKey(id) == user){
-                if(llGetSubString(message, 0,4) == "bloodupdate"){
-                    if(llGetSubString(message, 5,-1) != ""){
-                        string newTexture = llGetSubString(message, 5,-1);
-                        llSetPrimitiveParams([PRIM_TEXTURE, bloodBarLink, default_texture_DIFF, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0]);
-                        llSetPrimitiveParams([PRIM_TEXTURE, bloodBarLink, default_texture_NORM, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0]);
-                        llSetPrimitiveParams([PRIM_TEXTURE, bloodBarLink, default_texture_SPEC, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0]);
-                        llRotateTexture(PI_BY_TWO, ALL_SIDES);
-                        //FIX C# ATM
-                        integer i;
-                        for( i = 1; i < 100; i++ ){
-                            blood = minOffset + .1;
-                            llOffsetTexture((float)minOffset, (float)minOffset, i);
-                        }
-                    }
-                }
-        
+            if(message == "bloodupdate " + currentBlood){
+                string newTexturePOS = llGetSubString(message, 5,-1);
+                llSetPrimitiveParams([PRIM_TEXTURE, bloodBarLink, default_texture_DIFF, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0]);
+                llSetPrimitiveParams([PRIM_TEXTURE, bloodBarLink, default_texture_NORM, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0]);
+                llSetPrimitiveParams([PRIM_TEXTURE, bloodBarLink, default_texture_SPEC, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0]);
+                llRotateTexture(PI_BY_TWO, ALL_SIDES);
+                //FIX C# ATM
+                /* integer i;
+                for( i = 1; i < 100; i++ ){
+                    blood = minOffset + .1;
+                    llOffsetTexture((float)minOffset, (float)minOffset, i);
+                } */
+                llOwnerSay("here iam! -- " + (string)newTexturePOS);
             }
         }
     }
