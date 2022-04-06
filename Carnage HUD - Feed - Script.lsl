@@ -45,6 +45,7 @@ vector color_UNUSED     = <0.876, 0, 0>;
 menu(key _id)
 {
     list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
+    llListenRemove(listen_handle);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", _id, "");
     main_menu = ["Feed", "Settings", "▼"];
@@ -54,6 +55,7 @@ menu(key _id)
 settingMenu(key _id)
 {
     list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
+    llListenRemove(listen_handle);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", _id, "");
     if(animON)
@@ -114,7 +116,7 @@ default
         llSetText("", <0.0, 0.0, 0.0>, 0.0);
         llSetObjectDesc(desc_);
         dlgChannel = -1 - (integer)("0x" + llGetSubString( (string)llGetKey(), -7, -1) );
-        llListen(listenChannel, "", llGetOwner(), "");
+        //llListen(listenChannel, "", llGetOwner(), "");
         llListen(ll_channel, "", "", "");
         llPreloadSound(VampireSuck);
         llResetTime();
