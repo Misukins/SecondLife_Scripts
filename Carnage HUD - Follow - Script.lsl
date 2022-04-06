@@ -38,6 +38,7 @@ vector color_ON         = <0, 0.876, 0>;
 mainMenu(key id){
   main_menu = ["Follow", "Distance", "▼"];
   list avatar_name = llParseString2List(llGetDisplayName(id), [""], []);
+  llListenRemove(listen_handle);
   channel = llFloor(llFrand(2000000));
   listen_handle = llListen(channel, "", id, "");
   llDialog(id, "Hello " + (string)avatar_name + " Select a an option", main_menu, channel);
@@ -55,6 +56,7 @@ distanceMenu(key id){
   else if ((!defdist) && (!fivemDist) && (!tenmDist) && (!fifteenmDist) && (twentyMDist))
       distance_menu = ["▫Default", "▫5Meters", "▫10Meters", "▫15Meters", "▪20Meters", "◄", "▼"];
   list avatar_name = llParseString2List(llGetDisplayName(id), [""], []);
+  llListenRemove(listen_handle);
   channel = llFloor(llFrand(2000000));
   listen_handle = llListen(channel, "", id, "");
   llDialog(id, "Hello " + (string)avatar_name + " Select a an option\nCurrent Distance :: "+ (string)RANGE + " Meter(s)", distance_menu, channel);
