@@ -89,24 +89,4 @@ default
             llTriggerSound("fireballcast", 1.0);
         }
     }
-    
-    
-    /*NOTE no need to touch
-    touch_start(integer a)
-    {
-        name = llDetectedName(0);                     
-        keyname = llKey2Name(llGetOwner());           
-        string names = llDetectedName(0);             
-        integer n = llListFindList(Spisok, [names]);  
-        if (n > -1 || name == keyname) {              
-            relativePosOffset = <0.5, 0.0, 0.0>;  
-            vector myPos = llGetPos();
-            rotation myRot = llGetRot();
-            vector rezPos = myPos+relativePosOffset*myRot;
-            vector rezVel = relativeVel*myRot;
-            rotation rezRot = relativeRot*myRot;
-            llRezObject(object, rezPos, rezVel, rezRot, startParam);
-        }
-    }
-    */
 }
