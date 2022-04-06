@@ -25,7 +25,7 @@ float blood             = 0.0;
 float bloodMax          = 5.0;
 float feedMin           = 0.25;
 float feedMax           = 0.50;
-float bloodBallCost     = .1; //NOTE casting Blood ball cost
+float bloodBallCost     = 1.0; //NOTE casting Blood ball cost (cost will be high for high damage but slow projectile)
 
 integer _chan;
 integer hand;
@@ -37,7 +37,7 @@ integer armor;
 integer damage;
 integer llChan          = -458703;
 integer listenChannel   = -458790;
-integer hudStatus       = TRUE; //NOTE was 1 = True / 0 = False
+integer hudStatus       = TRUE;
 integer deathStatus     = FALSE;
 integer override_titleC = FALSE; //NOTE for overiting custom title colors that user has added
 integer Bats_Active     = FALSE;
@@ -57,6 +57,7 @@ integer random_chance()
 list main_buttons   = [];
 list exp_buttons    = [];
 list perk_buttons   = [];
+list debug_buttons  = [];
 list grayscale =["black",<0,0,0>,"white",<1,1,1>,"gray",<0.5,0.5,0.5>,"silver",<0.75,0.75,0.75>,"darkgray",<0.4,0.4,0.4>,
     "lightgrey",<0.83,0.83,0.83>];
 list reds = ["red",<1,0,0>,"darkred",<0.55,0,0>,"crimson",<0.86,0.08,0.24>,"indianred",<0.8,0.36,0.36>,
@@ -81,11 +82,12 @@ list sub_menu;
 list main_menu = ["grayscale", "reds", "pinks", "violets", "dk_blues", "lt_blues", "yellows", "dk_greens", "lt_greens", "oranges", "DEFAULT", "▼"];
 
 
-string csName       = "CARNAGE ";
-string version      = "v8.6.7a";
+string csName       = " CARNAGE ";
+string version      = "v8.6.8a ";
 string customTitle  = "Vampire";
 string statusText   = "COMBAT+RP";
 string desc_        = "(c)Amy (meljonna Resident)";
+string InfoNote     = "CARNAGE - Information";
 
 string Float2String ( float num, integer places, integer rnd)
 {
@@ -114,23 +116,32 @@ doMenu(key id)
     if ((!hudStatus) && (!DEBUG)) //NOTE DEBUG not on
         main_buttons = [ "» Title «", "» Color «", "» Silent «", "» Stats «", "» Help «", "▼" ];
     else if ((!hudStatus) && (DEBUG)) //NOTE if DEBUG is on
-        main_buttons = [ "» Title «", "» Color «", "» Silent «", "» Stats «", "levelup", "damage", "reset", "» Help «", "▼" ];
+        main_buttons = [ "» Title «", "» Color «", "» Silent «", "» Stats «", "» DEBUG «", "» Help «", "▼" ];
     else{
         if(attributePoints >= 1)
-            main_buttons = [ "» Suicide «", "» Title «", "» Color «", "» Perks «", "» Help «", "▼" ];
+            main_buttons = [ "» Suicide «", "» Title «", "» Color «", "» Stats «", "» Perks «", "» Help «", "▼" ];
         else
             main_buttons = [ "» Suicide «", "» Title «", "» Color «", "» Stats «", "» Help «", "▼" ];
     }
     llListenRemove(hand);
     _chan = llFloor(llFrand(2000000));
     hand = llListen(_chan, "", id, "");
-    llDialog(id, (string)llGetDisplayName(id) + " Carnage Meter Menu\n"
+    llDialog(id, (string)llGetDisplayName(id) + " (" + (string)llKey2Name(id) + ") Carnage Meter Menu\n"
         + "You have "   + (string)attributePoints + " Perk Points to use.\nCurrent Stats :: \n"
         + "Health: "    + (string)healthMax + "\n"
         + "Stamina: "   + (string)manaMax + "\n"
         + "Blood: "     + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters.\n"
         + "Armor: "     + (string)armor + "\n"
         + "Damage: "    + (string)damage + "\n", main_buttons, _chan);
+}
+
+doDEBUGmenu(key id)
+{
+    debug_buttons = [ "levelup", "damage", "addblood", "remoblood", "exp", "addperk", "» Perks «", "◄", "▼" ];
+    llListenRemove(hand);
+    _chan = llFloor(llFrand(2000000));
+    hand = llListen(_chan, "", id, "");
+    llDialog(id, (string)llGetDisplayName(id) + " (" + (string)llKey2Name(id) + ")'s Carnage Meter DEBUG Menu\nChoose an option?", debug_buttons, _chan);
 }
 
 doEXPMenu(key id)
@@ -141,7 +152,7 @@ doEXPMenu(key id)
     llListenRemove(hand);
     _chan = llFloor(llFrand(2000000));
     hand = llListen(_chan, "", id, "");
-    llDialog(id, (string)llGetDisplayName(id) + "'s Carnage Meter Menu\nChoose an option?", exp_buttons, _chan);
+    llDialog(id, (string)llGetDisplayName(id) + " (" + (string)llKey2Name(id) + ")'s Carnage Meter Menu\nChoose an option?", exp_buttons, _chan);
 }
 
 doPerksMenu(key id)
@@ -150,7 +161,7 @@ doPerksMenu(key id)
     llListenRemove(hand);
     _chan = llFloor(llFrand(2000000));
     hand = llListen(_chan, "", id, "");
-    llDialog(id, (string)llGetDisplayName(id) + " Select what stast you want to increase\n"
+    llDialog(id, (string)llGetDisplayName(id) + " (" + (string)llKey2Name(id) + ") Select what stast you want to increase\n"
         + "You have "   + (string)attributePoints + " Perk Points to use.\nCurrent Stats :: \n"
         + "Health: "    + (string)healthMax + "\n"
         + "Stamina: "   + (string)manaMax + "\n"
@@ -231,10 +242,10 @@ setStatusText()
         llSetText("", <1, 1, 1>, 1.0); //NOTE WHITE
 }
 
-help(key user)
-{
+/* help(key user)
+{ //TODO - add more things.. make it notecard!
     llOwnerSay("Hello " 
-        + (string)llGetDisplayName(user) + "\n
+        + (string)llGetDisplayName(user) + " (" + (string)llKey2Name(user) + ")\n
           Command for this System are typed onto channel\n"
         + (string)chan + " and are as follows :\n" 
         + "1. To activate the system type : /4on\n" 
@@ -246,7 +257,7 @@ help(key user)
         + "7. Clicking the rings at bottom of hud will scan area allowing you to teleport and auto follow target...adjusting distance as needed to avoid damage.\n"
         + "8. Please refer to notecard for more help..Also join the group in the notecard for support by the community..Enjoy - The Source
     ");
-}
+} */
 
 stats()
 {
@@ -277,8 +288,8 @@ addEXP(key id, float experience)
             Leveling();
         }
     if(DEBUG)
-        llSay(0, "EXP:: " 
-            + (string)llGetDisplayName(id) + " | " 
+        llOwnerSay("EXP:: " 
+            + (string)llGetDisplayName(id) + " (" + (string)llKey2Name(id) + ") | " 
             + (string)Float2String(gain, 2, FALSE) + "/" 
             + (string)Float2String(totalExperience, 2, FALSE) + " Points:: " 
             + (string)attributePoints);
@@ -310,25 +321,21 @@ Leveling()
 updateHealthMeter(string health)
 {
     //TODO
-    //llSay(listenChannel, health);
 }
 
 updateStaminaMeter(string mana)
 {
     //TODO
-    //llSay(listenChannel, mana);
 }
 
 updateBloodMeter(string blood)
 {
     //TODO
-    //llSay(listenChannel, (string)Float2String(blood, 2, FALSE));
 }
 
 updateEXPMeter(string experience)
 {
     //TODO
-    //llSay(listenChannel, (string)Float2String(experience, 2, FALSE));
 }
 
 default
@@ -377,14 +384,16 @@ default
 
     attach(key attached)
     {
-        if(attached == NULL_KEY)
+        if(attached == NULL_KEY){
             llSay(llChan, "meterOFF");
+            llSay(listenChannel, "METER_NOTFOUND");
+        }
         else{
             llSay(llChan, "meterON");
             llSay(listenChannel, "healthFULL");
             hudStatus = FALSE;
             statusText = "OOC/AFK"; 
-            user = llGetOwner(); 
+            user = llGetOwner();
             llRequestPermissions(user, PERMISSION_TRIGGER_ANIMATION); 
             if(syslisten)
                 llListenRemove(syslisten);
@@ -421,7 +430,7 @@ default
         if(channel == chan){
             if(llGetOwnerKey(id) == user){
                 if(message == "help")
-                    help(user);
+                    llGiveInventory(user, InfoNote);
                 else if(message == "on"){
                     if(!silentMode){
                         hudStatus = TRUE;
@@ -434,8 +443,8 @@ default
                         llOwnerSay("You need to disable SilentMode!");
                 }
                 else if(message == "suicide"){
-                    deathStatus = TRUE; 
-                    llSay(0, (string)llGetDisplayName(user) + " has died in combat."); //NOTE will change abit
+                    deathStatus = TRUE;
+                    llSay(0, (string)llGetDisplayName(user) + " (" + (string)llKey2Name(user) + ") took the easy way out!");
                     health = 0; 
                     setStatusText(); 
                     state dead;
@@ -465,21 +474,6 @@ default
                     else
                         llOwnerSay("You do not have enough Perk Points!");
                 }
-
-                //NOTE "GM" Commands for testing (GM? = GameMaster :P lol) works only if DEBUG is TRUE!
-                else if (message == "damage"){
-                    health -= damage + 20;
-                    llOwnerSay((string)csName + (string)version + (string)health + "/" + (string)healthMax + ".");
-                    doMenu(user);
-                    setStatusText();
-                }
-                else if(message == "levelup"){
-                    llTriggerSound(levelupSound, 1.0);
-                    doMenu(user);
-                    level += 1;
-                    Leveling();
-                    setStatusText();
-                }
                 else if (message == "silent"){
                     if(!silentMode){
                         silentMode = TRUE;
@@ -502,8 +496,7 @@ default
                     llOwnerSay("Unknown command please try again"); 
             }
         }
-        else if(channel == DynamicChannel(llGetOwner())) //FIX i need to FIX this thing at somepoint
-        {
+        else if(channel == DynamicChannel(llGetOwner())){
             list incomingParams = llParseString2List(message,[","],[]);
             string damagetype = llList2String(incomingParams,0);
             string attacker = llList2String(incomingParams,1);
@@ -528,7 +521,9 @@ default
                     health -= damage + 10; //will change high just for testing
                 else
                     health -= damage + 10; //NOTE JUST FOR BACKUP... everytype of weapon works with this now
-                llOwnerSay(attacker + " hit you with damage of type " + damagetype + " ( " + subdamagetype + " )"); //NOTE will change abit
+
+                //FIX
+                llOwnerSay((string)llGetDisplayName(attacker) + " (" + (string)llKey2Name(attacker) + ") hit you with their " + damagetype + ", you took " + (string)damage + " points of damage!");
             }
         }
         else if(channel == listenChannel){
@@ -607,6 +602,7 @@ default
                             + "/" + (string)Float2String(bloodMax, 2, FALSE) 
                             + " liters.");
                             llSay(listenChannel, "okBlood");
+                            //FIX - llSay(listenChannel, "bloodupdate");
                         }
                         else if(blood == bloodMax)
                             llOwnerSay("You are full!\nCurrent Blood: " 
@@ -632,25 +628,6 @@ default
             setStatusText();
         }
 
-        /* if(message == "» On «"){
-            if(!silentMode){
-                hudStatus = TRUE;
-                statusText = "RP+COMBAT"; 
-                setStatusText(); 
-                llOwnerSay((string)csName + (string)version +" is now in RP"); 
-                doMenu(id);
-            }
-            else
-                llOwnerSay("You need to disable SilentMode!");
-        }
-        else if(message == "» Off «"){
-            hudStatus = FALSE;
-            statusText = "OOC/AFK";
-            setStatusText();
-            llOwnerSay((string)csName + (string)version + " is now AFK/OOC");
-            doMenu(id);
-        }
-        else */
         if (message == "» Stats «"){
             stats();
             doMenu(user);
@@ -659,10 +636,8 @@ default
             llTextBox(id, "To change your title type : title (name)\nso for example you might type.. title Unamed Player", chan);
         else if(message == "» Color «")
             llDialog(id, "\n\nSelect a color group", main_menu, channel);
-        else if (message == "» Help «"){
-            help(id);
-            doMenu(id);
-        }
+        else if (message == "» Help «")
+            llGiveInventory(user, InfoNote);
         else if (message == "» Silent «")
         {
             if(!silentMode){
@@ -678,13 +653,15 @@ default
         }
         else if(message == "» Suicide «"){
             deathStatus = TRUE;
-            llSay(0, (string)llGetDisplayName(user) + " has died in combat."); //NOTE will change abit
+            llSay(0, (string)llGetDisplayName(user) + " (" + (string)llKey2Name(user) + ") took the easy way out!");
             health = 0;
             setStatusText();
             state dead;
         }
         else if (message == "» Perks «")
             doPerksMenu(user);
+        else if (message == "» DEBUG «")
+            doDEBUGmenu(user);
         else if (message == "Health+"){
             healthMax += 10;
             attributePoints -= 1;
@@ -720,24 +697,43 @@ default
             if(attributePoints >= 1)
                 doPerksMenu(user);
         }
+        //---------------------------------------------------
+        //will be removed when im done
         //NOTE "GM" Commands for testing (GM? = GameMaster :P lol) works only if DEBUG is TRUE!
         else if (message == "damage"){
             health -= damage + 20;
             llOwnerSay((string)csName + (string)version + (string)health + "/" + (string)healthMax + ".");
             setStatusText();
-            doMenu(user);
+            doDEBUGmenu(user);
         }
         else if(message == "levelup"){
-            llTriggerSound(levelupSound, 1.0);
-            level += 1;
-            Leveling();
-            setStatusText();
-            doMenu(user);
+            addEXP(user, totalExperience);
+            doDEBUGmenu(user);
         }
+        else if (message == "addblood"){
+            blood += 1.0;
+            llSay(listenChannel, "bloodupdate " + (string)Float2String(blood, 2, FALSE));
+            setStatusText();
+            doDEBUGmenu(user);
+        }
+        else if (message == "remoblood"){
+            blood -= 1.0;
+            setStatusText();
+            doDEBUGmenu(user);
+        }
+        else if (message == "addperk"){
+            attributePoints += 1;
+            setStatusText();
+            doDEBUGmenu(user);
+        }
+        else if (message == "exp")
+            doEXPMenu(user);
+        //---------------------------------------------------
         else if (message == "◄")
             doMenu(user);
         else if (message == "▼")
             return;
+
         if (llListFindList(main_menu, [message]) != -1){
             if (message == "grayscale")
                 sub_menu = grayscale + "▼"; 
@@ -775,17 +771,17 @@ default
 
     collision_start(integer num)
     {
-        if(hudStatus == FALSE)  // = 0 <<<<
+        if(!hudStatus) //NOTE == FALSE
             return;
         if(llDetectedType(0) == AGENT_BY_LEGACY_NAME)
             return;
-        integer armordamage = llRound(llVecMag(llDetectedVel(0)) / armor);
+        integer armordamage = llRound(llVecMag(llDetectedVel(0)) / armor); //FIXME 
         health -= armordamage;
         setStatusText();
         llSetTimerEvent(1);
         if(health <= 0){
             deathStatus = TRUE;
-            llSay(0, (string)llGetDisplayName(user) + " has died in combat."); //NOTE will change a bit
+            llSay(0, (string)llGetDisplayName(user) + " (" + (string)llKey2Name(user) + ") has died in combat.");
             health = 0;
             setStatusText();
             state dead;
@@ -809,7 +805,7 @@ default
         }
             
         if(health < healthMax){
-            health += 1; //NOTE might add Health Potions so 1 HP per second..
+            health += 2;
             if(health > healthMax)
                 health = healthMax;
         }
@@ -817,14 +813,14 @@ default
             if(Bats_Active)
                 mana -= 3; //NOTE bats consume 3mana per second..
             else
-                mana += 1; //NOTE might add Mana Potions so 1 HP per second..
+                mana += 1;
             if(mana > manaMax)
                 mana = manaMax;
         }
 
         if(health <= 0){
             deathStatus = TRUE;
-            llSay(0, (string)llGetDisplayName(user) + " has died in combat."); //NOTE will change a bit
+            llSay(0, (string)llGetDisplayName(user) + " (" + (string)llKey2Name(user) + ") has died in combat.");
             health = 0;
             setStatusText();
             state dead;
@@ -844,9 +840,6 @@ default
     }
 }
 
-/*
-NOTE I might remove this state since its not necessary.
-*/
 state dead
 {
     state_entry()
@@ -861,7 +854,6 @@ state dead
         if(deathStatus){
             llStopAnimation("death");
             llOwnerSay("You have been revived");
-            health += 10; //NOTE restores 10HP when you revived /* maybe enable potions? */
             deathStatus = FALSE;
             state default;
         }
@@ -870,5 +862,6 @@ state dead
     state_exit()
     {
         llStopAnimation("death");
+        health += 50; //NOTE restores 50HP when you revived
     }
 }
