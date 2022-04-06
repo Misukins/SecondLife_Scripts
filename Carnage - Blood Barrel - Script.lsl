@@ -1,40 +1,35 @@
 key owner;
+key texture1 = "9027e14e-51e5-3a34-4e01-0e53e80c9597";
+key texture2 = "3c52c863-44ba-5433-0b51-ba463a0c7174";
+key texture3 = "67b4de19-a738-e83a-ba1f-b0298937ac7f";
 
-float totalBlood        = 10.0;
-float currentBlood      = 0.0;
+float totalBlood            = 10.0;
+float currentBlood          = 0.0;
 
-integer ll_channel      = -98754465;
+integer listenChannel       = -458790;
 integer channel;
 integer listen_handle;
-integer DEBUG           = TRUE;
-integer Group_Only      = FALSE;
-integer Owner_Only      = TRUE;
-integer Public_Access   = FALSE;
-integer isEMPTY;
-integer texture1_enabled = FALSE;
-integer texture2_enabled = FALSE;
-integer texture3_enabled = TRUE;
+integer DEBUG               = TRUE;
+integer METERfound          = FALSE;
+integer texture1_enabled    = FALSE;
+integer texture2_enabled    = FALSE;
+integer texture3_enabled    = TRUE;
+integer waittime            = 10;
 
 list main_menu;
-list AccessList_Menu;
-list owner_name;
 list Settings_Menu;
 list Textures_Menu;
-list Withdraw_Menu;
-list Deposit_Menu;
+list zList = [];
+list Charsetx = ["█","█","█","█","█","█","█","█","█","█"];
 
 string desc_    = "(c)Amy (meljonna Resident) -";
-string name = "";
 string origName;
-string acc = "";
+string pList;
 
-vector titleColor = <0.905, 0.686, 0.924>; //will be removed 
+vector titleColor   = <0.905, 0.686, 0.924>;
+vector color        = <0, 1, 0>;
 
-/*
-■
-□
-*/
-
+/* ■ □ */
 string Float2String ( float num, integer places, integer rnd)
 {
     if (rnd){
@@ -54,14 +49,11 @@ string Float2String ( float num, integer places, integer rnd)
 
 menu(key _id)
 {
-    list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
+    llListenRemove(listen_handle);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", _id, "");
-    if(_id == llGetOwner())
-        main_menu = ["Deposit", "Withdraw", "Settings", "▼"];
-    else
-        main_menu = ["Deposit", "Withdraw", "▼"];
-    llDialog(_id, "Hello " + (string)avatar_name + " Select an option\nCurrent Blood volume :: "
+    main_menu = ["Deposit 1L", "Withdraw 1L", "Settings", "▼"];
+    llDialog(_id, "Hello " + (string)llGetDisplayName(_id) + " (" + (string)llKey2Name(_id) + ") Select an option\nCurrent Blood volume :: "
         + (string)Float2String(currentBlood, 2, FALSE) + "/"
         + (string)Float2String(totalBlood, 2, FALSE) + 
         " liters(s)", main_menu, channel);
@@ -69,29 +61,17 @@ menu(key _id)
 
 settingsMenu(key _id)
 {
-    list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
+    llListenRemove(listen_handle);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", _id, "");
     Settings_Menu = ["Textures", "Access", "◄", "▼"];
-    llDialog(_id, "Hello " + (string)avatar_name + " Select an option", Settings_Menu, channel);
-}
-
-accessMenu(key _id){
-    list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
-    channel = llFloor(llFrand(2000000));
-    listen_handle = llListen(channel, "", _id, "");
-    if((Owner_Only) && (!Group_Only) && (!Public_Access))
-        AccessList_Menu = ["Group", "■Private", "Public", "◄", "▼"];
-    else if((!Owner_Only) && (Group_Only) && (!Public_Access))
-        AccessList_Menu = ["■Group", "Private", "Public", "◄", "▼"];
-    else if((!Owner_Only) && (!Group_Only) && (Public_Access))
-        AccessList_Menu = ["Group", "Private", "■Public", "◄", "▼"];
-    llDialog(_id, "Hello " + (string)avatar_name + " Select an option", AccessList_Menu, channel);
+    llDialog(_id, "Hello " + (string)llGetDisplayName(_id) + " (" + (string)llKey2Name(_id) + ") Select an option", Settings_Menu, channel);
 }
 
 texturesMenu(key _id)
+
 {
-    list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
+    llListenRemove(listen_handle);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", _id, "");
     if((texture1_enabled) && (!texture2_enabled) && (!texture3_enabled))
@@ -100,108 +80,78 @@ texturesMenu(key _id)
         Textures_Menu = ["texture1", "■texture2", "texture3", "◄", "▼"];
     else if((!texture1_enabled) && (!texture2_enabled) && (texture3_enabled))
         Textures_Menu = ["texture1", "texture2", "■texture3", "◄", "▼"];
-    llDialog(_id, "Hello " + (string)avatar_name + " Select an option", Textures_Menu, channel);
-}
-
-WithdrawMenu(key _id)
-{
-    list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
-    channel = llFloor(llFrand(2000000));
-    listen_handle = llListen(channel, "", _id, "");
-    Withdraw_Menu = ["*1 liter", "*0.50 liter", "*0.25 liter", "*0.10 liter", "◄", "▼"];
-    llDialog(_id, "Hello " + (string)avatar_name + " Select an option\nCurrent Blood volume :: "
-        + (string)Float2String(currentBlood, 2, FALSE) + "/"
-        + (string)Float2String(totalBlood, 2, FALSE) + 
-        " liters(s)", Withdraw_Menu, channel);
-}
-
-DepositMenu(key _id)
-{
-    list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
-    channel = llFloor(llFrand(2000000));
-    listen_handle = llListen(channel, "", _id, "");
-    Deposit_Menu = ["1 liter", "0.50 liter", "0.25 liter", "0.10 liter", "◄", "▼"];
-    llDialog(_id, "Hello " + (string)avatar_name + " Select an option\nCurrent Blood volume :: "
-        + (string)Float2String(currentBlood, 2, FALSE) + "/"
-        + (string)Float2String(totalBlood, 2, FALSE) + 
-        " liters(s)", Deposit_Menu, channel);
-}
-
-
-saveData()
-{
-    list saveData;
-    saveData += Float2String(totalBlood, 2, FALSE);
-    llSetObjectDesc(desc_ + llDumpList2String(saveData, "-"));
-}
-
-dispString(string value)
-{
-    llSetText(value, titleColor, 1);
+    llDialog(_id, "Hello " + (string)llGetDisplayName(_id) + " (" + (string)llKey2Name(_id) + ") Select an option", Textures_Menu, channel);
 }
 
 updateTimeDisp()
 {
-    if((Group_Only) && (!Owner_Only) && (!Public_Access))
-        acc = "Group Access";
-    else if((!Group_Only) && (Owner_Only) && (!Public_Access))
-        acc = "Owner Only";
-    else if((!Group_Only) && (!Owner_Only) && (Public_Access))
-        acc = "Public Access";
-    dispString((string)owner_name + " (" + (string)name + ")'s Blood Barrel 10L\nTotal Blood: "
+    //NOTE THIS IS MY BEN LAZY LOL!!!!!
+    if(currentBlood == 10.0){
+        zList = ["█","█","█","█","█","█","█","█","█","█"];
+        titleColor = <0,1,0>;
+    }
+    else if(currentBlood == 9.0){
+        zList = ["█","█","█","█","█","█","█","█","█"];
+        titleColor = <0,1,0>;
+    }
+    else if(currentBlood == 8.0){
+        zList = ["█","█","█","█","█","█","█","█"];
+        titleColor = <0,1,0>;
+    }
+    else if(currentBlood == 7.0){
+        zList = ["█","█","█","█","█","█","█"];
+        titleColor = <0,1,0>;
+    }
+    else if(currentBlood == 6.0){
+        zList = ["█","█","█","█","█","█"];
+        titleColor = <1,1,0>;
+    }
+    else if(currentBlood == 5.0){
+        zList = ["█","█","█","█","█"];
+        titleColor = <1,1,0>;
+    }
+    else if(currentBlood == 4.0){
+        zList = ["█","█","█","█"];
+        titleColor = <1,0,0>;
+    }
+    else if(currentBlood == 3.0){
+        zList = ["█","█","█"];
+        titleColor = <1,0,0>;
+    }
+    else if(currentBlood == 2.0){
+        zList = ["█","█"];
+        titleColor = <1,0,0>;
+    }
+    else if(currentBlood == 1.0){
+        zList = ["█"];
+        titleColor = <1,0,0>;
+    }
+    else{
+        zList = [];
+        titleColor = <1,0,0>;
+    }
+    llSetText(
+        (string)llGetDisplayName(owner) 
+        + " (" + (string)llKey2Name(owner) 
+        + ")\nBlood Barrel 10L\nTotal Blood: "
         + (string)Float2String(currentBlood, 2, FALSE) + "/"
-        + (string)Float2String(totalBlood, 2, FALSE) + ".\nCurrent Access: "
-        + (string)acc + ".");
-}
-
-call_Deposit(key _id)
-{
-    if(currentBlood != totalBlood){
-        if(currentBlood < totalBlood){
-            currentBlood += 1.0;
-            llShout(ll_channel, "depositBlood");
-            if(currentBlood > totalBlood)
-                currentBlood = totalBlood;
-        }
-    }
-    else
-        llOwnerSay("BARREL FULL!!");
-    menu(_id);
-    updateTimeDisp();
-}
-
-call_Withdraw(key _id)
-{
-    if(currentBlood == 0)
-        isEMPTY = TRUE;
-    else
-        isEMPTY = FALSE;
-    if(currentBlood <= totalBlood){
-        if(!isEMPTY){
-            currentBlood -= 1.0;
-            llShout(ll_channel, "withdrawBlood");
-        }
-        else
-            llOwnerSay("EMPTY");
-    }
-    menu(_id);
-    updateTimeDisp();
+        + (string)Float2String(totalBlood, 2, FALSE) + "L\n"
+        + (string)zList, titleColor, 1);
 }
 
 default
 {
     state_entry()
     {
+        owner = llGetOwner();
         origName = llGetObjectName();
-        owner_name = llParseString2List(llGetDisplayName(llGetOwnerKey(llGetKey())), [""], []);
-        name = llKey2Name(llGetOwner());
-        llSetText("", <0.0, 0.0, 0.0>, 0.0);
         llSetObjectDesc(desc_);
-        llListen(ll_channel, "", "", "");
-        if(currentBlood == 0)
-            isEMPTY = TRUE;
+        llListenRemove(listen_handle);
+        llListen(listenChannel, "", "", "");
+        if(METERfound)
+            llSetTimerEvent(300);
         else
-            isEMPTY = FALSE;
+            state waiting;
         updateTimeDisp();
     }
 
@@ -217,181 +167,73 @@ default
             llOwnerSay("YOU NEED TO REZ ME!!");
             llDetachFromAvatar();
         }
-        
     }
 
     touch_start(integer total_number)
     {
         key id = llDetectedKey(0);
-        key owner = llGetOwner();
-        integer sameGroup = llSameGroup(id);
-        list username = llParseString2List(llGetDisplayName(id), [""], []);
-        string owneruser = llKey2Name(owner);
-        string avatar = llKey2Name(id);
-        if (id == owner)
-            menu(id);
-        else if (Group_Only){
-            if (sameGroup)
+        if(llGetOwnerKey(id) == owner){
+            if(!METERfound)
+                state looking;
+            else
                 menu(id);
-            else{
-                llSetObjectName("");
-                llInstantMessage(id, "Hello " + (string)username + ", you are not in same group, ask secondlife:///app/agent/" + (string)owner + "/about for access?");
-                llSetObjectName(origName);
-            }
         }
-        else if (Owner_Only){
-            if(id == owner)
-                menu(id);
-            else{
-                llSetObjectName("");
-                llInstantMessage(id, "Hello " + (string)username + ", sorry this has been set to owner access only, ask secondlife:///app/agent/" + (string)owner + "/about for access?");
-                llSetObjectName(origName);
-            }
-        }
-        else if (Public_Access)
-            menu(id);
+        else
+            llSay(0, "Sorry only " + (string)llGetDisplayName(owner) + " (" + (string)llKey2Name(owner) + ") has access!");
     }
 
     listen(integer channel, string name, key id, string message)
     {
+        if (channel == listenChannel){
+            if(message == "METER_FOUND"){
+                METERfound = TRUE;
+                state looking;
+            }
+            else if(message == "METER_NOTFOUND")
+                state waiting;
+        }
+
         if (message == "▼")
             return;
         else if (message == "◄")
             menu(id);
-        else if (message == "Deposit"){
+        else if (message == "Done"){
+            METERfound == FALSE;
+            state waiting;
+        }
+        else if (message == "Deposit 1L"){
             if(currentBlood == totalBlood){
-                llOwnerSay("BARREL FULL");
+                llOwnerSay("BARREL FULL"); //FIXME - 
                 menu(id);
             }
-            else
-                //state depositBlood;
-        }
-        else if (message == "Withdraw"){
-            if(!isEMPTY)
-
-                //state withdrawBlood;
             else{
-                llOwnerSay("EMPTY");
+                currentBlood += 1.0;
+                llSay(listenChannel, "deposit 1.0");
+                updateTimeDisp();
                 menu(id);
             }
         }
-        else if (message == "1 liter"){
-            if(HUDon)
-                if(currentBlood != totalBlood){
-                    if(currentBlood < totalBlood){
-                        currentBlood += 0.25;
-                        llShout(ll_channel, "depositBlood2");
-                        if(currentBlood > totalBlood)
-                            currentBlood = totalBlood;
-                    }
-                }
-                else
-                    llOwnerSay("BARREL FULL!!");
-            else
-                llOwnerSay("no HUD");
-            DepositMenu(id);
-            updateTimeDisp();
-        }
-        else if (message == "0.50 liter"){
-            if(currentBlood != totalBlood){
-                if(currentBlood < totalBlood){
-                    currentBlood += 0.25;
-                    llShout(ll_channel, "depositBlood2");
-                    if(currentBlood > totalBlood)
-                        currentBlood = totalBlood;
-                }
+        else if (message == "Withdraw 1L"){
+            if(currentBlood == 0.0){
+                llOwnerSay("BARREL EMPTY"); //FIXME - 
+                menu(id);
             }
-            else
-                llOwnerSay("BARREL FULL!!");
-            DepositMenu(id);
-            updateTimeDisp();
-        }
-        else if (message == "0.25 liter"){
-            if(currentBlood != totalBlood){
-                if(currentBlood < totalBlood){
-                    currentBlood += 0.25;
-                    llShout(ll_channel, "depositBlood2");
-                    if(currentBlood > totalBlood)
-                        currentBlood = totalBlood;
-                }
+            else{
+                currentBlood -= 1.0;
+                llSay(listenChannel, "withdraw 1.0");
+                updateTimeDisp();
+                menu(id);
             }
-            else
-                llOwnerSay("BARREL FULL!!");
-            DepositMenu(id);
-            updateTimeDisp();
         }
-        else if (message == "0.10 liter"){
-            if(currentBlood != totalBlood){
-                if(currentBlood < totalBlood){
-                    currentBlood += 0.25;
-                    llShout(ll_channel, "depositBlood2");
-                    if(currentBlood > totalBlood)
-                        currentBlood = totalBlood;
-                }
-            }
-            else
-                llOwnerSay("BARREL FULL!!");
-            DepositMenu(id);
-            updateTimeDisp();
-        }
-    
-        else if (message == "*1 liter"){
-            //
-        }
-        else if (message == "*0.50 liter"){
-            //
-        }
-        else if (message == "*0.25 liter"){
-            //
-        }
-        else if (message == "*0.10 liter"){
-            //
-        }
-        else if (message == "Access")
-            accessMenu(id);
         else if (message == "Settings")
             settingsMenu(id);
         else if (message == "Textures")
             texturesMenu(id);
-/*     NOTE    
-        else if (message == "RESET")
-            llResetScript();
-*/
-        else if (message == "Group"){
-            Group_Only      = TRUE;
-            Owner_Only      = FALSE;
-            Public_Access   = FALSE;
-            llSetObjectName("");
-            llOwnerSay("Group mode has been set!");
-            llSetObjectName(origName);
-            updateTimeDisp();
-            settingsMenu(id);
-        }
-        else if (message == "Private"){
-            Group_Only      = FALSE;
-            Owner_Only      = TRUE;
-            Public_Access   = FALSE;
-            llSetObjectName("");
-            llOwnerSay("Private mode has been set!");
-            llSetObjectName(origName);
-            updateTimeDisp();
-            settingsMenu(id);
-        }
-        else if (message == "Public"){
-            Group_Only      = FALSE;
-            Owner_Only      = FALSE;
-            Public_Access   = TRUE;
-            llSetObjectName("");
-            llOwnerSay("Public mode has been set!");
-            llSetObjectName(origName);
-            updateTimeDisp();
-            settingsMenu(id);
-        }
         else if (message == "texture1"){
             texture1_enabled = TRUE;
             texture2_enabled = FALSE;
             texture3_enabled = FALSE;
-            llSetLinkTexture(LINK_THIS, "Barrel1_Basecolor", ALL_SIDES); //FIX change it
+            llSetLinkTexture(LINK_THIS, texture1, ALL_SIDES);
             llSetObjectName("");
             llOwnerSay("Barrel Texture Changed!");
             llSetObjectName(origName);
@@ -402,7 +244,7 @@ default
             texture1_enabled = FALSE;
             texture2_enabled = TRUE;
             texture3_enabled = FALSE;
-            llSetLinkTexture(LINK_THIS, "Barrel2_Basecolor", ALL_SIDES); //FIX change it
+            llSetLinkTexture(LINK_THIS, texture2, ALL_SIDES);
             llSetObjectName("");
             llOwnerSay("Barrel Texture Changed!");
             llSetObjectName(origName);
@@ -413,219 +255,95 @@ default
             texture1_enabled = FALSE;
             texture2_enabled = FALSE;
             texture3_enabled = TRUE;
-            llSetLinkTexture(LINK_THIS, "Barrel3_Basecolor", ALL_SIDES); //FIX change it
+            llSetLinkTexture(LINK_THIS, texture3, ALL_SIDES);
             llSetObjectName("");
             llOwnerSay("Barrel Texture Changed!");
             llSetObjectName(origName);
             updateTimeDisp();
             settingsMenu(id);
         }
-        else
-            menu(id);
+    }
 
-        /* if (channel == ll_channel){
-            if(message == "depositBlood"){
-                if(DEBUG)
-                    llOwnerSay("HEARD: depositBlood");
-            }
-            else if (message == "withdrawBlood"){
-                if(DEBUG)
-                    llOwnerSay("HEARD: withdrawBlood");
-            }
-        } */
+    timer()
+    {
+        if(METERfound)
+            METERfound == FALSE;
+        state waiting;
     }
 }
 
-state depositBlood
+state looking
 {
     state_entry()
     {
-        llListen(ll_channel, "", "", "");
-    }
-
-    touch_start(integer total_number)
-    {
-        key id = llDetectedKey(0);
-        key owner = llGetOwner();
-        integer sameGroup = llSameGroup(id);
-        if (id == owner)
-            DepositMenu(id);
-        else if (Group_Only){
-            if (sameGroup)
-                DepositMenu(id);
-            else{
-                llSetObjectName("");
-                llInstantMessage(id, "SORRY YOU ARE NOT IN SAMEGROUP!");
-                llSetObjectName(origName);
-            }
-        }
-        else if (Owner_Only){
-            if(id == owner)
-                DepositMenu(id);
-            else{
-                llSetObjectName("");
-                llInstantMessage(id, "SORRY YOU ARE NOT THE OWNER!");
-                llSetObjectName(origName);
-            }
-        }
-        else if (Public_Access)
-            DepositMenu(id);
+        llListenRemove(listen_handle);
+        llSetText("Waiting fo Carnage Meter...\n" + llDumpList2String(Charsetx, ""), color, 1.0);
+        llListen(listenChannel, "", "", "");
+        llSetTimerEvent(1);
     }
 
     listen(integer channel, string name, key id, string message)
     {
-        if (message == "1"){
-            if(currentBlood != totalBlood){
-                if(currentBlood < totalBlood){
-                    currentBlood += 1.0;
-                    llShout(ll_channel, "depositBlood1");
-                    if(currentBlood > totalBlood)
-                        currentBlood = totalBlood;
-                }
+        if (channel == listenChannel){
+            if(llGetOwnerKey(id) == llGetOwner()){
+                if(message == "METER_FOUND")
+                    METERfound = TRUE;
+                else if(message == "METER_NOTFOUND")
+                    state waiting;
             }
-            else
-                llOwnerSay("BARREL FULL!!");
-            DepositMenu(id);
-            updateTimeDisp();
         }
-        else if (message == "0.25"){
-            if(currentBlood != totalBlood){
-                if(currentBlood < totalBlood){
-                    currentBlood += 0.25;
-                    llShout(ll_channel, "depositBlood2");
-                    if(currentBlood > totalBlood)
-                        currentBlood = totalBlood;
-                }
+    }
+
+    timer()
+    {
+        integer num = 10;
+        if(!METERfound){
+            waittime -= num;
+            if(waittime < 7)
+                color = <1,1,0>;
+            if(waittime < 4)
+                color = <1,0,0>;
+            if(waittime == 0){
+                waittime = 10;
+                color = <0,1,0>;
             }
-            else
-                llOwnerSay("BARREL FULL!!");
-            DepositMenu(id);
-            updateTimeDisp();
+            zList = llList2List(Charsetx, 0, waittime);
+            pList = llDumpList2String(zList, "");
+            llSetText("Please Wait...\n" + pList, color, 1.0);
+            llSay(listenChannel, "METER_OK");
         }
-        else if (message == "0.10"){
-            if(currentBlood != totalBlood){
-                if(currentBlood < totalBlood){
-                    currentBlood += 0.10;
-                    llShout(ll_channel, "depositBlood3");
-                    if(currentBlood > totalBlood)
-                        currentBlood = totalBlood;
-                }
-            }
-            else
-                llOwnerSay("BARREL FULL!!");
-            DepositMenu(id);
-            updateTimeDisp();
-        }
-        else if (message == "Done")
+        else{
+            llSetText("DONE...", color, 1.0);
+            llSleep(3.0);
             state default;
-        else
-            state default;
-        if (channel == ll_channel){
-            if(message == "depositBlood"){
-                if(DEBUG)
-                    llOwnerSay("HEARD: depositBlood");
-                //FIXME
-            }
         }
     }
 }
 
-state withdrawBlood
+state waiting
 {
     state_entry()
     {
-        llListen(ll_channel, "", "", "");
+        llListenRemove(listen_handle);
+        llSetText("Waiting for " + (string)llGetDisplayName(owner) + " (" + (string)llKey2Name(owner) + ")", color, 1.0);
+        METERfound = FALSE;
     }
 
-    touch_start(integer total_number)
+    touch_start(integer num_detected)
     {
         key id = llDetectedKey(0);
-        key owner = llGetOwner();
-        integer sameGroup = llSameGroup(id);
-        if (id == owner)
-            WithdrawMenu(id);
-        else if (Group_Only){
-            if (sameGroup)
-                WithdrawMenu(id);
-            else{
-                llSetObjectName("");
-                llInstantMessage(id, "SORRY YOU ARE NOT IN SAMEGROUP!");
-                llSetObjectName(origName);
-            }
+        if(llGetOwnerKey(id) == owner){
+            if(!METERfound)
+                state looking;
+            else
+                menu(id);
         }
-        else if (Owner_Only){
-            if(id == owner)
-                WithdrawMenu(id);
-            else{
-                llSetObjectName("");
-                llInstantMessage(id, "SORRY YOU ARE NOT THE OWNER!");
-                llSetObjectName(origName);
-            }
-        }
-        else if (Public_Access)
-            WithdrawMenu(id);
+        else
+            llSay(0, "Sorry only " + (string)llGetDisplayName(owner) + " (" + (string)llKey2Name(owner) + ") has access!");
     }
 
-    listen(integer channel, string name, key id, string message)
+    state_exit()
     {
-        if (message == "1"){
-            if(currentBlood == 0)
-                isEMPTY = TRUE;
-            else
-                isEMPTY = FALSE;
-            if(currentBlood <= totalBlood){
-                if(!isEMPTY){
-                    currentBlood -= 1.0;
-                    llShout(ll_channel, "withdrawBlood1");
-                }
-                else
-                    llOwnerSay("EMPTY");
-            }
-            WithdrawMenu(id);
-            updateTimeDisp();
-        }
-        else if (message == "0.25"){
-            if(currentBlood == 0)
-                isEMPTY = TRUE;
-            else
-                isEMPTY = FALSE;
-            if(currentBlood <= totalBlood){
-                if(!isEMPTY){
-                    currentBlood -= 0.25;
-                    llShout(ll_channel, "withdrawBlood2");
-                }
-                else
-                    llOwnerSay("EMPTY");
-            }
-            WithdrawMenu(id);
-            updateTimeDisp();
-        }
-        else if (message == "0.10"){
-            if(currentBlood == 0)
-                isEMPTY = TRUE;
-            else
-                isEMPTY = FALSE;
-            if(currentBlood <= totalBlood){
-                if(!isEMPTY){
-                    currentBlood -= 0.10;
-                    llShout(ll_channel, "withdrawBlood3");
-                }
-                else
-                    llOwnerSay("EMPTY");
-            }
-            WithdrawMenu(id);
-            updateTimeDisp();
-        }
-        else if (message == "Done")
-            state default;
-        else
-            state default;
-        if (channel == ll_channel){
-            if (message == "withdrawBlood"){
-                if(DEBUG)
-                    llOwnerSay("HEARD: withdrawBlood");
-                //FIXME
-            }
-        }
+        llSetText("", color, 1.0);
     }
 }
