@@ -2,10 +2,11 @@ key chokehigh = "01c5340e-654e-cd38-39db-b9569609f98a";
 key vamplaugh = "1be7ea61-d7a4-414b-b745-8d48c0cc2a7b";
 
 integer listenChannel   = -458790;
-integer llChan          = -458702;
+integer llChan          = -458703;
 integer batsON          = FALSE;
 integer gotPermission   = FALSE;
 integer draw            = FALSE;
+integer meterON;
 integer HUD_ON;
 
 vector color_OFF        = <0.876, 0, 0>;
@@ -42,8 +43,7 @@ default
                 llSetLinkColor(LINK_THIS, color_ON, ALL_SIDES);
             }
             else{
-                llOwnerSay("no hud online"); //FIX
-                return;
+                llOwnerSay("You have to be in COMBAT+RP mode!");
             }
         }
         else if((batsON) && (gotPermission) && (draw)){
@@ -76,6 +76,10 @@ default
                     batsON = TRUE;
                 else if(msg == "batsOFF")
                     batsON = FALSE;
+                else if(msg == "meterON")
+                    meterON = TRUE;
+                else if(msg == "meterON")
+                    meterON = FALSE;
             }
         }
         else if(chan == listenChannel){
@@ -88,12 +92,10 @@ default
                     llSetLinkColor(LINK_THIS, color_OFF, ALL_SIDES);
                     draw = FALSE;
                 }
-                else if(msg == "HUD_ON"){
+                else if(msg == "HUD_ON")
                     HUD_ON = TRUE;
-                }
-                else if(msg == "HUD_OFF"){
+                else if(msg == "HUD_OFF")
                     HUD_ON = FALSE;
-                }
             }
         }
     }
