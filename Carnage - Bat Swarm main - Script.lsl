@@ -14,7 +14,7 @@ float bats_duration = 20.0; //NOTE 20seconds or if out of stamina
 integer Drawn           = FALSE;
 integer AutoSheathOnRez = TRUE;
 integer listenChannel   = -458790;
-integer llChan          = -458702;
+integer llChan          = -458703;
 
 integer DynamicChannel()
 {
@@ -88,7 +88,6 @@ default
                         llPlaySound(SheathSound, SoundVolume);
                     llTargetOmega(<0, 0, 0>, 0, 0);
                     llSay(listenChannel, "Bats_Deactive");
-                    llOwnerSay("You are out of Stamina!");
                 }
             }
         }
