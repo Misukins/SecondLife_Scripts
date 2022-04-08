@@ -117,6 +117,8 @@ doMenu(key id)
         main_buttons = [ "» Title «", "» Color «", "» Silent «", "» Stats «", "» Help «", "▼" ];
     else if ((!hudStatus) && (DEBUG)) //NOTE if DEBUG is on
         main_buttons = [ "» Title «", "» Color «", "» Silent «", "» Stats «", "» DEBUG «", "» Help «", "▼" ];
+    else if ((hudStatus) && (DEBUG)) //NOTE if DEBUG is on
+        main_buttons = [ "» Title «", "» Color «", "» Silent «", "» Stats «", "» DEBUG «", "» Help «", "▼" ];
     else{
         if(attributePoints >= 1)
             main_buttons = [ "» Suicide «", "» Title «", "» Color «", "» Stats «", "» Perks «", "» Help «", "▼" ];
@@ -521,7 +523,6 @@ default
                     health -= damage + 10; //will change high just for testing
                 else
                     health -= damage + 10; //NOTE JUST FOR BACKUP... everytype of weapon works with this now
-
                 //FIX
                 llOwnerSay((string)llGetDisplayName(attacker) + " (" + (string)llKey2Name(attacker) + ") hit you with their " + damagetype + ", you took " + (string)damage + " points of damage!");
             }
@@ -555,6 +556,26 @@ default
                 else if(message == "Bats_Active"){
                     Bats_Active = TRUE;
                     mana -= batsCost;
+                }
+                else if(message == "METER_OK")
+                    llSay(listenChannel, "METER_FOUND");
+                else if(message == "deposit 1.0"){
+                    if(blood != 0.0){
+                        blood -= 1.0;
+                        if(blood == 0.0) //NOTE - for backup!
+                            blood = 0.0;
+                    }
+                    else
+                        llSay(listenChannel, "noBlood");
+                }
+                else if(message == "withdraw 1.0"){
+                    if(blood < bloodMax){
+                        blood += 1.0;
+                        if(blood > bloodMax)
+                            blood = bloodMax;
+                    }
+                    else
+                        llSay(listenChannel, "fullBlood");
                 }
                 else if(message == "Bats_Deactive")
                     Bats_Active = FALSE;
@@ -701,7 +722,7 @@ default
         //will be removed when im done
         //NOTE "GM" Commands for testing (GM? = GameMaster :P lol) works only if DEBUG is TRUE!
         else if (message == "damage"){
-            health -= damage + 20;
+            health -= damage + 10;
             llOwnerSay((string)csName + (string)version + (string)health + "/" + (string)healthMax + ".");
             setStatusText();
             doDEBUGmenu(user);
@@ -711,13 +732,13 @@ default
             doDEBUGmenu(user);
         }
         else if (message == "addblood"){
-            blood += 1.0;
+            blood += 5.0;
             llSay(listenChannel, "bloodupdate " + (string)Float2String(blood, 2, FALSE));
             setStatusText();
             doDEBUGmenu(user);
         }
         else if (message == "remoblood"){
-            blood -= 1.0;
+            blood -= 5.0;
             setStatusText();
             doDEBUGmenu(user);
         }
@@ -790,7 +811,7 @@ default
 
     timer()
     {
-        //NOTE low health sounds 
+        //NOTE low health sounds
         if((health < 40) && health > 30){
             llSay(listenChannel, "healthLOW");
             llLoopSound(heartbeatSlow, 1.0);
@@ -822,20 +843,146 @@ default
             deathStatus = TRUE;
             llSay(0, (string)llGetDisplayName(user) + " (" + (string)llKey2Name(user) + ") has died in combat.");
             health = 0;
+            if(hudStatus)
+                llSay(listenChannel, "UPDATEHEALTH" + "," + (string)health);
             setStatusText();
             state dead;
+        }
+        else if (health >= 1 && health <= 10){
+            if(hudStatus)
+                llSay(listenChannel, "UPDATEHEALTH" + "," + (string)health);
+        }
+        else if (health >= 11 && health <= 20){
+            if(hudStatus)
+                llSay(listenChannel, "UPDATEHEALTH" + "," + (string)health);
+        }
+        else if (health >= 21 && health <= 30){
+            if(hudStatus)
+                llSay(listenChannel, "UPDATEHEALTH" + "," + (string)health);
+        }
+        else if (health >= 31 && health <= 40){
+            if(hudStatus)
+                llSay(listenChannel, "UPDATEHEALTH" + "," + (string)health);
+        }
+        else if (health >= 41 && health <= 50){
+            if(hudStatus)
+                llSay(listenChannel, "UPDATEHEALTH" + "," + (string)health);
+        }
+        else if (health >= 51 && health <= 60){
+            if(hudStatus)
+                llSay(listenChannel, "UPDATEHEALTH" + "," + (string)health);
+        }
+        else if (health >= 61 && health <= 70){
+            if(hudStatus)
+                llSay(listenChannel, "UPDATEHEALTH" + "," + (string)health);
+        }
+        else if (health >= 71 && health <= 80){
+            if(hudStatus)
+                llSay(listenChannel, "UPDATEHEALTH" + "," + (string)health);
+        }
+        else if (health >= 81 && health <= 90){
+            llSay(listenChannel, "UPDATEHEALTH" + "," + (string)health);
+        }
+        else if (health >= 91 && health <= 100){
+            if(hudStatus)
+                llSay(listenChannel, "UPDATEHEALTH" + "," + (string)health);
         }
 
         if(mana <= 0){
             llSay(listenChannel,"noMana");
             llOwnerSay("You are out of Stamina!");
+            //if(hudStatus)
+            //    llSay(listenChannel, "UPDATEMANA" + "," + (string)health);
             mana = 0;
         }
+        /* else if (mana >= 1 && mana <= 10){
+            if(hudStatus)
+                llSay(listenChannel, "UPDATEMANA" + "," + (string)mana);
+        }
+        else if (mana >= 11 && mana <= 20){
+            if(hudStatus)
+                llSay(listenChannel, "UPDATEMANA" + "," + (string)mana);
+        }
+        else if (mana >= 21 && mana <= 30){
+            if(hudStatus)
+                llSay(listenChannel, "UPDATEMANA" + "," + (string)mana);
+        }
+        else if (mana >= 31 && mana <= 40){
+            if(hudStatus)
+                llSay(listenChannel, "UPDATEMANA" + "," + (string)mana);
+        }
+        else if (mana >= 41 && mana <= 50){
+            if(hudStatus)
+                llSay(listenChannel, "UPDATEMANA" + "," + (string)mana);
+        }
+        else if (mana >= 51 && mana <= 60){
+            if(hudStatus)
+                llSay(listenChannel, "UPDATEMANA" + "," + (string)mana);
+        }
+        else if (mana >= 61 && mana <= 70){
+            if(hudStatus)
+                llSay(listenChannel, "UPDATEMANA" + "," + (string)mana);
+        }
+        else if (mana >= 71 && mana <= 80){
+            if(hudStatus)
+                llSay(listenChannel, "UPDATEMANA" + "," + (string)mana);
+        }
+        else if (mana >= 81 && mana <= 90){
+            llSay(listenChannel, "UPDATEMANA" + "," + (string)mana);
+        }
+        else if (mana >= 91 && mana <= 100){
+            if(hudStatus)
+                llSay(listenChannel, "UPDATEMANA" + "," + (string)mana);
+        } */
 
         if(blood <= 0){
             llSay(listenChannel,"noBlood");
+            //if(hudStatus)
+            //    llSay(listenChannel, "UPDATEBLOOD" + "," + (string)health);
             blood = 0.0;
         }
+        /* else if(blood >= bloodMax)
+            llSay(listenChannel,"fullBlood");
+        else if (blood >= 1 && blood <= 10){
+            if(hudStatus)
+                llSay(listenChannel, "UPDATEBLOOD" + "," + (string)blood);
+        }
+        else if (blood >= 11 && blood <= 20){
+            if(hudStatus)
+                llSay(listenChannel, "UPDATEBLOOD" + "," + (string)blood);
+        }
+        else if (blood >= 21 && blood <= 30){
+            if(hudStatus)
+                llSay(listenChannel, "UPDATEBLOOD" + "," + (string)blood);
+        }
+        else if (blood >= 31 && blood <= 40){
+            if(hudStatus)
+                llSay(listenChannel, "UPDATEBLOOD" + "," + (string)blood);
+        }
+        else if (blood >= 41 && blood <= 50){
+            if(hudStatus)
+                llSay(listenChannel, "UPDATEBLOOD" + "," + (string)blood);
+        }
+        else if (blood >= 51 && blood <= 60){
+            if(hudStatus)
+                llSay(listenChannel, "UPDATEBLOOD" + "," + (string)blood);
+        }
+        else if (blood >= 61 && blood <= 70){
+            if(hudStatus)
+                llSay(listenChannel, "UPDATEBLOOD" + "," + (string)blood);
+        }
+        else if (blood >= 71 && blood <= 80){
+            if(hudStatus)
+                llSay(listenChannel, "UPDATEBLOOD" + "," + (string)blood);
+        }
+        else if (blood >= 81 && blood <= 90){
+            llSay(listenChannel, "UPDATEBLOOD" + "," + (string)blood);
+        }
+        else if (blood >= 91 && blood <= 100){
+            if(hudStatus)
+                llSay(listenChannel, "UPDATEBLOOD" + "," + (string)blood);
+        }
+        */
         setStatusText();
     }
 }
