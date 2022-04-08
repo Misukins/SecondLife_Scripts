@@ -1,7 +1,4 @@
 key owner;
-key texture1 = "9027e14e-51e5-3a34-4e01-0e53e80c9597";
-key texture2 = "3c52c863-44ba-5433-0b51-ba463a0c7174";
-key texture3 = "67b4de19-a738-e83a-ba1f-b0298937ac7f";
 
 float totalBlood            = 10.0;
 float currentBlood          = 0.0;
@@ -15,14 +12,16 @@ integer texture1_enabled    = FALSE;
 integer texture2_enabled    = FALSE;
 integer texture3_enabled    = TRUE;
 integer waittime            = 10;
+integer userBlood           = TRUE;
 
 list main_menu;
 list Settings_Menu;
 list Textures_Menu;
-list zList = [];
-list Charsetx = ["█","█","█","█","█","█","█","█","█","█"];
+list zList          = [];
+list Charsetx       = ["█","█","█","█","█","█","█","█","█","█"];
 
-string desc_    = "(c)Amy (meljonna Resident) -";
+string desc_        = "(c)Amy (meljonna Resident) -";
+string objectName   = "Carnage - Blood Barrel";
 string origName;
 string pList;
 
@@ -33,16 +32,16 @@ vector color        = <0, 1, 0>;
 string Float2String ( float num, integer places, integer rnd)
 {
     if (rnd){
-        float f = llPow( 10.0, places );
+        float f = llPow(10.0, places);
         integer i = llRound(llFabs(num) * f);
         string s = "00000" + (string)i;
         if(num < 0.0)
-            return "-" + (string)( (integer)(i / f) ) + "." + llGetSubString( s, -places, -1);
-        return (string)( (integer)(i / f) ) + "." + llGetSubString( s, -places, -1);
+            return "-" + (string)( (integer)(i / f)) + "." + llGetSubString(s, -places, -1);
+        return (string)((integer)(i / f)) + "." + llGetSubString(s, -places, -1);
     }
     if (!places)
-        return (string)((integer)num );
-    if ( (places = (places - 7 - (places < 1) ) ) & 0x80000000)
+        return (string)((integer)num);
+    if ( (places = (places - 7 - (places < 1))) & 0x80000000)
         return llGetSubString((string)num, 0, places);
     return (string)num;
 }
@@ -52,35 +51,11 @@ menu(key _id)
     llListenRemove(listen_handle);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", _id, "");
-    main_menu = ["Deposit 1L", "Withdraw 1L", "Settings", "▼"];
+    main_menu = ["Deposit 1L", "Withdraw 1L", "Done", "▼"];
     llDialog(_id, "Hello " + (string)llGetDisplayName(_id) + " (" + (string)llKey2Name(_id) + ") Select an option\nCurrent Blood volume :: "
         + (string)Float2String(currentBlood, 2, FALSE) + "/"
         + (string)Float2String(totalBlood, 2, FALSE) + 
         " liters(s)", main_menu, channel);
-}
-
-settingsMenu(key _id)
-{
-    llListenRemove(listen_handle);
-    channel = llFloor(llFrand(2000000));
-    listen_handle = llListen(channel, "", _id, "");
-    Settings_Menu = ["Textures", "Access", "◄", "▼"];
-    llDialog(_id, "Hello " + (string)llGetDisplayName(_id) + " (" + (string)llKey2Name(_id) + ") Select an option", Settings_Menu, channel);
-}
-
-texturesMenu(key _id)
-
-{
-    llListenRemove(listen_handle);
-    channel = llFloor(llFrand(2000000));
-    listen_handle = llListen(channel, "", _id, "");
-    if((texture1_enabled) && (!texture2_enabled) && (!texture3_enabled))
-        Textures_Menu = ["■texture1", "texture2", "texture3", "◄", "▼"];
-    else if((!texture1_enabled) && (texture2_enabled) && (!texture3_enabled))
-        Textures_Menu = ["texture1", "■texture2", "texture3", "◄", "▼"];
-    else if((!texture1_enabled) && (!texture2_enabled) && (texture3_enabled))
-        Textures_Menu = ["texture1", "texture2", "■texture3", "◄", "▼"];
-    llDialog(_id, "Hello " + (string)llGetDisplayName(_id) + " (" + (string)llKey2Name(_id) + ") Select an option", Textures_Menu, channel);
 }
 
 updateTimeDisp()
@@ -88,47 +63,47 @@ updateTimeDisp()
     //NOTE THIS IS MY BEN LAZY LOL!!!!!
     if(currentBlood == 10.0){
         zList = ["█","█","█","█","█","█","█","█","█","█"];
-        titleColor = <0,1,0>;
+        titleColor = <0.055, 0.965, 0.031>;
     }
     else if(currentBlood == 9.0){
         zList = ["█","█","█","█","█","█","█","█","█"];
-        titleColor = <0,1,0>;
+        titleColor = <0.275, 0.965, 0.031>;
     }
     else if(currentBlood == 8.0){
         zList = ["█","█","█","█","█","█","█","█"];
-        titleColor = <0,1,0>;
+        titleColor = <0.404, 0.965, 0.031>;
     }
     else if(currentBlood == 7.0){
         zList = ["█","█","█","█","█","█","█"];
-        titleColor = <0,1,0>;
+        titleColor = <0.667, 0.965, 0.031>;
     }
     else if(currentBlood == 6.0){
         zList = ["█","█","█","█","█","█"];
-        titleColor = <1,1,0>;
+        titleColor = <0.788, 0.965, 0.031>;
     }
     else if(currentBlood == 5.0){
         zList = ["█","█","█","█","█"];
-        titleColor = <1,1,0>;
+        titleColor = <0.965, 0.965, 0.031>;
     }
     else if(currentBlood == 4.0){
         zList = ["█","█","█","█"];
-        titleColor = <1,0,0>;
+        titleColor = <0.965, 0.667, 0.031>;
     }
     else if(currentBlood == 3.0){
         zList = ["█","█","█"];
-        titleColor = <1,0,0>;
+        titleColor = <0.965, 0.404, 0.031>;
     }
     else if(currentBlood == 2.0){
         zList = ["█","█"];
-        titleColor = <1,0,0>;
+        titleColor = <0.965, 0.275, 0.031>;
     }
     else if(currentBlood == 1.0){
         zList = ["█"];
-        titleColor = <1,0,0>;
+        titleColor = <0.969, 0.165, 0.031>;
     }
     else{
         zList = [];
-        titleColor = <1,0,0>;
+        titleColor = <0.969, 0.055, 0.031>;
     }
     llSetText(
         (string)llGetDisplayName(owner) 
@@ -137,6 +112,7 @@ updateTimeDisp()
         + (string)Float2String(currentBlood, 2, FALSE) + "/"
         + (string)Float2String(totalBlood, 2, FALSE) + "L\n"
         + (string)zList, titleColor, 1);
+    llSetObjectName(objectName + " " + (string)Float2String(currentBlood, 0, FALSE) + "/" + (string)Float2String(totalBlood, 0, FALSE) + "L");
 }
 
 default
@@ -191,8 +167,20 @@ default
             }
             else if(message == "METER_NOTFOUND")
                 state waiting;
+            else if (message == "noBlood"){  // deposit
+                if(userBlood){
+                    userBlood = FALSE;
+                    llOwnerSay("you have no blood!");
+                }
+            }
+            else if (message == "fullBlood"){ //Withdraw
+                if(!userBlood){
+                    userBlood = TRUE;
+                    llOwnerSay("you are full!");
+                }
+            } 
         }
-
+        
         if (message == "▼")
             return;
         else if (message == "◄")
@@ -207,10 +195,12 @@ default
                 menu(id);
             }
             else{
-                currentBlood += 1.0;
-                llSay(listenChannel, "deposit 1.0");
-                updateTimeDisp();
-                menu(id);
+                if (userBlood){
+                    currentBlood += 1.0;
+                    llSay(listenChannel, "deposit 1.0");
+                    updateTimeDisp();
+                    menu(id);
+                }
             }
         }
         else if (message == "Withdraw 1L"){
@@ -219,48 +209,13 @@ default
                 menu(id);
             }
             else{
-                currentBlood -= 1.0;
-                llSay(listenChannel, "withdraw 1.0");
-                updateTimeDisp();
-                menu(id);
-            }
-        }
-        else if (message == "Settings")
-            settingsMenu(id);
-        else if (message == "Textures")
-            texturesMenu(id);
-        else if (message == "texture1"){
-            texture1_enabled = TRUE;
-            texture2_enabled = FALSE;
-            texture3_enabled = FALSE;
-            llSetLinkTexture(LINK_THIS, texture1, ALL_SIDES);
-            llSetObjectName("");
-            llOwnerSay("Barrel Texture Changed!");
-            llSetObjectName(origName);
-            updateTimeDisp();
-            settingsMenu(id);
-        }
-        else if (message == "texture2"){
-            texture1_enabled = FALSE;
-            texture2_enabled = TRUE;
-            texture3_enabled = FALSE;
-            llSetLinkTexture(LINK_THIS, texture2, ALL_SIDES);
-            llSetObjectName("");
-            llOwnerSay("Barrel Texture Changed!");
-            llSetObjectName(origName);
-            updateTimeDisp();
-            settingsMenu(id);
-        }
-        else if (message == "texture3"){
-            texture1_enabled = FALSE;
-            texture2_enabled = FALSE;
-            texture3_enabled = TRUE;
-            llSetLinkTexture(LINK_THIS, texture3, ALL_SIDES);
-            llSetObjectName("");
-            llOwnerSay("Barrel Texture Changed!");
-            llSetObjectName(origName);
-            updateTimeDisp();
-            settingsMenu(id);
+                if (userBlood){
+                    currentBlood -= 1.0;
+                    llSay(listenChannel, "withdraw 1.0");
+                    updateTimeDisp();
+                    menu(id);
+                }
+            } 
         }
     }
 
@@ -276,6 +231,7 @@ state looking
 {
     state_entry()
     {
+        llSetObjectName(objectName + " " + (string)Float2String(currentBlood, 0, FALSE) + "/" + (string)Float2String(totalBlood, 0, FALSE) + "L");
         llListenRemove(listen_handle);
         llSetText("Waiting fo Carnage Meter...\n" + llDumpList2String(Charsetx, ""), color, 1.0);
         llListen(listenChannel, "", "", "");
@@ -324,6 +280,7 @@ state waiting
 {
     state_entry()
     {
+        llSetObjectName(objectName + " " + (string)Float2String(currentBlood, 0, FALSE) + "/" + (string)Float2String(totalBlood, 0, FALSE) + "L");
         llListenRemove(listen_handle);
         llSetText("Waiting for " + (string)llGetDisplayName(owner) + " (" + (string)llKey2Name(owner) + ")", color, 1.0);
         METERfound = FALSE;
