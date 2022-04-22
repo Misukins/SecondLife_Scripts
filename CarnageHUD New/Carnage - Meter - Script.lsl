@@ -356,7 +356,6 @@ default
         }
         else{
             llSay(llChan, "meterON");
-            llSay(listenChannel, "healthFULL");
             hudStatus = FALSE;
             statusText = "OOC/AFK"; 
             user = llGetOwner();
@@ -382,6 +381,11 @@ default
             else
                 llSay(listenChannel, "silentModeOFF");
         }
+    }
+
+    on_rez(integer start_param)
+    {
+        //TODO - for fixing relog bugs
     }
 
     touch_start(integer total_number)
@@ -481,10 +485,16 @@ default
                     health -= damage + 20;
                 else if(damagetype == "bloodball")
                     health -= damage + 50;
-                else if(damagetype == "claw") //NOTE for Vampire Claw
-                    health -= damage + 25;
-                else if(damagetype == "bats") //NOTE for batSwarm
+                else if(damagetype == "claw"){ //NOTE for Vampire Claw
+                    health -= damage + 25; //will change high just for testing
+                    if(attacker != llGetOwner())
+                        llSay(listenChannel, "give_exp2");
+                }
+                else if(damagetype == "bats"){ //NOTE for batSwarm
                     health -= damage + 10; //will change high just for testing
+                    if(attacker != llGetOwner())
+                        llSay(listenChannel, "give_exp2");
+                }
                 else
                     health -= damage + 10; //NOTE JUST FOR BACKUP... everytype of weapon works with this now
                 //FIX
@@ -523,6 +533,27 @@ default
                 }
                 else if(message == "METER_OK")
                     llSay(listenChannel, "METER_FOUND");
+                else if (message == "STATS")
+                    stats();
+/*                 else if (message == "PERKS"){
+                    
+                } */
+                else if (message == "SILENTON")
+                {
+                    if(!silentMode){
+                        silentMode = TRUE;
+                        llSay(listenChannel, "silentModeON");
+                        llOwnerSay("Silentmode Active (Combat Disabled)"); // you can still FEED without title texts
+                    }
+                }
+                else if (message == "SILENTOFF")
+                {
+                    if(silentMode){
+                        silentMode = FALSE;
+                        llSay(listenChannel, "silentModeOFF");
+                        llOwnerSay("Silentmode Deactive (Combat Enabled)");
+                    }
+                }
                 else if(message == "deposit 1.0"){
                     if(blood != 0.0){
                         blood -= 1.0;
@@ -613,29 +644,12 @@ default
             setStatusText();
         }
 
-        if (message == "» Stats «"){
-            stats();
-            doMenu(user);
-        }
-        else if(message == "» Title «")
+        if(message == "» Title «")
             llTextBox(id, "To change your title type : title (name)\nso for example you might type.. title Unamed Player", chan);
         else if(message == "» Color «")
             llDialog(id, "\n\nSelect a color group", main_menu, channel);
         else if (message == "» Help «")
             llGiveInventory(user, InfoNote);
-        else if (message == "» Silent «")
-        {
-            if(!silentMode){
-                silentMode = TRUE;
-                llSay(listenChannel, "silentModeON");
-                llOwnerSay("Silentmode Active (Combat Disabled)"); // you can still FEED without title texts
-            }
-            else{
-                silentMode = FALSE;
-                llSay(listenChannel, "silentModeOFF");
-                llOwnerSay("Silentmode Deactive (Combat Enabled)");
-            }
-        }
         else if(message == "» Suicide «"){
             deathStatus = TRUE;
             llSay(0, (string)llGetDisplayName(user) + " (" + (string)llKey2Name(user) + ") took the easy way out!");
@@ -777,26 +791,6 @@ default
 
     timer()
     {
-        llSay(listenChannel, "UPDATEEXP" + "," + (string)llRound(experience));
-        if(hudStatus){
-            llSay(listenChannel, "UPDATEHEALTH" + "," + (string)health);
-            llSay(listenChannel, "UPDATEBLOOD" + "," + (string)Float2String(blood, 2, FALSE));
-            llSay(listenChannel, "UPDATESTAMINA" + "," + (string)mana);
-        }
-        //NOTE low health sounds
-        if((health < 40) && health > 30){
-            llSay(listenChannel, "healthLOW");
-            llLoopSound(heartbeatSlow, 1.0);
-        }
-        else if((health < 30) && health >= 0){
-            llSay(listenChannel, "healthCRIT");
-            llLoopSound(heartbeatFast, 1.0);
-        }
-        else{
-            llSay(listenChannel, "healthFULL");
-            llStopSound();
-        }
-            
         if(health < healthMax){
             health += 2;
             if(health > healthMax)

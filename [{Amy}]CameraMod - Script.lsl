@@ -276,7 +276,6 @@ default
     state_entry()
     {
         llSetObjectName(objName);
-        //llSetLinkColor(LINK_THIS, _redState, ALL_SIDES);
         llSitTarget(<0.0, 0.0, 0.1>, ZERO_ROTATION);
         llPreloadSound(_sound_on);
         llPreloadSound(_sound_off);
@@ -396,21 +395,6 @@ default
                 off_cam(agent);
         }
     }
-
-    /*
-    timer()
-    {
-        string curAnimState = llGetAnimation(llGetOwner());
-        if (curAnimState == "Sitting") {
-            sitOverride = TRUE;
-            if (sitOverride) {
-                sitting();
-            }
-        }
-        else
-            sitOverride = FALSE;
-    }
-    */
 }
 
 state stopAnims

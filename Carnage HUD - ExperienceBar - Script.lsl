@@ -5,7 +5,7 @@ float maxOffset         = 0.7;
 integer listenChannel   = -458790;
 
 string desc_            = "(c)Amy (meljonna Resident)";
-string onjectName       = "CARNAGE - BloodBar";
+string onjectName       = "CARNAGE - ExperienceBar";
 
 default
 {
@@ -35,27 +35,27 @@ default
             0.37 //0
         */
 
-        if (msg == "UPDATEBLOOD,0")
+        if (msg == "UPDATEEXP,0")
             llOffsetTexture(0, 0.37, ALL_SIDES);
-        else if ((msg == "UPDATEBLOOD,1") || (msg == "UPDATEBLOOD,10"))
+        else if ((msg == "UPDATEEXP,1") || (msg == "UPDATEEXP,10"))
             llOffsetTexture(0, 0.4, ALL_SIDES);
-        else if ((msg == "UPDATEBLOOD,11") || (msg == "UPDATEBLOOD,20"))
+        else if ((msg == "UPDATEEXP,11") || (msg == "UPDATEEXP,20"))
             llOffsetTexture(0, 0.43, ALL_SIDES);
-        else if ((msg == "UPDATEBLOOD,21") || (msg == "UPDATEBLOOD,30"))
+        else if ((msg == "UPDATEEXP,21") || (msg == "UPDATEEXP,30"))
             llOffsetTexture(0, 0.45, ALL_SIDES);
-        else if ((msg == "UPDATEBLOOD,31") || (msg == "UPDATEBLOOD,40"))
+        else if ((msg == "UPDATEEXP,31") || (msg == "UPDATEEXP,40"))
             llOffsetTexture(0, 0.48, ALL_SIDES);
-        else if ((msg == "UPDATEBLOOD,41") || (msg == "UPDATEBLOOD,50"))
+        else if ((msg == "UPDATEEXP,41") || (msg == "UPDATEEXP,50"))
             llOffsetTexture(0, 0.51, ALL_SIDES);
-        else if ((msg == "UPDATEBLOOD,51") || (msg == "UPDATEBLOOD,60"))
+        else if ((msg == "UPDATEEXP,51") || (msg == "UPDATEEXP,60"))
             llOffsetTexture(0, 0.54, ALL_SIDES);
-        else if ((msg == "UPDATEBLOOD,61") || (msg == "UPDATEBLOOD,70"))
+        else if ((msg == "UPDATEEXP,61") || (msg == "UPDATEEXP,70"))
             llOffsetTexture(0, 0.57, ALL_SIDES);
-        else if ((msg == "UPDATEBLOOD,71") || (msg == "UPDATEBLOOD,80"))
+        else if ((msg == "UPDATEEXP,71") || (msg == "UPDATEEXP,80"))
             llOffsetTexture(0, 0.6, ALL_SIDES);
-        else if ((msg == "UPDATEBLOOD,81") || (msg == "UPDATEBLOOD,90"))
+        else if ((msg == "UPDATEEXP,81") || (msg == "UPDATEEXP,90"))
             llOffsetTexture(0, 0.62, ALL_SIDES);
-        else if ((msg == "UPDATEBLOOD,91") || (msg == "UPDATEBLOOD,100"))
+        else if ((msg == "UPDATEEXP,91") || (msg == "UPDATEEXP,100"))
             llOffsetTexture(0, 0.7, ALL_SIDES);
     }
 }

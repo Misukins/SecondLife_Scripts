@@ -93,8 +93,10 @@ default
 
     link_message(integer from,integer to,string msg,key id)
     {
-      if (msg == "RESET")
+      if (msg == "RESET"){
+          llOwnerSay("Resetting - Cam2Avi Script!");
           llResetScript();
+        }
     }
 
     changed(integer change)
