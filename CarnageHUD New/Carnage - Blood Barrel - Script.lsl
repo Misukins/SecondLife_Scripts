@@ -1,4 +1,5 @@
 key owner;
+key blank = "5748decc-f629-461c-9a36-a35a221fe21f";
 
 float totalBlood            = 10.0;
 float currentBlood          = 0.0;
@@ -13,6 +14,9 @@ integer texture2_enabled    = FALSE;
 integer texture3_enabled    = TRUE;
 integer waittime            = 10;
 integer userBlood           = TRUE;
+integer profpiclink         = 2;
+integer profile_key_prefix_length;
+integer profile_img_prefix_length;
 
 list main_menu;
 list Settings_Menu;
@@ -24,6 +28,12 @@ string desc_        = "(c)Amy (meljonna Resident) -";
 string objectName   = "Carnage - Blood Barrel";
 string origName;
 string pList;
+string url = "http://world.secondlife.com/resident/";
+string name;
+string real_name;
+string status;
+string profile_key_prefix = "<meta name=\"imageid\" content=\"";
+string profile_img_prefix = "<img alt=\"profile image\" src=\"http://secondlife.com/app/image/";
 
 vector titleColor   = <0.905, 0.686, 0.924>;
 vector color        = <0, 1, 0>;
@@ -124,6 +134,10 @@ default
         llSetObjectDesc(desc_);
         llListenRemove(listen_handle);
         llListen(listenChannel, "", "", "");
+        profile_key_prefix_length = llStringLength(profile_key_prefix);
+        profile_img_prefix_length = llStringLength(profile_img_prefix);
+        llSetLinkTexture(profpiclink, blank, ALL_SIDES);
+        llRequestAgentData(owner, DATA_NAME);
         if(METERfound)
             llSetTimerEvent(300);
         else
@@ -219,6 +233,31 @@ default
         }
     }
 
+    http_response(key request_id,integer status, list metadata, string body)
+    {
+        string profile_pic;
+        integer s1 = llSubStringIndex(body, profile_key_prefix);
+        integer s1l = profile_key_prefix_length;
+        if(s1 == -1){
+            s1 = llSubStringIndex(body, profile_img_prefix);
+            s1l = profile_img_prefix_length;
+        }
+ 
+        if (s1 == -1)
+            profile_pic = blank;
+        else{
+            profile_pic = llGetSubString(body,s1 + s1l, s1 + s1l + 35);
+            if (profile_pic == (string)NULL_KEY)
+                profile_pic = blank;
+        }
+        llSetLinkTexture(LINK_THIS, profile_pic, picture_side);
+    }
+    
+    dataserver(key queryid, string data)
+    {
+        //NOTE - nada
+    }
+
     timer()
     {
         if(METERfound)
@@ -270,6 +309,8 @@ state looking
         }
         else{
             llSetText("DONE...", color, 1.0);
+            llHTTPRequest( url + (string)owner,[HTTP_METHOD,"GET"],"");
+            llRequestAgentData(owner, DATA_ONLINE);
             llSleep(3.0);
             state default;
         }

@@ -25,6 +25,20 @@ string objectName   = "Carnage - Blood Barrel";
 string origName;
 string pList;
 
+/*NOTE - TEMP LOC*/
+key blank = "f5514051-f0a4-df60-a73c-0a91f5492b1f";
+
+integer profile_key_prefix_length;
+integer profile_img_prefix_length;
+integer PIC_LINK = 2;
+
+string url = "http://world.secondlife.com/resident/";
+string name;
+string real_name;
+string status;
+string profile_key_prefix = "<meta name=\"imageid\" content=\"";
+string profile_img_prefix = "<img alt=\"profile image\" src=\"http://secondlife.com/app/image/";
+
 vector titleColor   = <0.905, 0.686, 0.924>;
 vector color        = <0, 1, 0>;
 
@@ -119,6 +133,8 @@ default
 {
     state_entry()
     {
+        if (DEBUG)
+            llOwnerSay("DEBUG: state def");
         owner = llGetOwner();
         origName = llGetObjectName();
         llSetObjectDesc(desc_);
@@ -231,6 +247,14 @@ state looking
 {
     state_entry()
     {
+        if (DEBUG)
+            llOwnerSay("DEBUG: state looking");
+        owner = llGetOwner();
+        profile_key_prefix_length = llStringLength(profile_key_prefix);
+        profile_img_prefix_length = llStringLength(profile_img_prefix);
+        llSetText("", <1,0,0>, 1.0);
+        llSetLinkTexture(PIC_LINK, blank, ALL_SIDES);
+        llRequestAgentData(owner, DATA_NAME);
         llSetObjectName(objectName + " " + (string)Float2String(currentBlood, 0, FALSE) + "/" + (string)Float2String(totalBlood, 0, FALSE) + "L");
         llListenRemove(listen_handle);
         llSetText("Waiting fo Carnage Meter...\n" + llDumpList2String(Charsetx, ""), color, 1.0);
@@ -253,6 +277,8 @@ state looking
     timer()
     {
         integer num = 10;
+        llHTTPRequest(url + (string)owner, [HTTP_METHOD,"GET"], "");
+        llRequestAgentData(owner, DATA_ONLINE);   
         if(!METERfound){
             waittime -= num;
             if(waittime < 7)
@@ -274,12 +300,35 @@ state looking
             state default;
         }
     }
+
+    http_response(key request_id, integer status, list metadata, string body)
+    {
+        string profile_pic;
+        integer s1 = llSubStringIndex(body, profile_key_prefix);
+        integer s1l = profile_key_prefix_length;
+        if(s1 == -1){
+            s1 = llSubStringIndex(body, profile_img_prefix);
+            s1l = profile_img_prefix_length;
+        }
+ 
+        if (s1 == -1)
+            profile_pic = blank;
+        else{
+            profile_pic = llGetSubString(body,s1 + s1l, s1 + s1l + 35);
+            if (profile_pic == (string)NULL_KEY)
+                profile_pic = blank;
+        }
+        llSetLinkTexture(PIC_LINK, profile_pic, ALL_SIDES);
+    }
+    
 }
 
 state waiting
 {
     state_entry()
     {
+        if (DEBUG)
+            llOwnerSay("DEBUG: state waiting");
         llSetObjectName(objectName + " " + (string)Float2String(currentBlood, 0, FALSE) + "/" + (string)Float2String(totalBlood, 0, FALSE) + "L");
         llListenRemove(listen_handle);
         llSetText("Waiting for " + (string)llGetDisplayName(owner) + " (" + (string)llKey2Name(owner) + ")", color, 1.0);
@@ -289,6 +338,7 @@ state waiting
     touch_start(integer num_detected)
     {
         key id = llDetectedKey(0);
+        list ownerName = llParseString2List(llGetDisplayName(owner), [""], []);
         if(llGetOwnerKey(id) == owner){
             if(!METERfound)
                 state looking;
@@ -296,7 +346,7 @@ state waiting
                 menu(id);
         }
         else
-            llSay(0, "Sorry only " + (string)llGetDisplayName(owner) + " (" + (string)llKey2Name(owner) + ") has access!");
+            llSay(0, "Sorry only " + (string)ownerName + " (" + (string)llKey2Name(owner) + ") has access!");
     }
 
     state_exit()
