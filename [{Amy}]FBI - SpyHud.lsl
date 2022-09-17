@@ -197,7 +197,6 @@ default
     touch_start(integer total_number)
     {
         menu(llGetOwner());
-        //llResetScript();
     }
 
     listen(integer channel, string name, key id, string message)
@@ -209,14 +208,14 @@ default
                 state Sniffing;
                 llOwnerSay("Listen Scanner is now On..");
                 llPlaySound(_sound_on, _volume);
-                menu(llGetOwner());
+                menu(id);
                 return;
             }
             else{
                 state default;
                 llOwnerSay("Listen Scanner is now Off..");
                 llPlaySound(_sound_off, _volume);
-                menu(llGetOwner());
+                menu(id);
                 return;
             }
             ScannerOn = !ScannerOn;
@@ -226,14 +225,14 @@ default
                 state Script;
                 llOwnerSay("Script Counter is now On..");
                 llPlaySound(_sound_on, _volume);
-                menu(llGetOwner());
+                menu(id);
                 return;
             }
             else{
                 state default;
                 llOwnerSay("Script Counter is now Off..");
                 llPlaySound(_sound_off, _volume);
-                menu(llGetOwner());
+                menu(id);
                 return;
             }
             ScriptOn = !ScriptOn;
