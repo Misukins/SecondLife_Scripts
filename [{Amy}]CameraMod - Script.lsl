@@ -351,8 +351,8 @@ default
 
     changed(integer change)
     {
-        if (change & CHANGED_OWNER)
-            llResetScript();
+        //if (change & CHANGED_OWNER)
+        //    llResetScript();
         if (change & CHANGED_LINK){
             key agent = llAvatarOnSitTarget();
             if (agent){
