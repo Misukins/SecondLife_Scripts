@@ -4,37 +4,36 @@ so far so good.. still alot work
 
 */
 
-key targetKey           = NULL_KEY;
+key targetKey                               = NULL_KEY;
 
-float DELAY = 0.5;
-float TAU = 1.0;
-float LIMIT = 60.0;
-float Walking_Sound_Speed = 1.0;
-float Volume_For_Sounds = 0.05;
-float Volume_For_Bell = 0.2;
-float seconds_to_check_when_avatar_walks = 0.01;
-float soundsVolume = 1.0;
+float DELAY                                 = 0.5;
+float TAU                                   = 1.0;
+float LIMIT                                 = 60.0;
+float Walking_Sound_Speed                   = 1.0;
+float Volume_For_Sounds                     = 0.05;
+float Volume_For_Bell                       = 0.2;
+float seconds_to_check_when_avatar_walks    = 0.01;
+float soundsVolume                          = 1.0;
 
-integer RANGE = 2;
-integer WalkingSound;
-integer walking         = FALSE;
-integer leshedON        = FALSE;
-integer announced       = FALSE;
-integer ll_channel      = 665;
-integer COLLAR_FACE     = 1;
-integer dlgHandle       = -1;
-integer defdist       = TRUE;
-integer fivemDist     = FALSE;
-integer tenmDist      = FALSE;
-integer fifteenmDist  = FALSE;
-integer twentyMDist   = FALSE;
-integer gotPermission = FALSE;
-integer globalListenHandle  = -0;
 integer channel;
 integer listen_handle;
-integer tid = 0;
-
-integer listenChannel = 1;
+integer WalkingSound;
+integer walking             = FALSE;
+integer leshedON            = FALSE;
+integer announced           = FALSE;
+integer defdist             = TRUE;
+integer fivemDist           = FALSE;
+integer tenmDist            = FALSE;
+integer fifteenmDist        = FALSE;
+integer twentyMDist         = FALSE;
+integer gotPermission       = FALSE;
+integer ll_channel          = 665;
+integer COLLAR_FACE         = 1;
+integer dlgHandle           = -1;
+integer globalListenHandle  = -0;
+integer tid                 = 0;
+integer RANGE               = 2;
+integer listenChannel       = 1;
 
 list main_menu;
 //list sounds_menu      = [ "Bell 1", "←", "▼"];
@@ -44,7 +43,7 @@ list accessList         = [];
 list avatarList         = [];
 list avatarUUIDs        = [];
 list distance_menu      = [];
-list anims_menu          = [];
+list anims_menu         = [];
 /* //NOTE Coming soon.. (walk sounds) with on/off option
 string Default_Start_Walking_Sound = "";
 string Default_Walking_Sound = "";
@@ -66,16 +65,16 @@ string sound_8 = "1dc1e689-3fd8-13c5-b57f-3fedd06b827a";
 //TODO ~ more textures
 string blackTexture = "9af0ef91-122c-d867-d066-81c7929cdb40"; //Black
 string whiteTexture = "6b2ffa5f-dc71-c551-c9eb-9ce636c7ef84"; //White
-string brownTexture = "1d32a1d4-538c-a1fe-1d9f-33a95867e060"; // Brown
-string redTexture   = "ed55e038-2e2d-4372-d0c8-a1ce50e74b81"; // Red
-
-string tpSound      = "93070de9-ffe7-8f9e-cbbe-7a570a9a0410";
+string brownTexture = "1d32a1d4-538c-a1fe-1d9f-33a95867e060"; //Brown
+string redTexture   = "ed55e038-2e2d-4372-d0c8-a1ce50e74b81"; //Red
+string tpSound      = "93070de9-ffe7-8f9e-cbbe-7a570a9a0410"; //Bleep!!!!
 
 string API_Start_Sound;
 string API_Stop_Sound;
-string targetName = "";
-string objectName = "(TEMP): Collar - Leash";
-string desc_    = "(c)Amy (meljonna Resident) -";
+
+string targetName   = "";
+string objectName   = "(TEMP): Collar - Leash";
+string desc_        = "(c)Amy (meljonna Resident) -";
 
 // TODO list START
 /* //NOTE so far this works 100% but leash goesto Avi Center looks stupid!!
@@ -85,7 +84,7 @@ string desc_    = "(c)Amy (meljonna Resident) -";
 //FIX link leash to collar LOGO
 what else? oh
 //FIX after teleport checks
-//FIX range checks
+//FIX range checks (DONE)
 //FIX CLEAN UP!!!
 //FIX Sorry, someone who outranks you on
 */ //TODO list END
@@ -410,7 +409,6 @@ default
         else if (message == "cutie"){
             if(gotPermission)
                 llStartAnimation("cutie");
-            
         }
         else if (message == "kneel"){
             if(gotPermission)
@@ -565,7 +563,7 @@ state Remove
     {
         llListen(listenChannel, "", llGetOwner(), "");
         llOwnerSay("type /" + (string)listenChannel + "del (username), you have 1min (60seconds)!");
-        llSetTimerEvent(60);
+        llSetTimerEvent(60); //60 Seconds
         dumpAccessList();
     }
 
@@ -584,7 +582,7 @@ state Remove
                     accessList = llDeleteSubList(accessList, pos, pos);
                     llSetObjectName("");
                     llOwnerSay("Removed: secondlife:///app/agent/" + (string)targetKey + "/about for access list.");
-                    //llInstantMessage(targetKey, "secondlife:///app/agent/" + (string)id + "/about removed you from her Collar.");
+                    //llInstantMessage(targetKey, "secondlife:///app/agent/" + (string)id + "/about removed you from theyr Collar.");
                     llSetObjectName(origName);
                     state default;
                 }
@@ -629,7 +627,7 @@ state OwnerDialog
     state_entry()
     {
         dlgHandle = llListen(listenChannel, "", "", "");
-        llSetTimerEvent(30.0);
+        llSetTimerEvent(30.0); //30 seconds
         avatarList += ["※Cancel"];
         llDialog(llGetOwner(), "Please select an avatar you want", avatarList, listenChannel);
         llOwnerSay("You have 30seconds to send this.. or else you have to start over!");
@@ -645,7 +643,7 @@ state OwnerDialog
             accessList = llListInsertList(accessList, [avatar], 0);
             llSetObjectName("");
             llOwnerSay("Added: secondlife:///app/agent/" + (string)targetKey + "/about to access list.");
-            llInstantMessage(targetKey, "secondlife:///app/agent/" + (string)id + "/about added you to her Collar.");
+            llInstantMessage(targetKey, "secondlife:///app/agent/" + (string)id + "/about added you to theyr Collar.");
             llSetObjectName(origName);
             Cleanup();
             state default;
