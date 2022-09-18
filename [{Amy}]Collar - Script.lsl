@@ -506,7 +506,7 @@ default
         if (change & CHANGED_TELEPORT)
         {
             llTriggerSound(tpSound, soundsVolume);
-            //TODO
+            //TODO MORE FEATURES?
         }
 
         if(llGetInventoryNumber(INVENTORY_SOUND) > 0)
@@ -550,7 +550,7 @@ default
         if(leshedON)
             keepFollowing();
     }
-
+    	//WHY???????
     /* state_exit()
     {
         llSetTimerEvent(0);
