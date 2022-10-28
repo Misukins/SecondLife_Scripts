@@ -2,6 +2,9 @@
 	"folders": [
 		{
 			"path": "."
+		},
+		{
+			"path": "../Amy_CameraMod/SL-Camera-MOD"
 		}
 	],
 	"settings": {
