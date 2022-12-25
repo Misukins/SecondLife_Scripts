@@ -1,0 +1,29 @@
+#Rental Cost
+1
+
+#For Rent Texture UUID
+53bb8c9e-66e5-3441-40d5-dffe1ef76148
+
+#For Sticker Blank Texture UUID
+3ab7e2fa-9572-ef36-1a30-d855dbea4f92
+
+#For Sticker Texture UUID
+e26260df-9989-0fa0-a9ee-d90da7c6f60b
+
+#Owner UUID (Daycare Leader: Akasha)
+bb327145-2627-43c3-bedf-58a20e41914e
+
+#Manager UUID (Daycare Manager)
+
+
+#Employee #1 UUID ( employee )
+
+
+#Employee #2 UUID ( employee )
+
+
+#Employee #3 UUID ( employee )
+
+
+#Employee #4 UUID ( employee )
+
