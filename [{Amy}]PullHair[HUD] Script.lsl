@@ -11,7 +11,7 @@ string desc_    = "(c)Amy (meljonna Resident) -";
 list avatarList = [];
 list avatarUUIDs = [];
 
-list main_menu      = [ "※MessHair", "※PullHair", "※PlayHair", "※Reset", "※Quit" ];
+list main_menu      = [ "※MessHair", "※PullHair", "※PlayHair", "※Panties", "※Reset", "※Quit" ];
 
 menu()
 {
@@ -61,7 +61,7 @@ default
             menu();
     }
 
-    listen(integer channel, string name, key id, string message)
+    listen(integer _channel, string name, key id, string message)
     {
         if (message == "※MessHair")
             state MessUp;
@@ -69,6 +69,8 @@ default
             state Pull;
         else if (message == "※PlayHair")
             state Play;
+        else if (message == "※Panties")
+            state Panties;
         else if (message == "※Reset")
             reset();
         else if (message == "※Quit")
@@ -107,10 +109,10 @@ state MessUp
             menu();
     }
 
-    listen(integer channel, string name, key id, string message)
+    listen(integer _channel, string name, key id, string message)
     {
         if (message == "※MessHair")
-            state MessUp;
+            state MessUpDialog;
         else if (message == "※Reset")
             resetInfo();
         else if (message == "※Quit")
@@ -130,11 +132,10 @@ state MessUpDialog
         llOwnerSay("You have 30seconds to send this.. or else you have to start over!");
     }
 
-    listen(integer channel, string name, key id, string message)
+    listen(integer _channel, string name, key id, string message)
     {
-        if ((channel == dlgChannel) && (llListFindList(avatarList, [message]) != -1)){
+        if ((_channel == dlgChannel) && (llListFindList(avatarList, [message]) != -1)){
             if (message != "※Cancel"){
-                list owner_name = llParseString2List(llGetDisplayName(llGetOwnerKey(llGetKey())), [""], []);
                 list targetName = [];
                 key targetKey;
                 targetName += [message];
@@ -186,10 +187,10 @@ state Pull
             menu();
     }
 
-    listen(integer channel, string name, key id, string message)
+    listen(integer _channel, string name, key id, string message)
     {
         if (message == "※PullHair")
-            state Pull;
+            state PullDialog;
         else if (message == "※Reset")
             resetInfo();
         else if (message == "※Quit")
@@ -209,11 +210,10 @@ state PullDialog
         llOwnerSay("You have 30seconds to send this.. or else you have to start over!");
     }
 
-    listen(integer channel, string name, key id, string message)
+    listen(integer _channel, string name, key id, string message)
     {
-        if ((channel == dlgChannel) && (llListFindList(avatarList, [message]) != -1)){
+        if ((_channel == dlgChannel) && (llListFindList(avatarList, [message]) != -1)){
             if (message != "※Cancel"){
-                list owner_name = llParseString2List(llGetDisplayName(llGetOwnerKey(llGetKey())), [""], []);
                 list targetName = [];
                 key targetKey;
                 targetName += [message];
@@ -265,10 +265,10 @@ state Play
             menu();
     }
 
-    listen(integer channel, string name, key id, string message)
+    listen(integer _channel, string name, key id, string message)
     {
         if (message == "※PlayHair")
-            state Play;
+            state PlayDialog;
         else if (message == "※Reset")
             resetInfo();
         else if (message == "※Quit")
@@ -288,11 +288,10 @@ state PlayDialog
         llOwnerSay("You have 30seconds to send this.. or else you have to start over!");
     }
 
-    listen(integer channel, string name, key id, string message)
+    listen(integer _channel, string name, key id, string message)
     {
         if ((channel == dlgChannel) && (llListFindList(avatarList, [message]) != -1)){
             if (message != "※Cancel"){
-                list owner_name = llParseString2List(llGetDisplayName(llGetOwnerKey(llGetKey())), [""], []);
                 list targetName = [];
                 key targetKey;
                 targetName += [message];
@@ -300,6 +299,84 @@ state PlayDialog
                 targetKey = llName2Key(targetID);
                 llSetObjectName("");
                 llSay(0, llGetDisplayName(llGetOwner()) + " plays with " + llGetDisplayName(targetKey) + "'s hair!");
+            }
+            reset();
+            state default;
+        }
+    }
+
+    timer()
+    {
+        reset();
+        state default;
+    }
+}
+
+state Panties
+{
+    state_entry()
+    {
+        llListen(listenChannel, "", llGetOwner(), "");
+        avatarList = [];
+        avatarUUIDs = [];
+        llSensor("", NULL_KEY, AGENT, 15.0, PI);
+    }
+
+    sensor(integer num_detected)
+    {
+        integer i;
+        while((i < num_detected) && (i < 9)){
+            if (llDetectedKey(i) != llGetOwner()){
+                avatarList += [llDetectedName(i)];
+                avatarUUIDs += [llDetectedKey(i)];
+            }
+            ++i;
+        }
+        if (llGetListLength(avatarList) > 0)
+            state PlayDialog;
+    }
+
+    touch_start(integer total_number)
+    {
+        key id = llDetectedKey(0);
+        if (id == llGetOwner())
+            menu();
+    }
+
+    listen(integer _channel, string name, key id, string message)
+    {
+        if (message == "※Panties")
+            state PantiesDialog;
+        else if (message == "※Reset")
+            resetInfo();
+        else if (message == "※Quit")
+            return;
+    }
+}
+
+state PantiesDialog
+{
+    state_entry()
+    {
+        llListen(listenChannel, "", llGetOwner(), "");
+        dlgHandle = llListen(dlgChannel, "", llGetOwner(), "");
+        llSetTimerEvent(30.0);
+        avatarList += ["※Cancel"];
+        llDialog(llGetOwner(), "Please select an avatar you want", avatarList, dlgChannel);
+        llOwnerSay("You have 30seconds to send this.. or else you have to start over!");
+    }
+
+    listen(integer _channel, string name, key id, string message)
+    {
+        if ((_channel == dlgChannel) && (llListFindList(avatarList, [message]) != -1)){
+            if (message != "※Cancel"){
+                list targetName = [];
+                key targetKey;
+                targetName += [message];
+                string targetID = (key)llList2String(targetName,0);
+                targetKey = llName2Key(targetID);
+                llSetObjectName("");
+                llSay(0, llGetDisplayName(llGetOwner()) + " steals " + llGetDisplayName(targetKey) + "'s panties!");
             }
             reset();
             state default;
