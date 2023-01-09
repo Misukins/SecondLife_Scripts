@@ -9,13 +9,13 @@ string vehicle;
 
 list buttons;
 
-float pos_x = 9.5;
-float pos_y = 5.0;
+float pos_x = 1.0;
+float pos_y = 2.0;
 float pos_z = 0.2;
 
 float rot_x = 0.0;
 float rot_y = 0.0;
-float rot_z = 0.0;
+float rot_z = 90.0;
 
 float time = 5.0;
 
