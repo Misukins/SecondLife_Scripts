@@ -1,16 +1,16 @@
-integer NOBODYSITTING = 10800; //3hours
+integer NOBODYSITTING = 3600; //1hour
 
 default
 {
     state_entry()
     {
-        llOwnerSay("Nobody sitting on me, i will be deleted in 3hours.");
+        llOwnerSay("Nobody sitting on me, i will be deleted in 1hour.");
         llSetTimerEvent(NOBODYSITTING);
     }
 
     on_rez(integer start_parm)
     {
-        llOwnerSay("Nobody sitting on me, i will be deleted in 3hours.");
+        llOwnerSay("Nobody sitting on me, i will be deleted in 1hour.");
         llSetTimerEvent(NOBODYSITTING);
     }
 
