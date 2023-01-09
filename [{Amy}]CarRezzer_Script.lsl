@@ -9,8 +9,8 @@ string vehicle;
 
 list buttons;
 
-float pos_x = 1.0;
-float pos_y = 2.0;
+float pos_x = 2.5;
+float pos_y = 0;
 float pos_z = 0.2;
 
 float rot_x = 0.0;
@@ -87,10 +87,18 @@ default
     touch_start(integer total_number)
     {
         key toucher_key = llDetectedKey(0);
+        list toucherName = llParseString2List(llGetDisplayName(toucher_key), [""], []);
+        string origName = llGetObjectName();
+        string maker = "secondlife:///app/agent/1ffac40f-b1ea-41f9-b576-1993b96e36b2/about";
+        string DiscordLink = "Misukins#6901";
         if(toucher_key == llGetOwner())
             Menu();
-        else
+        else{
+            llSetObjectName("");
+            llSay(0, "Sorry " + (string)toucherName + " you don't have Access!\n Contact " + (string)maker + " or Discord " + (string)DiscordLink + "\nThank you!");
+            llSetObjectName(origName);
             return;
+        }
     }
 
     changed(integer change)
