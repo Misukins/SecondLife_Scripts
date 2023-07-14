@@ -11,7 +11,7 @@ string desc_    = "(c)Amy (meljonna Resident) -";
 list avatarList = [];
 list avatarUUIDs = [];
 
-list main_menu      = [ "※MessHair", "※PullHair", "※PlayHair", "※Panties", "※Reset", "※Quit" ];
+list main_menu      = [ "※MessHair", "※PullHair", "※PlayHair", "※Panties", "※Bra", "※Reset", "※Quit" ];
 
 menu()
 {
@@ -71,6 +71,8 @@ default
             state Play;
         else if (message == "※Panties")
             state Panties;
+        else if (message == "※Bra")
+            state Bra;
         else if (message == "※Reset")
             reset();
         else if (message == "※Quit")
@@ -333,7 +335,7 @@ state Panties
             ++i;
         }
         if (llGetListLength(avatarList) > 0)
-            state PlayDialog;
+            state PantiesDialog;
     }
 
     touch_start(integer total_number)
@@ -377,6 +379,84 @@ state PantiesDialog
                 targetKey = llName2Key(targetID);
                 llSetObjectName("");
                 llSay(0, llGetDisplayName(llGetOwner()) + " steals " + llGetDisplayName(targetKey) + "'s panties!");
+            }
+            reset();
+            state default;
+        }
+    }
+
+    timer()
+    {
+        reset();
+        state default;
+    }
+}
+
+state Bra
+{
+    state_entry()
+    {
+        llListen(listenChannel, "", llGetOwner(), "");
+        avatarList = [];
+        avatarUUIDs = [];
+        llSensor("", NULL_KEY, AGENT, 15.0, PI);
+    }
+
+    sensor(integer num_detected)
+    {
+        integer i;
+        while((i < num_detected) && (i < 9)){
+            if (llDetectedKey(i) != llGetOwner()){
+                avatarList += [llDetectedName(i)];
+                avatarUUIDs += [llDetectedKey(i)];
+            }
+            ++i;
+        }
+        if (llGetListLength(avatarList) > 0)
+            state BraDialog;
+    }
+
+    touch_start(integer total_number)
+    {
+        key id = llDetectedKey(0);
+        if (id == llGetOwner())
+            menu();
+    }
+
+    listen(integer _channel, string name, key id, string message)
+    {
+        if (message == "※Bra")
+            state BraDialog;
+        else if (message == "※Reset")
+            resetInfo();
+        else if (message == "※Quit")
+            return;
+    }
+}
+
+state BraDialog
+{
+    state_entry()
+    {
+        llListen(listenChannel, "", llGetOwner(), "");
+        dlgHandle = llListen(dlgChannel, "", llGetOwner(), "");
+        llSetTimerEvent(30.0);
+        avatarList += ["※Cancel"];
+        llDialog(llGetOwner(), "Please select an avatar you want", avatarList, dlgChannel);
+        llOwnerSay("You have 30seconds to send this.. or else you have to start over!");
+    }
+
+    listen(integer _channel, string name, key id, string message)
+    {
+        if ((_channel == dlgChannel) && (llListFindList(avatarList, [message]) != -1)){
+            if (message != "※Cancel"){
+                list targetName = [];
+                key targetKey;
+                targetName += [message];
+                string targetID = (key)llList2String(targetName,0);
+                targetKey = llName2Key(targetID);
+                llSetObjectName("");
+                llSay(0, llGetDisplayName(llGetOwner()) + " steals " + llGetDisplayName(targetKey) + "'s bra!");
             }
             reset();
             state default;

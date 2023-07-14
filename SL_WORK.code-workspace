@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "../Amy_CameraMod/SL-Camera-MOD"
+		},
+		{
+			"path": "../SL-Amy-KiljuMaker"
 		}
 	],
 	"settings": {
