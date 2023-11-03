@@ -4,36 +4,36 @@ so far so good.. still alot work
 
 */
 
-key targetKey           = NULL_KEY;
+key targetKey                               = NULL_KEY;
 
-float DELAY = 0.5;
-float TAU = 1.0;
-float LIMIT = 60.0;
-float Walking_Sound_Speed = 1.0;
-float Volume_For_Sounds = 0.05;
-float Volume_For_Bell = 0.2;
-float seconds_to_check_when_avatar_walks = 0.01;
+float DELAY                                 = 0.5;
+float TAU                                   = 1.0;
+float LIMIT                                 = 60.0;
+float Walking_Sound_Speed                   = 1.0;
+float Volume_For_Sounds                     = 0.05;
+float Volume_For_Bell                       = 0.2;
+float seconds_to_check_when_avatar_walks    = 0.01;
+float soundsVolume                          = 1.0;
 
-integer RANGE = 2;
-integer WalkingSound;
-integer walking         = FALSE;
-integer leshedON        = FALSE;
-integer announced       = FALSE;
-integer ll_channel      = 665;
-integer COLLAR_FACE     = 1;
-integer dlgHandle       = -1;
-integer defdist       = TRUE;
-integer fivemDist     = FALSE;
-integer tenmDist      = FALSE;
-integer fifteenmDist  = FALSE;
-integer twentyMDist   = FALSE;
-
-integer globalListenHandle  = -0;
 integer channel;
 integer listen_handle;
-integer tid = 0;
-
-integer listenChannel = 1;
+integer WalkingSound;
+integer walking             = FALSE;
+integer leshedON            = FALSE;
+integer announced           = FALSE;
+integer defdist             = TRUE;
+integer fivemDist           = FALSE;
+integer tenmDist            = FALSE;
+integer fifteenmDist        = FALSE;
+integer twentyMDist         = FALSE;
+integer gotPermission       = FALSE;
+integer ll_channel          = 665;
+integer COLLAR_FACE         = 1;
+integer dlgHandle           = -1;
+integer globalListenHandle  = -0;
+integer tid                 = 0;
+integer RANGE               = 2;
+integer listenChannel       = 1;
 
 list main_menu;
 //list sounds_menu      = [ "Bell 1", "←", "▼"];
@@ -42,15 +42,19 @@ list users_menu         = ["Add", "Remove", "List", "←", "▼"];
 list accessList         = [];
 list avatarList         = [];
 list avatarUUIDs        = [];
-list distance_menu       = [];
+list distance_menu      = [];
+list anims_menu         = [];
 /* //NOTE Coming soon.. (walk sounds) with on/off option
 string Default_Start_Walking_Sound = "";
 string Default_Walking_Sound = "";
 string Default_Stop_Walking_Sound = "";
 */
 
-string sound_1 = "7b04c2ee-90d9-99b8-fd70-8e212a72f90d";
-string sound_9 = "23e2a7d9-6dd1-6549-942c-feb4d591cc08";
+//sound
+string tpSound      = "93070de9-ffe7-8f9e-cbbe-7a570a9a0410"; //Bleep!!!!
+
+string sound_1      = "7b04c2ee-90d9-99b8-fd70-8e212a72f90d";
+string sound_9      = "23e2a7d9-6dd1-6549-942c-feb4d591cc08";
 /*
 string sound_2 = "b442e334-cb8a-c30e-bcd0-5923f2cb175a";
 string sound_3 = "1acaf624-1d91-a5d5-5eca-17a44945f8b0";
@@ -64,14 +68,15 @@ string sound_8 = "1dc1e689-3fd8-13c5-b57f-3fedd06b827a";
 //TODO ~ more textures
 string blackTexture = "9af0ef91-122c-d867-d066-81c7929cdb40"; //Black
 string whiteTexture = "6b2ffa5f-dc71-c551-c9eb-9ce636c7ef84"; //White
-string brownTexture = "1d32a1d4-538c-a1fe-1d9f-33a95867e060"; // Brown
-string redTexture = "ed55e038-2e2d-4372-d0c8-a1ce50e74b81"; // Red
+string brownTexture = "1d32a1d4-538c-a1fe-1d9f-33a95867e060"; //Brown
+string redTexture   = "ed55e038-2e2d-4372-d0c8-a1ce50e74b81"; //Red
 
 string API_Start_Sound;
 string API_Stop_Sound;
-string targetName = "";
-string objectName = "(TEMP): Collar - Leash";
-string desc_    = "(c)Amy (meljonna Resident) -";
+
+string targetName   = "";
+string objectName   = "(TEMP): Collar - Leash";
+string desc_        = "(c)Amy (meljonna Resident) -";
 
 // TODO list START
 /* //NOTE so far this works 100% but leash goesto Avi Center looks stupid!!
@@ -81,7 +86,7 @@ string desc_    = "(c)Amy (meljonna Resident) -";
 //FIX link leash to collar LOGO
 what else? oh
 //FIX after teleport checks
-//FIX range checks
+//FIX range checks (DONE)
 //FIX CLEAN UP!!!
 //FIX Sorry, someone who outranks you on
 */ //TODO list END
@@ -108,7 +113,7 @@ menu(key _id)
         llDialog(_id, "Hello " + (string)avatar_name + " Select a an option\nCurrent Follow Distance :: " + (string)RANGE + " meter(s)", main_menu, channel);
     }
     else{
-        main_menu = ["Unleash", "Distance", "▼"];
+        main_menu = ["Unleash", "Animation", "Distance", "▼"];
         llDialog(_id, "Hello " + (string)avatar_name + " Select a an option\nCurrent Follow Distance :: " + (string)RANGE + " meter(s)", main_menu, channel);
     }
 }
@@ -116,9 +121,9 @@ menu(key _id)
 ownermenu(key _id)
 {
     if(!WalkingSound)
-        main_menu = ["On", "Textures", "Users", "Reset", "▼"];
+        main_menu = ["On", "Animation", "Textures", "Users", "Reset", "▼"];
     else
-        main_menu = ["Off", "Textures", "Users", "Reset", "▼"];
+        main_menu = ["Off", "Animation", "Textures", "Users", "Reset", "▼"];
     list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
     channel = llFloor(llFrand(2000000));
     listen_handle = llListen(channel, "", _id, "");
@@ -159,6 +164,15 @@ distanceMenu(key id)
     llDialog(id, "Hello " + (string)avatar_name + " Select a an option\nCurrent Distance :: "+ (string)RANGE + " meter(s)", distance_menu, channel);
 }
 
+animsmenu(key _id)
+{
+    anims_menu = ["booty", "bendover", "cutie", "kneel", "doggie", "STOP", "▼"];
+    list avatar_name = llParseString2List(llGetDisplayName(_id), [""], []);
+    channel = llFloor(llFrand(2000000));
+    listen_handle = llListen(channel, "", _id, "");
+    llDialog(_id, "Hello " + (string)avatar_name + " Select a an option", anims_menu, channel);
+}
+
 dumpAccessList()
 {
     llOwnerSay("current access list:\n" + llDumpList2String(accessList, ", "));
@@ -197,15 +211,15 @@ soundsOFF()
 
 stopFollowing(key id)
 {
-  string origName = llGetObjectName();
-  list username = llParseString2List(llGetDisplayName(id), [""], []);
-  list owner = llParseString2List(llGetDisplayName(llGetOwner()), [""], []);
-  llTargetRemove(tid);
-  llStopMoveToTarget();
-  llSetObjectName(llKey2Name(llGetOwner())+ "'s Collar");
-  llOwnerSay("No longer following " + (string)username + ".");
-  llSay(0, (string)username + " lets go " + (string)owner + "'s leash.");
-  llSetObjectName(origName);
+    string origName = llGetObjectName();
+    list username = llParseString2List(llGetDisplayName(id), [""], []);
+    list owner = llParseString2List(llGetDisplayName(llGetOwner()), [""], []);
+    llTargetRemove(tid);
+    llStopMoveToTarget();
+    llSetObjectName(llKey2Name(llGetOwner())+ "'s Collar");
+    llOwnerSay("No longer following " + (string)username + ".");
+    llSay(0, (string)username + " lets go " + (string)owner + "'s leash.");
+    llSetObjectName(origName);
 }
 
 startFollowingName(string name)
@@ -216,37 +230,51 @@ startFollowingName(string name)
 
 startFollowingKey(key id)
 {
-  string origName = llGetObjectName();
-  list username = llParseString2List(llGetDisplayName(id), [""], []);
-  list owner = llParseString2List(llGetDisplayName(llGetOwner()), [""], []);
-  targetKey = id;
-  llSetObjectName(llKey2Name(llGetOwner())+ "'s Collar");
-  llOwnerSay("You are now following " + (string)username + ".");
-  llSay(0, (string)username + " grabs " + (string)owner + "'s leash.");
-  llSetObjectName(origName);
-  keepFollowing();
-  llSetTimerEvent(DELAY);
+    string origName = llGetObjectName();
+    list username = llParseString2List(llGetDisplayName(id), [""], []);
+    list owner = llParseString2List(llGetDisplayName(llGetOwner()), [""], []);
+    targetKey = id;
+    llSetObjectName(llKey2Name(llGetOwner())+ "'s Collar");
+    llOwnerSay("You are now following " + (string)username + ".");
+    llSay(0, (string)username + " grabs " + (string)owner + "'s leash.");
+    llSetObjectName(origName);
+    keepFollowing();
+    llSetTimerEvent(DELAY);
 }
 
 keepFollowing()
 {
-  llTargetRemove(tid);
-  llStopMoveToTarget();
-  list answer = llGetObjectDetails(targetKey,[OBJECT_POS]);
-  string origName = llGetObjectName();
-  if (llGetListLength(answer) == 0)
-    announced = TRUE;
-  else{
-    announced = FALSE;
-    vector targetPos = llList2Vector(answer,0);
-    float dist = llVecDist(targetPos, llGetPos());
-    if (dist > RANGE) {
-      tid = llTarget(targetPos, RANGE);
-      if (dist>LIMIT)
-        targetPos = llGetPos() + LIMIT * llVecNorm( targetPos - llGetPos() );
-      llMoveToTarget(targetPos,TAU);
+    llTargetRemove(tid);
+    llStopMoveToTarget();
+    list answer = llGetObjectDetails(targetKey,[OBJECT_POS]);
+    string origName = llGetObjectName();
+    if (llGetListLength(answer) == 0){
+        if (!announced){
+            llSetObjectName(objectName);
+            llOwnerSay(targetName + " seems to be out of range.  Waiting for return...");
+            llSetObjectName(origName);
+        }
+        announced = TRUE;
     }
-  }
+    else {
+        announced = FALSE;
+        vector targetPos = llList2Vector(answer,0);
+        float dist = llVecDist(targetPos,llGetPos());
+        if (dist > RANGE) {
+            tid = llTarget(targetPos, RANGE);
+            if (dist>LIMIT)
+                targetPos = llGetPos() + LIMIT * llVecNorm( targetPos - llGetPos() );
+            llMoveToTarget(targetPos,TAU);
+        }
+    }
+}
+
+stopAllAnimations()
+{
+    list anims = llGetAnimationList(llGetOwner());
+    integer n;
+    for (n = 0; n < llGetListLength(anims); n++)
+        llStopAnimation(llList2String(anims,n));
 }
 
 default
@@ -258,6 +286,9 @@ default
         globalListenHandle = llListen(ll_channel, "", llGetOwner(), "");
         llSetObjectName(llKey2Name(llGetOwner()) + "'s Collar");
         llOwnerSay("Type /" +  (string)ll_channel + "menu for Menu");
+        llPreloadSound(tpSound);
+        if(llGetAttached())
+            llRequestPermissions(llGetOwner(), PERMISSION_TRIGGER_ANIMATION);
         if(llGetAttached() != 0){
             llSetTimerEvent(seconds_to_check_when_avatar_walks);
             asLoadSounds();
@@ -355,20 +386,42 @@ default
             llSetLinkTexture(LINK_THIS, redTexture, COLLAR_FACE);
             texturesmenu(id);
         }
-        else if (message == "Users"){
+        else if (message == "Users")
             usersmenu(id);
-        }
-        else if (message == "List"){
+        else if (message == "List")
             dumpAccessList();
-        }
-        else if (message == "Add"){
+        else if (message == "Add")
             state Owner;
-        }
-        else if (message == "Remove"){
+        else if (message == "Remove")
             state Remove;
-        }
         else if (message == "menu")
             ownermenu(id);
+        else if (message == "Animation"){
+            animsmenu(id);
+            stopAllAnimations();
+        }
+        else if (message == "booty"){
+            if(gotPermission)
+                llStartAnimation("booty");
+        }
+        else if (message == "bendover"){
+            if(gotPermission)
+                llStartAnimation("bendover");
+        }
+        else if (message == "cutie"){
+            if(gotPermission)
+                llStartAnimation("cutie");
+        }
+        else if (message == "kneel"){
+            if(gotPermission)
+                llStartAnimation("kneel");
+        }
+        else if (message == "doggie"){
+            if(gotPermission)
+                llStartAnimation("doggie");
+        }
+        else if (message == "STOP")
+            stopAllAnimations();
         else if (message == "Reset")
             llResetScript();
         else if (message == "Distance")
@@ -441,7 +494,7 @@ default
     attach(key _id)
     {
         if (_id != NULL_KEY){
-            llRequestPermissions(llGetOwner(), PERMISSION_ATTACH | PERMISSION_TAKE_CONTROLS);
+            llRequestPermissions(llGetOwner(), PERMISSION_ATTACH | PERMISSION_TRIGGER_ANIMATION);
             llAttachToAvatar(ATTACH_NECK);
             dumpAccessList();
         }
@@ -453,10 +506,19 @@ default
             llResetScript();
 
         if (change & CHANGED_TELEPORT)
-            llOwnerSay("[INFO]: This is temp.. after TP :P");
+        {
+            llTriggerSound(tpSound, soundsVolume);
+            //TODO MORE FEATURES?
+        }
 
         if(llGetInventoryNumber(INVENTORY_SOUND) > 0)
             asLoadSounds();
+    }
+
+    run_time_permissions(integer perm)
+    {
+        if(perm & PERMISSION_TRIGGER_ANIMATION)
+            gotPermission = TRUE;
     }
 
     no_sensor()
@@ -490,7 +552,7 @@ default
         if(leshedON)
             keepFollowing();
     }
-
+        //WHY???????
     /* state_exit()
     {
         llSetTimerEvent(0);
@@ -503,7 +565,7 @@ state Remove
     {
         llListen(listenChannel, "", llGetOwner(), "");
         llOwnerSay("type /" + (string)listenChannel + "del (username), you have 1min (60seconds)!");
-        llSetTimerEvent(60);
+        llSetTimerEvent(60); //60 Seconds
         dumpAccessList();
     }
 
@@ -522,7 +584,7 @@ state Remove
                     accessList = llDeleteSubList(accessList, pos, pos);
                     llSetObjectName("");
                     llOwnerSay("Removed: secondlife:///app/agent/" + (string)targetKey + "/about for access list.");
-                    //llInstantMessage(targetKey, "secondlife:///app/agent/" + (string)id + "/about removed you from her Collar.");
+                    //llInstantMessage(targetKey, "secondlife:///app/agent/" + (string)id + "/about removed you from theyr Collar.");
                     llSetObjectName(origName);
                     state default;
                 }
@@ -567,7 +629,7 @@ state OwnerDialog
     state_entry()
     {
         dlgHandle = llListen(listenChannel, "", "", "");
-        llSetTimerEvent(30.0);
+        llSetTimerEvent(30.0); //30 seconds
         avatarList += ["※Cancel"];
         llDialog(llGetOwner(), "Please select an avatar you want", avatarList, listenChannel);
         llOwnerSay("You have 30seconds to send this.. or else you have to start over!");
@@ -583,7 +645,7 @@ state OwnerDialog
             accessList = llListInsertList(accessList, [avatar], 0);
             llSetObjectName("");
             llOwnerSay("Added: secondlife:///app/agent/" + (string)targetKey + "/about to access list.");
-            llInstantMessage(targetKey, "secondlife:///app/agent/" + (string)id + "/about added you to her Collar.");
+            llInstantMessage(targetKey, "secondlife:///app/agent/" + (string)id + "/about added you to theyr Collar.");
             llSetObjectName(origName);
             Cleanup();
             state default;
