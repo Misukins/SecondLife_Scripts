@@ -82,12 +82,11 @@ list oranges = ["orange",<1,0.65,0>,"darkorange",<1,0.55,0>,"coral",<1,0.5,0.31>
 list sub_menu;
 list main_menu = ["grayscale", "reds", "pinks", "violets", "dk_blues", "lt_blues", "yellows", "dk_greens", "lt_greens", "oranges", "DEFAULT", "▼"];
 
-
 string csName       = " CARNAGE ";
-string version      = "v8.6.8a ";
-string customTitle  = "Vampire";
+string version      = "v0.0.1b ";
+string customTitle  = "Unamed Player";
 string statusText   = "COMBAT+RP";
-string desc_        = "(c)Amy (meljonna Resident)";
+string desc_        = "(c)Vanessa (meljonna Resident)";
 string InfoNote     = "CARNAGE - Information";
 
 string Float2String ( float num, integer places, integer rnd)

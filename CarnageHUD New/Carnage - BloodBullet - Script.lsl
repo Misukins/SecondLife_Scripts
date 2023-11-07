@@ -10,7 +10,6 @@ string WeaponType       = "bloodball";
 string DamageType       = "bloodball";
 string SubDamageType    = "sword";
 
-
 particle()
 {
     llParticleSystem([

@@ -3,11 +3,8 @@ integer Receiver;
 integer startParam = 1;
 integer llChan     = -458704;
 
-string name;
-string keyname;
-string object = "bullet"; 
-
-list Spisok=["suemir Seorn", "", ""]; 
+string fireballcast = "f6d4dd62-c5ff-5007-b8f4-2603e3692b9c";
+string object = "BloodBullet";
 
 rotation relativeRot = <.1,.0,.0,.0>; 
 
@@ -20,8 +17,7 @@ default
     {
         if(llGetAttached())
             llSay(llChan, "casterON");
-        llPreloadSound("fireballcast");
-        llPreloadSound("lazerclick");
+        llPreloadSound(fireballcast);
         Receiver = llListen(330, "", NULL_KEY, "");
         llRequestPermissions(llGetOwner(), PERMISSION_TAKE_CONTROLS);
     }
@@ -86,7 +82,7 @@ default
             vector rezVel = relativeVel*myRot;
             rotation rezRot = relativeRot*myRot;
             llRezObject(object, rezPos, rezVel, rezRot, startParam);
-            llTriggerSound("fireballcast", 1.0);
+            llTriggerSound(fireballcast, 1.0);
         }
     }
 }
