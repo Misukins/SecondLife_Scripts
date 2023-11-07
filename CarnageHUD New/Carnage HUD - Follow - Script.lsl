@@ -24,7 +24,7 @@ integer DEBUG         = FALSE;
 
 string targetName     = "";
 string objectName     = "Carnage Hud - Follower";
-string desc_          = "(c)Amy (meljonna Resident) - ";
+string desc_          = "(c)Vanessa (meljonna Resident) - ";
 
 list avatarList       = [];
 list avatarUUIDs      = [];

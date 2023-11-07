@@ -1,9 +1,11 @@
 string output;
+string desc_          = "(c)Vanessa (meljonna Resident) - ";
 
 default
 {
     state_entry()
     {
+        llSetObjectDesc(desc_);
         llSensorRepeat("", "", AGENT_BY_LEGACY_NAME, 100, PI, 0.1);
     }
 

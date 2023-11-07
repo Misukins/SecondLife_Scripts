@@ -5,6 +5,7 @@ integer llChan     = -458704;
 
 string fireballcast = "f6d4dd62-c5ff-5007-b8f4-2603e3692b9c";
 string object = "BloodBullet";
+string desc_          = "(c)Vanessa (meljonna Resident) - ";
 
 rotation relativeRot = <.1,.0,.0,.0>; 
 
@@ -15,6 +16,7 @@ default
 {
     state_entry()
     {
+        llSetObjectDesc(desc_);
         if(llGetAttached())
             llSay(llChan, "casterON");
         llPreloadSound(fireballcast);

@@ -86,7 +86,7 @@ string csName       = " CARNAGE ";
 string version      = "v0.0.1b ";
 string customTitle  = "Unamed Player";
 string statusText   = "COMBAT+RP";
-string desc_        = "(c)Vanessa (meljonna Resident)";
+string desc_          = "(c)Vanessa (meljonna Resident) - ";
 string InfoNote     = "CARNAGE - Information";
 
 string Float2String ( float num, integer places, integer rnd)

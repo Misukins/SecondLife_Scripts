@@ -22,7 +22,7 @@ integer random_chance(){
     return FALSE;
 }
 
-string desc_    = "(c)Amy (meljonna Resident) - ";
+string desc_          = "(c)Vanessa (meljonna Resident) - ";
 string objectname;
 
 list avatarList = [];

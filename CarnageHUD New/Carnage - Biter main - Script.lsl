@@ -8,6 +8,7 @@ string MissSound = "vamproar";
 string AttackAnimation = "vampbite01s";
 string DrawSound = "hungerdraw"; 
 string SheathSound = "wolfsheath"; 
+string desc_          = "(c)Vanessa (meljonna Resident) - ";
 
 float SoundVolume = 1.0;
 float Range = 1.5; 
@@ -37,6 +38,7 @@ default
 {
     state_entry()
     {
+        llSetObjectDesc(desc_);
         if(llGetAttached())
             llSay(llChan, "biterON");
         if(AutoSheathOnRez)

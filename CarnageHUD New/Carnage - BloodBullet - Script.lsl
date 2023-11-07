@@ -9,6 +9,7 @@ integer DynamicChannel()
 string WeaponType       = "bloodball";
 string DamageType       = "bloodball";
 string SubDamageType    = "sword";
+string desc_          = "(c)Vanessa (meljonna Resident) - ";
 
 particle()
 {
@@ -43,6 +44,7 @@ default
 {
     state_entry()
     {
+        llSetObjectDesc(desc_);
         particle();
         llTargetOmega(<-20, 20, 20>, -0.4, -4.0);
         //llSetTimerEvent(5.0); //NOTE - closed for now 

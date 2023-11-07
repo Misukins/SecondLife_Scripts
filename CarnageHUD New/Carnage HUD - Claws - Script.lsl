@@ -4,6 +4,8 @@ integer biterON         = FALSE;
 integer gotPermission   = FALSE;
 integer toggle          = FALSE;
 
+string desc_          = "(c)Vanessa (meljonna Resident) - ";
+
 vector color_OFF        = <0.876, 0, 0>;
 vector color_ON         = <0, 0.876, 0>;
 
@@ -11,6 +13,7 @@ default
 {
     state_entry()
     {
+        llSetObjectDesc(desc_);
         llListen(llChan, "", "", "");
         llPreloadSound("vamplaugh");
         llPreloadSound("chokehigh");

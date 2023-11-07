@@ -9,6 +9,8 @@ integer casterON        = FALSE;
 integer gotPermission   = FALSE;
 integer HUD_ON;
 
+string desc_          = "(c)Vanessa (meljonna Resident) - ";
+
 vector color_USED       = <0.30, 0.30, 0.30>;
 vector color_UNUSED     = <1, 1, 1>;
 vector color_ONCOOLDOWN = <0, 0, 0>;
@@ -29,6 +31,7 @@ default
 {
     state_entry()
     {
+        llSetObjectDesc(desc_);
         llSetLinkColor(LINK_THIS, color_UNUSED, ALL_SIDES);
         llListen(llChan, "", "", "");
         llListen(listenChannel, "", "", "");

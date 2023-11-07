@@ -5,6 +5,7 @@ string HitSound         = "hit";
 string MissSound        = "swingmiss2";
 string DrawSound        = "draw1";
 string SheathSound      = "sheath";
+string desc_          = "(c)Vanessa (meljonna Resident) - ";
 
 float SoundVolume   = 1.0;
 float Range         = 2.5;
@@ -34,6 +35,7 @@ default
 {
     state_entry()
     {
+        llSetObjectDesc(desc_);
         if(llGetAttached()){
             llSay(llChan, "batsON");
         }

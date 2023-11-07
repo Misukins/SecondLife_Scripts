@@ -3,11 +3,13 @@ float volume = 1.0;
 integer listenChannel = -458790;
 
 string clicksound = "aa12c98d-7ffe-f521-10cc-fd4ba3a63275";
+string desc_          = "(c)Vanessa (meljonna Resident) - ";
 
 default
 {
     state_entry()
     {
+        llSetObjectDesc(desc_);
         llPreloadSound(clicksound);
     }
 

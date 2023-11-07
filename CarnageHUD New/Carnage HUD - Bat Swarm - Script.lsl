@@ -9,6 +9,8 @@ integer draw            = FALSE;
 integer meterON;
 integer HUD_ON;
 
+string desc_          = "(c)Vanessa (meljonna Resident) - ";
+
 vector color_OFF        = <0.876, 0, 0>;
 vector color_ON         = <0, 0.876, 0>;
 
@@ -16,6 +18,7 @@ default
 {
     state_entry()
     {
+        llSetObjectDesc(desc_);
         llListen(listenChannel, "", "", "");
         llListen(llChan, "", "", "");
         llPreloadSound(vamplaugh);

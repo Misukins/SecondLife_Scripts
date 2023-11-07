@@ -6,7 +6,7 @@ integer Prim;
 integer Channel;
 integer Listener;
 
-string desc_          = "(c)Amy (meljonna Resident) - ";
+string desc_          = "(c)Vanessa (meljonna Resident) - ";
 
 Chan()
 {
@@ -40,6 +40,7 @@ default
 {
     state_entry()
     {
+        llSetObjectDesc(desc_);
         owner = llGetOwner();
     }
 
