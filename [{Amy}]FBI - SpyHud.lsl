@@ -592,9 +592,4 @@ state SpyAvatar
             llResetScript();
         }
     }
-
-    state_exit()
-    {
-        //FIX
-    }
 }
