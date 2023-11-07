@@ -134,7 +134,9 @@ doMenu(key id)
         + "Stamina: "   + (string)manaMax + "\n"
         + "Blood: "     + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters.\n"
         + "Armor: "     + (string)armor + "\n"
-        + "Damage: "    + (string)damage + "\n", main_buttons, _chan);
+        + "Damage: "    + (string)damage + "\n"
+        + "Level: "    + (string)level + "\n"
+        + "PerkPoints: "    + (string)attributePoints + "\n", main_buttons, _chan);
 }
 
 doDEBUGmenu(key id)
@@ -169,7 +171,9 @@ doPerksMenu(key id)
         + "Stamina: "   + (string)manaMax + "\n"
         + "Blood: "     + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters.\n"
         + "Armor: "     + (string)armor + "\n"
-        + "Damage: "    + (string)damage + "\n", perk_buttons, _chan);
+        + "Damage: "    + (string)damage + "\n"
+        + "Level: "    + (string)level + "\n"
+        + "PerkPoints: "    + (string)attributePoints + "\n", perk_buttons, _chan);
 }
 
 setStatusText()
@@ -253,6 +257,7 @@ stats()
         + "Blood: " + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + "\n"
         + "Armor: " + (string)armor + "\n"
         + "Damage: " + (string)damage + "\n"
+        + "PerkPoints: " + (string)attributePoints + "\n"
         + "Level/EXP: " + (string)level + " : " + (string)Float2String(gain, 2, FALSE) + "/" + (string)Float2String(totalExperience, 2, FALSE) + "\n"
         + "--------------------------------------------"
     );
@@ -656,6 +661,8 @@ default
             setStatusText();
             state dead;
         }
+        else if (message == "» Stats «")
+            stats();
         else if (message == "» Perks «")
             doPerksMenu(user);
         else if (message == "» DEBUG «")

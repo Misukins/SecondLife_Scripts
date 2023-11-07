@@ -44,6 +44,12 @@ default
         owner = llGetOwner();
     }
 
+    changed(integer change)
+    {
+        if (change & CHANGED_OWNER)
+            llResetScript();
+    }
+
     touch_start(integer total_number)
     {
         owner = llGetOwner();

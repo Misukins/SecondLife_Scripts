@@ -8,6 +8,12 @@ default
         //!TODO
     }
 
+    changed(integer change)
+    {
+        if (change & CHANGED_OWNER)
+            llResetScript();
+    }
+
     touch_start(integer total_number)
     {
         //!TODO
