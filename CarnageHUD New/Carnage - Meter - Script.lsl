@@ -129,13 +129,13 @@ doMenu(key id)
     _chan = llFloor(llFrand(2000000));
     hand = llListen(_chan, "", id, "");
     llDialog(id, (string)llGetDisplayName(id) + " (" + (string)llKey2Name(id) + ") Carnage Meter Menu\n"
-        + "You have "   + (string)attributePoints + " Perk Points to use.\nCurrent Stats :: \n"
-        + "Health: "    + (string)healthMax + "\n"
-        + "Stamina: "   + (string)manaMax + "\n"
-        + "Blood: "     + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters.\n"
-        + "Armor: "     + (string)armor + "\n"
-        + "Damage: "    + (string)damage + "\n"
-        + "Level: "    + (string)level + "\n"
+        + "You have "       + (string)attributePoints + " Perk Points to use.\nCurrent Stats :: \n"
+        + "Health: "        + (string)healthMax + "\n"
+        + "Stamina: "       + (string)manaMax + "\n"
+        + "Blood: "         + (string)Float2String(blood, 2, FALSE) + "/" + (string)Float2String(bloodMax, 2, FALSE) + " liters.\n"
+        + "Armor: "         + (string)armor + "\n"
+        + "Damage: "        + (string)damage + "\n"
+        + "Level: "         + (string)level + "\n"
         + "PerkPoints: "    + (string)attributePoints + "\n", main_buttons, _chan);
 }
 
