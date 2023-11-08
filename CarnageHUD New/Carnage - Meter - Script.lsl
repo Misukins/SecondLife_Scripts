@@ -106,9 +106,9 @@ string Float2String ( float num, integer places, integer rnd)
     return (string)num;
 }
 
-vector color            = <1, 1, 1>; //NOTE WHITE
-vector color_AFK        = <0.876, 0, 0>; //NOTE RED
-vector color_RP         = <0, 0.876, 0>; //NOTE GREEN
+vector color            = <1, 1, 1>;        //NOTE WHITE
+vector color_AFK        = <0.876, 0, 0>;    //NOTE RED
+vector color_RP         = <0, 0.876, 0>;    //NOTE GREEN
 //NOTE AMY EDIT END
 
 doMenu(key id)
