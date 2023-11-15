@@ -415,7 +415,7 @@ state Dialog
           llResetScript();
   }
 
-  /* touch_start(integer total_number)
+  touch_start(integer total_number)
   {
     key _id = llDetectedKey(0);
     if (_id == llGetOwner()){
@@ -424,7 +424,7 @@ state Dialog
         reset();
         state default;
     }
-  } */
+  }
 
   listen(integer channel, string name, key id, string message)
   {
