@@ -37,7 +37,7 @@ integer listenChannel       = 1;
 
 list main_menu;
 //list sounds_menu      = [ "Bell 1", "←", "▼"];
-list textures_menu      = ["Black", "White", "Brown", "Red", "←", "▼"];
+list textures_menu      = ["Pink", "Black", "White", "Brown", "Red", "←", "▼"];
 list users_menu         = ["Add", "Remove", "List", "←", "▼"];
 list accessList         = [];
 list avatarList         = [];
@@ -67,6 +67,7 @@ string blackTexture = "9af0ef91-122c-d867-d066-81c7929cdb40"; //Black
 string whiteTexture = "6b2ffa5f-dc71-c551-c9eb-9ce636c7ef84"; //White
 string brownTexture = "1d32a1d4-538c-a1fe-1d9f-33a95867e060"; //Brown
 string redTexture   = "ed55e038-2e2d-4372-d0c8-a1ce50e74b81"; //Red
+string pinkTexture  = "29119f4e-db2c-7d06-5a50-52913f08b54f"; //Pink
 string tpSound      = "93070de9-ffe7-8f9e-cbbe-7a570a9a0410"; //Bleep!!!!
 
 string API_Start_Sound;
@@ -384,6 +385,10 @@ default
             llSetLinkTexture(LINK_THIS, redTexture, COLLAR_FACE);
             texturesmenu(id);
         }
+        else if (message == "Pink"){
+            llSetLinkTexture(LINK_THIS, pinkTexture, COLLAR_FACE);
+            texturesmenu(id);
+        }
         else if (message == "Users")
             usersmenu(id);
         else if (message == "List")
@@ -550,7 +555,7 @@ default
         if(leshedON)
             keepFollowing();
     }
-    	//WHY???????
+        //WHY???????
     /* state_exit()
     {
         llSetTimerEvent(0);
